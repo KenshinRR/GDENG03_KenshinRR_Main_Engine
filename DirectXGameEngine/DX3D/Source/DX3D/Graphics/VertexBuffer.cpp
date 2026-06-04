@@ -5,9 +5,9 @@ dx3d::VertexBuffer::VertexBuffer(const VertexBufferDesc& desc, const GraphicsRes
 	m_vertexSize(desc.vertexSize),
 	m_vertexListSize(desc.vertexListSize)
 {
-	if (!desc.vertexList) DX3DLogThrowErrorInvalidArg("No vertex list provided!");
-	if (!desc.vertexListSize) DX3DLogThrowErrorInvalidArg("Vertex list size must be non-zero!");
-	if (!desc.vertexSize) DX3DLogThrowErrorInvalidArg("Vertex list size must be non-zero!");
+	if (!desc.vertexList) DX3DLogThrowInvalidArg("No vertex list provided!");
+	if (!desc.vertexListSize) DX3DLogThrowInvalidArg("Vertex list size must be non-zero!");
+	if (!desc.vertexSize) DX3DLogThrowInvalidArg("Vertex list size must be non-zero!");
 
 	D3D11_BUFFER_DESC buffDesc{};
 	buffDesc.ByteWidth = desc.vertexListSize * desc.vertexSize;

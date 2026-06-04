@@ -7,7 +7,7 @@ dx3d::GraphicsPipelineState::GraphicsPipelineState(const GraphicsPipelineStateDe
 	GraphicsResource(gDesc)
 {
 	if (desc.ps.getType() != ShaderType::PixelShader)
-		DX3DLogThrowErrorInvalidArg("The 'ps' member is not a valid pixel shader binary.");
+		DX3DLogThrowInvalidArg("The 'ps' member is not a valid pixel shader binary.");
 
 	auto vs = desc.vs.getShaderBinaryData();
 	auto ps = desc.ps.getData();

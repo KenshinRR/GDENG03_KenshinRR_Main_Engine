@@ -3,8 +3,7 @@
 
 dx3d::Logger::Logger(LogLevel logLevel): m_logLevel(logLevel)
 {
-	std::clog << "GDENG03 KenshinRR" << "\n";
-	std::clog << "-----------------" << "\n";
+
 }
 
 dx3d::Logger::~Logger()

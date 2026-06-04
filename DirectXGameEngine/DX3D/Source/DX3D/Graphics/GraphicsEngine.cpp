@@ -66,6 +66,7 @@ dx3d::GraphicsEngine::GraphicsEngine(const GraphicsEngineDesc& desc) : Base(desc
 	};
 
 	m_vb = device.createVertexBuffer({ vertexList , std::size(vertexList), sizeof(Vertex)});
+	m_cb = device.createConstantBuffer({ {}, sizeof(ConstantData) });
 }
 
 dx3d::GraphicsEngine::~GraphicsEngine()
@@ -77,9 +78,17 @@ GraphicsDevice& dx3d::GraphicsEngine::getGraphicsDevice() noexcept
 	return *m_graphicsDevice;
 }
 
-void dx3d::GraphicsEngine::render(SwapChain& swapChain)
+void dx3d::GraphicsEngine::render(SwapChain& swapChain, f32 deltaTime)
 {
-	auto& context = *m_deviceContext;
+	auto& context = *m_deviceContext; 
+	auto& cb = *m_cb;
+
+	m_sum += deltaTime * 3.0f;
+	m_scale = std::abs(std::sin(m_sum));
+
+	ConstantData data{};
+	data.scale = m_scale;
+	context.updateConstantBuffer(cb, &data);
 	context.clearAndSetBackBuffer(swapChain, 
 		{ 0.66f,0.33f,0.66f,1.0f } // Background color rgba
 	);
@@ -89,6 +98,7 @@ void dx3d::GraphicsEngine::render(SwapChain& swapChain)
 
 	auto& vb = *m_vb;
 	context.setVertexBuffer(vb);
+	context.setConstantBuffer(cb);
 	context.drawTriangleList(vb.getVertexListsize(), 0u);
 
 	auto& device = *m_graphicsDevice;

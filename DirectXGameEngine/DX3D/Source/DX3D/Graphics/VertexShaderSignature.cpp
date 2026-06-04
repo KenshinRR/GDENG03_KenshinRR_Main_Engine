@@ -7,8 +7,8 @@
 dx3d::VertexShaderSignature::VertexShaderSignature(const VertexShaderSignatureDesc& desc, const GraphicsResourceDesc& gDesc) :
 	GraphicsResource(gDesc), m_vsBinary(desc.vsBinary)
 {
-	if (!desc.vsBinary) DX3DLogThrowErrorInvalidArg("No Shader Binary Provided!");
-	if (desc.vsBinary->getType() != ShaderType::VertextShader) DX3DLogThrowErrorInvalidArg("The 'vsBinary' is not a valid vertex shader binary");
+	if (!desc.vsBinary) DX3DLogThrowInvalidArg("No Shader Binary Provided!");
+	if (desc.vsBinary->getType() != ShaderType::VertextShader) DX3DLogThrowInvalidArg("The 'vsBinary' is not a valid vertex shader binary");
 
 	auto vsData = m_vsBinary->getData();
 

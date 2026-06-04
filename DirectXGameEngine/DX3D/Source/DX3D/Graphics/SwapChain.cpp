@@ -4,7 +4,7 @@ dx3d::SwapChain::SwapChain(const SwapChainDesc& desc, const GraphicsResourceDesc
 	GraphicsResource(gDesc),
 	m_size(desc.winSize)
 {
-	if (!desc.winHandle) DX3DLogThrowErrorInvalidArg("No window handle provided!");
+	if (!desc.winHandle) DX3DLogThrowInvalidArg("No window handle provided!");
 	DXGI_SWAP_CHAIN_DESC dxgiDesc{};
 
 	dxgiDesc.BufferDesc.Width = std::max(1, desc.winSize.width);

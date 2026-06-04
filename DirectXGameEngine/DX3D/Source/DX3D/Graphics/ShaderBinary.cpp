@@ -6,10 +6,10 @@
 dx3d::ShaderBinary::ShaderBinary(const ShaderCompileDesc& desc, const GraphicsResourceDesc& gDesc): 
 	GraphicsResource(gDesc), m_type(desc.shaderType)
 {
-	if (!desc.shaderSourceName) DX3DLogThrowErrorInvalidArg("No shader source name provided!");
-	if (!desc.shaderSourceCode) DX3DLogThrowErrorInvalidArg("No shader source code provided!");
-	if (!desc.shaderSourceCodeSize) DX3DLogThrowErrorInvalidArg("No sgader source code size provided!");
-	if (!desc.shaderEntryPoint) DX3DLogThrowErrorInvalidArg("No shader entry point provided!");
+	if (!desc.shaderSourceName) DX3DLogThrowInvalidArg("No shader source name provided!");
+	if (!desc.shaderSourceCode) DX3DLogThrowInvalidArg("No shader source code provided!");
+	if (!desc.shaderSourceCodeSize) DX3DLogThrowInvalidArg("No sgader source code size provided!");
+	if (!desc.shaderEntryPoint) DX3DLogThrowInvalidArg("No shader entry point provided!");
 
 	UINT compileFlags{};
 

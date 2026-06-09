@@ -155,6 +155,7 @@
     <ClCompile Include="DX3D\Source\DX3D\Graphics\GraphicsPipelineState.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\VertexBuffer.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\VertexShaderSignature.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\Shapes\Quad.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX3D\Source\DX3D\Graphics\ConstantBuffer.h" />
@@ -180,6 +181,7 @@
     <ClInclude Include="DX3D\Source\DX3D\Graphics\GraphicsPipelineState.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\VertexBuffer.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\VertexShaderSignature.h" />
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\Shapes\Quad.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

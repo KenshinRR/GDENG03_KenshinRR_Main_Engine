@@ -3,6 +3,8 @@
 #include <DX3D/Core/Base.h>
 #include <DX3D/Math/Vec3.h>
 #include <DX3D/Math/Vec4.h>
+#include <DX3D/Graphics/Shapes/Quad.h>
+#include <vector>
 
 namespace dx3d
 {
@@ -31,6 +33,8 @@ namespace dx3d
 		RefPtr<GraphicsPipelineState> m_pipeline{};
 		RefPtr<VertexBuffer> m_vb{};
 		RefPtr<ConstantBuffer> m_cb{};
+
+		std::vector<RefPtr<Quad>> m_quads{};
 
 		f32 m_sum{};
 		f32 m_scale{};

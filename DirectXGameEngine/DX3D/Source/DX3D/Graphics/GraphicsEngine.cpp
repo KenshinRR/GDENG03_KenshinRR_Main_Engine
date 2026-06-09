@@ -36,37 +36,71 @@ dx3d::GraphicsEngine::GraphicsEngine(const GraphicsEngineDesc& desc) : Base(desc
 
 	m_pipeline = device.createGraphicsPipelineState({ *vsSig, *ps, });
 
-	const Vertex vertexList[] =
+	/*const Vertex vertexList[] =
 	{
 		{
-			{-0.5f, -0.5f, 0.0f},
+			{-0.25f, -0.25f, 0.0f},
 			{1,0,0,1}
 		},
 		{
-			{-0.5f, 0.5f, 0.0f},
+			{-0.25f, 0.25f, 0.0f},
 			{0,1,0,1}
 		},
 		{
-			{ 0.5f, 0.5f, 0.0f },
+			{ 0.25f, 0.25f, 0.0f },
 			{0,0,1,1}
 		},
 
 		{
-			{ 0.5f, 0.5f, 0.0f },
+			{ 0.25f, 0.25f, 0.0f },
 			{0,0,1,1}
 		},
 		{
-			{0.5f, -0.5f, 0.0f},
+			{0.25f, -0.25f, 0.0f},
 			{1,0,1,1}
 		},
 		{ 
-			{-0.5f, -0.5f, 0.0f},
+			{-0.25f, -0.25f, 0.0f},
 			{1,0,0,1}
 		},
-	};
+	};*/
 
-	m_vb = device.createVertexBuffer({ vertexList , std::size(vertexList), sizeof(Vertex)});
+	// m_vb = device.createVertexBuffer({ vertexList , std::size(vertexList), sizeof(Vertex)});
 	m_cb = device.createConstantBuffer({ {}, sizeof(ConstantData) });
+
+	// Initializing the Quads
+	m_quads.push_back(std::make_shared<Quad>(Quad::QuadDesc{
+		{m_logger},
+		device,
+		*m_deviceContext,
+		*m_pipeline,
+		{-0.70f, 0.50f, 0.0f},  // position
+		{0.4f, 0.4f, 1.0f},    // scale
+		{1, 0, 0, 1}           // color (red)
+			})
+	);
+
+	m_quads.push_back(std::make_shared<Quad>(Quad::QuadDesc{
+		{m_logger},
+		device,
+		*m_deviceContext,
+		*m_pipeline,
+		{0.70f, 0.50f, 0.0f},   // position
+		{0.4f, 0.4f, 1.0f},    // scale
+		{0, 1, 0, 1}           // color (green)
+		})
+	);
+
+	m_quads.push_back(std::make_shared<Quad>(Quad::QuadDesc{
+		{m_logger},
+		device,
+		*m_deviceContext,
+		*m_pipeline,
+		{-0.25f, 0.25f, 0.0f},  // position
+		{0.4f, 0.4f, 1.0f},    // scale
+		{0, 0, 1, 1}           // color (blue)
+		})
+	);
 }
 
 dx3d::GraphicsEngine::~GraphicsEngine()
@@ -83,12 +117,15 @@ void dx3d::GraphicsEngine::render(SwapChain& swapChain, f32 deltaTime)
 	auto& context = *m_deviceContext; 
 	auto& cb = *m_cb;
 
-	m_sum += deltaTime * 3.0f;
-	m_scale = std::abs(std::sin(m_sum));
+	// Animating the scale
+	/*m_sum += deltaTime * 0.1f;
+	m_scale = std::abs(std::sin(m_sum));*/
 
 	ConstantData data{};
-	data.scale = m_scale;
+	data.scale = 1.0f;
 	context.updateConstantBuffer(cb, &data);
+
+	//
 	context.clearAndSetBackBuffer(swapChain, 
 		{ 0.66f,0.33f,0.66f,1.0f } // Background color rgba
 	);
@@ -96,11 +133,17 @@ void dx3d::GraphicsEngine::render(SwapChain& swapChain, f32 deltaTime)
 
 	context.setViewportSize(swapChain.getSize());
 
-	auto& vb = *m_vb;
-	context.setVertexBuffer(vb);
+	/*auto& vb = *m_vb;
+	context.setVertexBuffer(vb);*/
 	context.setConstantBuffer(cb);
-	context.drawTriangleList(vb.getVertexListsize(), 0u);
+	//context.drawTriangleList(vb.getVertexListsize(), 0u);
 
+	// Render the quads
+	for (auto quad : m_quads)
+	{
+		quad->render();
+	}
+	
 	auto& device = *m_graphicsDevice;
 	device.executeCommandList(context);
 	swapChain.present();

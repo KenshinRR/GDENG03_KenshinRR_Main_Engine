@@ -46,7 +46,7 @@ namespace dx3d
 		struct GameObjectEvent
 		{
 			GameObject* object{};
-			size_t pendingObjectIndex{};
+			// size_t pendingObjectIndex{};
 			EventType eventType{};
 		};
 

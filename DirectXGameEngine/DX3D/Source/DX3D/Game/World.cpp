@@ -9,42 +9,34 @@ dx3d::World::World(const WorldDesc& desc) : Base(desc.base)
 
 void dx3d::World::update(f32 deltaTime)
 {
-	if (m_events.size())
-	{
-		std::swap(m_events, m_eventsSwapBuffer);
-		std::swap(m_pendingObjects, m_pendingObjectsSwapBuffer);
+    if (m_events.size())
+    {
+        std::swap(m_events, m_eventsSwapBuffer);
 
-		for (auto& e : m_eventsSwapBuffer)
-		{
-			auto objTypeId = e.object->getTypeId();
-			auto pendingObjIndex = e.pendingObjectIndex;
+        for (auto& e : m_eventsSwapBuffer)
+        {
+            if (e.eventType == EventType::Create)
+            {
+                e.object->onCreate();  // Call onCreate on the object
+            }
+        }
 
-			if (e.eventType == EventType::Create)
-			{
-				auto& obj = m_pendingObjectsSwapBuffer[pendingObjIndex];
-				auto ptr = obj.get();
+        m_eventsSwapBuffer.clear();
+    }
 
-				ptr->onCreate();
-			}
-		}
+    for (auto&& [typeId, objects] : m_objects)
+    {
+        for (auto& object : objects)
+        {
+            object->onUpdate(deltaTime);
+        }
+    }
 
-		m_pendingObjectsSwapBuffer.clear();
-		m_eventsSwapBuffer.clear();
-	}
-
-	for (auto&& [typeId, objects] : m_objects)
-	{
-		for (auto& object : objects)
-		{
-			object->onUpdate(deltaTime);
-		}
-	}
-
-	for (auto& comp : m_dirtyTransforms)
-	{
-		comp->updateWorldMatrix();
-	}
-	m_dirtyTransforms.clear();
+    for (auto& comp : m_dirtyTransforms)
+    {
+        comp->updateWorldMatrix();
+    }
+    m_dirtyTransforms.clear();
 }
 
 dx3d::GameObject* dx3d::World::createGameObjectInternal(UniquePtr<GameObject>& object)
@@ -52,9 +44,13 @@ dx3d::GameObject* dx3d::World::createGameObjectInternal(UniquePtr<GameObject>& o
 	if (!object) return {};
 
 	auto ptr = object.get();
+	auto typeId = ptr->getTypeId();
 
-	auto index = m_pendingObjects.size();
-	m_events.push_back({ ptr, index, EventType::Create });
+	// Store immediately in the main container
+	m_objects[typeId].push_back(std::move(object));
+
+	// Queue the onCreate event for later
+    m_events.push_back({ ptr, EventType::Create });
 
 	return ptr;
 }

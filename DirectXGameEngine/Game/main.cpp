@@ -1,10 +1,10 @@
-#include <DX3D/All.h>
+#include "MainGame.h"
 
 int main()
 {
 	try
 	{
-		dx3d::Game game({ {1280,720},dx3d::Logger::LogLevel::Info });
+		MainGame game({ {1280,720},dx3d::Logger::LogLevel::Info });
 		game.run();
 	}
 	catch (const std::runtime_error&)

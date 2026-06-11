@@ -22,11 +22,6 @@ namespace dx3d
 		GraphicsDevice& graphicsDevice;
 	};
 
-	struct GraphicsEngineDesc
-	{
-		BaseDesc base;
-	};
-
 	struct GraphicsDeviceDesc
 	{
 		BaseDesc base;
@@ -111,5 +106,11 @@ namespace dx3d
 		BaseDesc base;
 		GameObject& object;
 		World& world;
+	};
+
+	struct WorldRendererDesc
+	{
+		BaseDesc base;
+		GraphicsDevice& engine;
 	};
 }

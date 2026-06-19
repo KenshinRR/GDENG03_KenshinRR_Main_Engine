@@ -1,4 +1,4 @@
-#include <DX3D/Graphics/MeshFactory.h>
+﻿#include <DX3D/Graphics/MeshFactory.h>
 #include <cmath>
 
 dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCubeMesh()
@@ -190,7 +190,6 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCapsuleMesh(f32 radius, f32 he
 
 	return std::make_shared<Mesh>(vertices, indices);
 }
-
 dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCylinderMesh(f32 radius, f32 height, ui32 segments)
 {
 	std::vector<Vertex> vertices;
@@ -199,63 +198,93 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCylinderMesh(f32 radius, f32 h
 	constexpr f32 PI = 3.14159265359f;
 	constexpr f32 TWO_PI = 2.0f * PI;
 
+	const Vec4 cyclinderColor = {1.0f, 1.0f, 1.0f, 1.0f};
+
 	f32 halfHeight = height / 2.0f;
 
 	// Top circle
-	vertices.push_back({ {0.0f, halfHeight, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f} });
-	for (ui32 i = 0; i <= segments; ++i)
+	vertices.push_back({ {0.0f, halfHeight, 0.0f}, cyclinderColor }); // center
+	for (ui32 i = 0; i < segments; ++i)
 	{
 		f32 theta = TWO_PI * (i / static_cast<f32>(segments));
 		f32 x = radius * cosf(theta);
 		f32 z = radius * sinf(theta);
-		vertices.push_back({ {x, halfHeight, z}, {0.8f, 0.2f, 0.8f, 1.0f} });
+		vertices.push_back({ {x, halfHeight, z}, cyclinderColor });
 	}
 
 	// Bottom circle
-	vertices.push_back({ {0.0f, -halfHeight, 0.0f}, {0.0f, 1.0f, 0.0f, 1.0f} });
-	for (ui32 i = 0; i <= segments; ++i)
+	ui32 bottomCenterIdx = static_cast<ui32>(vertices.size());
+	vertices.push_back({ {0.0f, -halfHeight, 0.0f}, cyclinderColor }); // center
+	for (ui32 i = 0; i < segments; ++i)
 	{
 		f32 theta = TWO_PI * (i / static_cast<f32>(segments));
 		f32 x = radius * cosf(theta);
 		f32 z = radius * sinf(theta);
-		vertices.push_back({ {x, -halfHeight, z}, {0.2f, 0.8f, 0.8f, 1.0f} });
+		vertices.push_back({ {x, -halfHeight, z}, cyclinderColor });
 	}
 
-	// Side vertices (duplicated for proper normals)
-	ui32 sideStartIdx = (segments + 2) * 2;
-	for (ui32 i = 0; i <= segments; ++i)
+	// Side vertices
+	ui32 sideStartIdx = static_cast<ui32>(vertices.size());
+	for (ui32 i = 0; i < segments; ++i)
 	{
 		f32 theta = TWO_PI * (i / static_cast<f32>(segments));
 		f32 x = radius * cosf(theta);
 		f32 z = radius * sinf(theta);
-		vertices.push_back({ {x, halfHeight, z}, {0.5f, 0.5f, 1.0f, 1.0f} });
-		vertices.push_back({ {x, -halfHeight, z}, {0.5f, 0.5f, 1.0f, 1.0f} });
+
+		vertices.push_back({ {x, halfHeight, z}, cyclinderColor });
+		vertices.push_back({ {x, -halfHeight, z}, cyclinderColor });
 	}
 
-	// Top cap
-	ui32 topCenterIdx = 0;
-	for (ui32 i = 1; i <= segments; ++i)
+	// Top cap (outward)
+	for (ui32 i = 1; i < segments; ++i)
 	{
-		indices.push_back(topCenterIdx);
+		indices.push_back(0);
+		indices.push_back(i);
+		indices.push_back(i + 1);
+	}
+	indices.push_back(0);
+	indices.push_back(segments);
+	indices.push_back(1);
+
+	// Top cap (inward, reversed winding)
+	for (ui32 i = 1; i < segments; ++i)
+	{
+		indices.push_back(0);
 		indices.push_back(i + 1);
 		indices.push_back(i);
 	}
+	indices.push_back(0);
+	indices.push_back(1);
+	indices.push_back(segments);
 
-	// Bottom cap
-	ui32 bottomCenterIdx = segments + 2;
-	for (ui32 i = 1; i <= segments; ++i)
+	// Bottom cap (outward)
+	for (ui32 i = 1; i < segments; ++i)
 	{
 		indices.push_back(bottomCenterIdx);
 		indices.push_back(bottomCenterIdx + i);
 		indices.push_back(bottomCenterIdx + i + 1);
 	}
+	indices.push_back(bottomCenterIdx);
+	indices.push_back(bottomCenterIdx + segments);
+	indices.push_back(bottomCenterIdx + 1);
+
+	// Bottom cap (inward, reversed winding)
+	for (ui32 i = 1; i < segments; ++i)
+	{
+		indices.push_back(bottomCenterIdx);
+		indices.push_back(bottomCenterIdx + i + 1);
+		indices.push_back(bottomCenterIdx + i);
+	}
+	indices.push_back(bottomCenterIdx);
+	indices.push_back(bottomCenterIdx + 1);
+	indices.push_back(bottomCenterIdx + segments);
 
 	// Side faces
 	for (ui32 i = 0; i < segments; ++i)
 	{
 		ui32 top1 = sideStartIdx + i * 2;
-		ui32 top2 = sideStartIdx + (i + 1) * 2;
 		ui32 bottom1 = top1 + 1;
+		ui32 top2 = sideStartIdx + ((i + 1) % segments) * 2;
 		ui32 bottom2 = top2 + 1;
 
 		indices.push_back(top1);

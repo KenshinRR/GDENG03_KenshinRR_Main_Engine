@@ -57,6 +57,46 @@ dx3d::GameObject* dx3d::World::createGameObjectInternal(UniquePtr<GameObject>& o
 	return ptr;
 }
 
+void dx3d::World::destroyGameObject(GameObject* object)
+{
+    if (!object)
+        return;
+
+    const size_t typeId = object->GetTypeId();
+
+    // Remove components associated with this object
+    for (auto& [compTypeId, comps] : m_components)
+    {
+        comps.erase(
+            std::remove_if(comps.begin(), comps.end(),
+                [&](Component* c) { return &(c->getGameObject()) == object; }),
+            comps.end()
+        );
+    }
+
+    // Remove from dirty transforms if present
+    /*m_dirtyTransforms.erase(
+        std::remove(m_dirtyTransforms.begin(), m_dirtyTransforms.end(),
+            object->getTransform()),
+        m_dirtyTransforms.end()
+    );*/
+
+    // Remove from objects map
+    auto it = m_objects.find(typeId);
+    if (it != m_objects.end())
+    {
+        auto& vec = it->second;
+        vec.erase(
+            std::remove_if(vec.begin(), vec.end(),
+                [&](UniquePtr<GameObject>& e) { return e.get() == object; }),
+            vec.end()
+        );
+    }
+
+    // Optionally push an event for destruction
+    m_events.push_back(GameObjectEvent{ object, EventType::Destroy });
+}
+
 void dx3d::World::addComponentInternal(Component& component)
 {
 	auto typeId = component.getTypeId();

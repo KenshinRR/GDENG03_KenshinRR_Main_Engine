@@ -103,6 +103,8 @@ short dx3d::InputSystem::getInternalKeyCode(const KeyCode& key)
 	case KeyCode::Escape: return VK_ESCAPE;
 	case KeyCode::Space: return VK_SPACE;
 	case KeyCode::Enter: return VK_RETURN;
+	case KeyCode::Delete: return VK_DELETE;
+	case KeyCode::Backspace: return VK_BACK;
 	case KeyCode::MouseLeft: return VK_LBUTTON;
 	case KeyCode::MouseMiddle: return VK_MBUTTON;
 	case KeyCode::MouseRight: return VK_RBUTTON;

@@ -1,6 +1,23 @@
 ﻿#include <DX3D/Graphics/MeshFactory.h>
 #include <cmath>
 
+dx3d::MeshFactory::MeshFactory()
+{
+	meshShapes = std::unordered_map< ShapeType, RefPtr<Mesh>>();
+	// Create mesh resources (reusable)
+	meshShapes[ShapeType::Cube] = dx3d::MeshFactory::createCubeMesh();
+	meshShapes[ShapeType::Sphere] = dx3d::MeshFactory::createSphereMesh(20, 20);
+	meshShapes[ShapeType::Capsule] = dx3d::MeshFactory::createCapsuleMesh(0.5f, 2.0f);
+	meshShapes[ShapeType::Cylinder] = dx3d::MeshFactory::createCylinderMesh(0.5f, 2.0f);
+	meshShapes[ShapeType::Plane] = dx3d::MeshFactory::createPlaneMesh(10.0f, 10.0f);
+	meshShapes[ShapeType::Circle] = dx3d::MeshFactory::createCircleMesh(0.5f, 32);
+}
+
+dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::getMesh(ShapeType _type)
+{
+	return meshShapes[_type];
+}
+
 dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCubeMesh()
 {
 	std::vector<Vertex> vertices =

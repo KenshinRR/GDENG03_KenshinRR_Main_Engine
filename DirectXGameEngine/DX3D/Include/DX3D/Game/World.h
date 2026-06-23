@@ -26,6 +26,8 @@ namespace dx3d
 			return static_cast<T*>(createGameObjectInternal(e));
 		}
 
+		void destroyGameObject(GameObject* object);
+
 		template <typename T> requires IsRegistered<Component, T>
 		T* const* getComponents(ui32& numComponents) const noexcept
 		{
@@ -42,7 +44,8 @@ namespace dx3d
 	private:
 		enum class EventType
 		{
-			Create = 0
+			Create = 0,
+			Destroy = 1
 		};
 		struct GameObjectEvent
 		{

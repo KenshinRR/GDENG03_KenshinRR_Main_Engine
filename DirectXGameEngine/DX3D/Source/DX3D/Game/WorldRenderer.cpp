@@ -43,43 +43,6 @@ dx3d::WorldRenderer::WorldRenderer(const WorldRendererDesc& desc) : Base(desc.ba
 
 	m_pipeline = device.createGraphicsPipelineState({ *vsSig, *ps });
 
-	/*const Vertex vertexList[] =
-	{
-		{{-0.5f,-0.5f,-0.5f}, {1,0,0,1}},
-		{{-0.5f,0.5f,-0.5f}, {0,1,0,1} },
-		{{0.5f,0.5f,-0.5f},  {0,0,1,1}},
-		{{0.5f,-0.5f,-0.5f}, {1,0,1,1}},
-
-		{{0.5f,-0.5f,0.5f}, {1,0,1,1}},
-		{{0.5f,0.5f,0.5f}, {0,0,1,1}},
-		{{-0.5f,0.5f,0.5f}, {0,1,0,1}},
-		{{-0.5f,-0.5f,0.5f}, {1,0,0,1}}
-	};
-
-	const ui32 indexList[] =
-	{
-		0,1,2,
-		2,3,0,
-
-		4,5,6,
-		6,7,4,
-
-		1,6,5,
-		5,2,1,
-
-		7,0,3,
-		3,4,7,
-
-		3,2,5,
-		5,4,3,
-
-		7,6,1,
-		1,0,7
-	};
-
-	m_vb = device.createVertexBuffer({ vertexList, std::size(vertexList), sizeof(Vertex) });
-	m_ib = device.createIndexBuffer({ indexList, std::size(indexList) });*/
-
 	m_cb = device.createConstantBuffer({ {}, sizeof(ConstantData) });
 }
 

@@ -16,7 +16,7 @@ void CircleSpawner::onCreate()
 
 void CircleSpawner::onUpdate(dx3d::f32 deltaTime)
 {
-	if (getInputSystem().isKeyDown(dx3d::KeyCode::Space))
+	if (getInputSystem().isKeyPressed(dx3d::KeyCode::Space))
 	{
 		auto newCircle = getWorld().createGameObject<dx3d::GameObject>();
 		auto circleMeshComp = newCircle->createOrGetComponent<dx3d::MeshComponent>();
@@ -26,8 +26,9 @@ void CircleSpawner::onUpdate(dx3d::f32 deltaTime)
 		_circleContainer.push(newCircle);
 	}
 
-	if (getInputSystem().isKeyDown(dx3d::KeyCode::Backspace))
+	if (getInputSystem().isKeyPressed(dx3d::KeyCode::Backspace))
 	{
+		getWorld().destroyGameObject(_circleContainer.top());
 		_circleContainer.pop();
 	}
 }

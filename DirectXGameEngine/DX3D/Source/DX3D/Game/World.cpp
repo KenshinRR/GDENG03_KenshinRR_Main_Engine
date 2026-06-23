@@ -64,7 +64,7 @@ void dx3d::World::destroyGameObject(GameObject* object)
 
     const size_t typeId = object->GetTypeId();
 
-    // Remove components associated with this object
+    // Remove components associated with this object from the world-level component registry
     for (auto& [compTypeId, comps] : m_components)
     {
         comps.erase(
@@ -75,13 +75,13 @@ void dx3d::World::destroyGameObject(GameObject* object)
     }
 
     // Remove from dirty transforms if present
-    /*m_dirtyTransforms.erase(
-        std::remove(m_dirtyTransforms.begin(), m_dirtyTransforms.end(),
-            object->getTransform()),
+    m_dirtyTransforms.erase(
+        std::remove_if(m_dirtyTransforms.begin(), m_dirtyTransforms.end(),
+            [&](TransformComponent* t) { return &(t->getGameObject()) == object; }),
         m_dirtyTransforms.end()
-    );*/
+    );
 
-    // Remove from objects map
+    // Remove from objects map (this will delete the GameObject and its owned components via UniquePtr)
     auto it = m_objects.find(typeId);
     if (it != m_objects.end())
     {
@@ -93,7 +93,7 @@ void dx3d::World::destroyGameObject(GameObject* object)
         );
     }
 
-    // Optionally push an event for destruction
+    // Push an event for destruction (optional, depending on your event system)
     m_events.push_back(GameObjectEvent{ object, EventType::Destroy });
 }
 

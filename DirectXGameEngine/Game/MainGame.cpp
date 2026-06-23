@@ -44,7 +44,7 @@ void MainGame::onCreate()
 	//circle->getTransform().setRotation({ 1.57f, 0.0f, 0.0f}); // rotate 90 degrees on X-axis
 
 	auto player = world.createGameObject<Player>();
-	player->getTransform().setPosition({ 0, 1, -2 });
+	player->getTransform().setPosition({ 0, 0, -2 });
 
 	getInputSystem().setCursorLocked(false);
 	getInputSystem().setCursorVisible(true);

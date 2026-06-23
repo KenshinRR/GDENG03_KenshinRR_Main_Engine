@@ -105,6 +105,9 @@
     <ClCompile Include="Game\Objects\CircleSpawner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Game\Objects\BouncingCircle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX3D\Include\DX3D\Core\Base.h">
@@ -228,6 +231,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Game\Objects\CircleSpawner.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Objects\BouncingCircle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

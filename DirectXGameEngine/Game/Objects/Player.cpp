@@ -1,4 +1,5 @@
 #include "Player.h"
+#include <Windows.h>
 
 Player::Player(const dx3d::GameObjectDesc& desc) : dx3d::GameObject(desc)
 {
@@ -34,6 +35,9 @@ void Player::onUpdate(dx3d::f32 deltaTime)
 
 	float rot_speed = 0.01f;
 	auto rot = getTransform().getRotation();
+
+	// Close application
+	if (getInputSystem().isKeyPressed(dx3d::KeyCode::Escape)) PostQuitMessage(0);
 
 	// Rotation via arrow keys
 	if (getInputSystem().isKeyDown(dx3d::KeyCode::Up)) rot.x -= rot_speed;

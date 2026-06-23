@@ -10,7 +10,7 @@ dx3d::MeshFactory::MeshFactory()
 	meshShapes[ShapeType::Capsule] = dx3d::MeshFactory::createCapsuleMesh(0.5f, 2.0f);
 	meshShapes[ShapeType::Cylinder] = dx3d::MeshFactory::createCylinderMesh(0.5f, 2.0f);
 	meshShapes[ShapeType::Plane] = dx3d::MeshFactory::createPlaneMesh(10.0f, 10.0f);
-	meshShapes[ShapeType::Circle] = dx3d::MeshFactory::createCircleMesh(0.5f, 32);
+	meshShapes[ShapeType::Circle] = dx3d::MeshFactory::createCircleMesh(0.25f, 32);
 }
 
 dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::getMesh(ShapeType _type)

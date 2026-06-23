@@ -23,11 +23,11 @@ void MainGame::onCreate()
 	auto circleMesh = dx3d::MeshFactory::getInstance().getMesh(dx3d::Circle);
 
 	// Create a floor with plane
-	auto floor = world.createGameObject<dx3d::GameObject>();
+	/*auto floor = world.createGameObject<dx3d::GameObject>();
 	auto floorMeshComp = floor->createOrGetComponent<dx3d::MeshComponent>();
 	floorMeshComp->setMesh(planeMesh);
 	floor->getTransform().setScale({ 1.0f, 0.0f, 1.0f });
-	floor->getTransform().setPosition({ 0.0f, -1.0f, 0.0f });
+	floor->getTransform().setPosition({ 0.0f, -1.0f, 0.0f });*/
 
 	// Creating Circle Spawner
 	auto circleSpawner = world.createGameObject<CircleSpawner>();

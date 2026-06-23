@@ -1,7 +1,7 @@
 #include <DX3D/All.h>
 #include <DX3D/Graphics/Mesh.h>
 #include <DX3D/Graphics/MeshFactory.h>
-#include <vector>
+#include <stack>
 
 class CircleSpawner : public dx3d::GameObject
 {
@@ -14,5 +14,5 @@ protected:
 	virtual void onUpdate(dx3d::f32 deltaTime);
 
 private:
-	std::vector<GameObject*> _circleContainer;
+	std::stack<GameObject*> _circleContainer;
 };

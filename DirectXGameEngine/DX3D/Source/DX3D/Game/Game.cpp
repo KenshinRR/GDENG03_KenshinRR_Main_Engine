@@ -10,22 +10,42 @@
 #include <DX3D/Game/WorldRenderer.h>
 #include <DX3D/Resource/ResourceManager.h>
 
+// ADDED: Engine-level setup for Dear ImGui's Win32 and DirectX 11 backends.
+#include <imgui.h>
+#include <imgui_impl_dx11.h>
+#include <imgui_impl_win32.h>
+
 dx3d::Game::Game(const GameDesc& desc)
 {
 	m_logger = std::make_unique<Logger>(desc.logLevel);
 
-	DX3DLogInfo("GDENG03 KenshinRR");
+	DX3DLogInfo("GDENG03");
 	DX3DLogInfo("-----------------");
 
-	m_inputSystem = std::make_unique<InputSystem>(InputSystemDesc{ *m_logger });
 	m_graphicsDevice = std::make_shared<GraphicsDevice>(GraphicsDeviceDesc{ *m_logger });
-	m_display = std::make_unique<Display>(DisplayDesc{ {*m_logger,desc.windowSize},*m_graphicsDevice }); auto context = SystemContext{ *m_graphicsDevice };
-	m_resourceManager = std::make_unique<ResourceManager>(ResourceManagerDesc{ {*m_logger},context });
 
-	m_world = std::make_unique<World>(WorldDesc{ BaseDesc{*m_logger}, GameContext{*m_inputSystem, *m_resourceManager,*m_graphicsDevice} });
-	m_worldRenderer = std::make_unique<WorldRenderer>(WorldRendererDesc{ {*m_logger},*m_graphicsDevice });
+	// Create the primary display
+	addDisplay(DisplayDesc{ {*m_logger, desc.windowSize}, *m_graphicsDevice });
+	addDisplay(DisplayDesc{ {*m_logger, desc.windowSize}, *m_graphicsDevice });
 
-	m_inputSystem->setCursorLockArea(m_display->getClientAreaInScreenSpace());
+	auto context = SystemContext{ *m_graphicsDevice };
+	m_resourceManager = std::make_unique<ResourceManager>(ResourceManagerDesc{ {*m_logger}, context });
+
+	// Set world for each display
+	for (auto& display : m_displays)
+	{
+		m_world = std::make_unique<World>(WorldDesc{ BaseDesc{*m_logger}, GameContext{display->getInputSystem(), *m_resourceManager, *m_graphicsDevice}});
+	}
+
+	m_worldRenderer = std::make_unique<WorldRenderer>(WorldRendererDesc{ {*m_logger}, *m_graphicsDevice });
+
+	// ADDED: One ImGui context is shared by the game and drawn on the first display.
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGui::StyleColorsDark();
+	ImGui_ImplWin32_Init(m_displays.front()->getHandle());
+	ImGui_ImplDX11_Init(m_graphicsDevice->getNativeDevice(), m_graphicsDevice->getNativeContext());
+	m_imguiInitialized = true;
 
 	DX3DLogInfo("Game Initialized!");
 }
@@ -42,12 +62,14 @@ dx3d::Logger& dx3d::Game::getLogger() noexcept
 
 dx3d::Game::~Game()
 {
-	DX3DLogInfo("Game is shutting down...");
-}
+	if (m_imguiInitialized)
+	{
+		ImGui_ImplDX11_Shutdown(); // ADDED: Release ImGui's DirectX resources before the graphics device is destroyed.
+		ImGui_ImplWin32_Shutdown(); // ADDED: Remove ImGui's Win32 backend data.
+		ImGui::DestroyContext(); // ADDED: Release the shared ImGui context.
+	}
 
-dx3d::InputSystem& dx3d::Game::getInputSystem() noexcept
-{
-	return *m_inputSystem;
+	DX3DLogInfo("Game is shutting down...");
 }
 
 dx3d::ResourceManager& dx3d::Game::getResourceManager() noexcept
@@ -62,11 +84,31 @@ void dx3d::Game::onInternalUpdate()
 	m_previousTime = currentTime;
 	auto deltaTime = delta.count();
 
-	m_inputSystem->update();
+	// Update each display痴 input system separately
+	for (auto& display : m_displays)
+	{
+		if (display->hasFocus())
+		{
+			display->getInputSystem().update();
+		}
+	}
 
 	onUpdate(deltaTime);
-
 	m_world->update(deltaTime);
 
-	m_worldRenderer->render(*m_world, m_display->getSwapChain(), deltaTime);
+	// ADDED: Start one UI frame after normal update work so derived games can submit widgets.
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+	onDrawUi();
+	ImGui::Render();
+
+	// ADDED: Render the world once for all displays, placing ImGui over the primary display before it presents.
+	m_worldRenderer->renderForDisplays(*m_world, m_displays, deltaTime, ImGui::GetDrawData(), m_displays.front().get());
+}
+
+void dx3d::Game::addDisplay(const DisplayDesc& desc)
+{
+	auto display = std::make_unique<Display>(desc);
+	m_displays.push_back(std::move(display));
 }

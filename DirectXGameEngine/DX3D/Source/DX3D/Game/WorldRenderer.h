@@ -6,6 +6,8 @@
 #include <DX3D/Math/Vec2.h>
 #include <DX3D/Math/Mat4x4.h>
 #include <vector>
+
+struct ImDrawData;
 namespace dx3d
 {
 	class WorldRenderer  final: public Base
@@ -14,6 +16,10 @@ namespace dx3d
 		explicit WorldRenderer(const WorldRendererDesc& desc);
 
 		void render(const World& world, SwapChain& swapChain, f32 deltaTime);
+		// uiDrawData is rendered into every display.  Each display owns a distinct
+	// add display render here to render ui for multiple displays 
+		void renderForDisplays(const World& world, const std::vector<UniquePtr<Display>>& displays, f32 deltaTime, ImDrawData* uiDrawData);
+
 	private:
 		struct alignas(16) ObjectData
 		{
@@ -23,6 +29,13 @@ namespace dx3d
 		{
 			Mat4x4 view{};
 			Mat4x4 proj{};
+			Vec4 cameraPosition{};
+		};
+		struct alignas(16) LightData
+		{
+			Vec4 lightDirection{};
+			Vec4 lightColor{};
+			Vec4 ambientColor{};
 		};
 	private:
 		GraphicsDevice& m_graphicsDevice;
@@ -30,6 +43,7 @@ namespace dx3d
 		RefPtr<ConstantBuffer> m_cameraCb{};
 		RefPtr<ConstantBuffer> m_objectCb{};
 		RefPtr<ConstantBuffer> m_materialCb{};
+		RefPtr<ConstantBuffer> m_lightCb{};
 		RefPtr<Sampler> m_sampler{};
 
 		std::vector<Texture*> m_textures{};

@@ -29,26 +29,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -73,10 +73,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>Bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>Intermediate\$(Platform)\$(Configuration)\</IntDir>
-    <IncludePath>DX3D/Include;DX3D/Source;$(IncludePath)</IncludePath>
+    <IncludePath>IMGUI;DX3D/Include;DX3D/Source;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>DX3D/Include;DX3D/Source;DX3D/Vendor/stb-image/include/;$(IncludePath)</IncludePath>
+    <IncludePath>IMGUI;DX3D/Include;DX3D/Source;DX3D/Vendor/stb-image/include/;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -140,6 +140,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <!-- ADDED: Dear ImGui core and the Win32/DirectX 11 backends required by TestUi. -->
+    <ClCompile Include="DX3D\Source\DX3D\Game\TestUI.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\EventBroadcasting\EventBroadcastManager.cpp" />
+    <ClCompile Include="IMGUI\imgui.cpp" />
+    <ClCompile Include="IMGUI\imgui_draw.cpp" />
+    <ClCompile Include="IMGUI\imgui_tables.cpp" />
+    <ClCompile Include="IMGUI\imgui_widgets.cpp" />
+    <ClCompile Include="IMGUI\imgui_impl_dx11.cpp" />
+    <ClCompile Include="IMGUI\imgui_impl_win32.cpp" />
+    <!-- ADDED: Test UI implementation. -->
+    <ClCompile Include="Game\Objects\Camera.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Component\CameraComponent.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Component\CubeComponent.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Game\Component.cpp" />
@@ -177,6 +188,11 @@
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Sampler.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <!-- ADDED: Test UI declaration. -->
+    <ClInclude Include="DX3D\Include\DX3D\EventBroadcasting\EventNames.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Game\TestUI.h" />
+    <ClInclude Include="DX3D\Include\DX3D\EventBroadcasting\EventBroadcastManager.h" />
+    <ClInclude Include="Game\Objects\Camera.h" />
     <ClInclude Include="DX3D\Include\DX3D\Component\CameraComponent.h" />
     <ClInclude Include="DX3D\Include\DX3D\Component\CubeComponent.h" />
     <ClInclude Include="DX3D\Include\DX3D\Game\Component.h" />

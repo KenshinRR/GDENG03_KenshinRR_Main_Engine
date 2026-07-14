@@ -2,11 +2,19 @@
 #include <Windows.h>
 #include <stdexcept>
 
+#include <imgui_impl_win32.h>
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+
+
+
 using namespace dx3d;
 
 // In your main message loop
 LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
+	ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam);
+
 	Window* pThis = nullptr;
 
 	if (msg == WM_CREATE)

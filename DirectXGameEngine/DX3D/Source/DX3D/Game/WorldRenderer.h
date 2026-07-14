@@ -6,6 +6,8 @@
 #include <DX3D/Math/Vec2.h>
 #include <DX3D/Math/Mat4x4.h>
 #include <vector>
+
+struct ImDrawData;
 namespace dx3d
 {
 	class WorldRenderer  final: public Base
@@ -13,7 +15,7 @@ namespace dx3d
 	public:
 		explicit WorldRenderer(const WorldRendererDesc& desc);
 
-		void render(const World& world, SwapChain& swapChain, f32 deltaTime);
+		void render(const World& world, SwapChain& swapChain, f32 deltaTime, ImDrawData* uiDrawData, const Display* uiDisplay);
 	private:
 		struct alignas(16) ObjectData
 		{

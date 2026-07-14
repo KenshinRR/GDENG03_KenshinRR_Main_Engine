@@ -10,6 +10,10 @@
 #include <DX3D/Game/WorldRenderer.h>
 #include <DX3D/Resource/ResourceManager.h>
 
+#include <imgui.h>
+#include <imgui_impl_dx11.h>
+#include <imgui_impl_win32.h>
+
 dx3d::Game::Game(const GameDesc& desc)
 {
 	m_logger = std::make_unique<Logger>(desc.logLevel);
@@ -27,6 +31,14 @@ dx3d::Game::Game(const GameDesc& desc)
 
 	m_inputSystem->setCursorLockArea(m_display->getClientAreaInScreenSpace());
 
+	// UI
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGui::StyleColorsDark();
+	ImGui_ImplWin32_Init(m_display->getHandle());
+	ImGui_ImplDX11_Init(m_graphicsDevice->getNativeDevice(), m_graphicsDevice->getNativeContext());
+	m_imguiInitialized = true;
+
 	DX3DLogInfo("Game Initialized!");
 }
 
@@ -42,6 +54,13 @@ dx3d::Logger& dx3d::Game::getLogger() noexcept
 
 dx3d::Game::~Game()
 {
+	if (m_imguiInitialized)
+	{
+		ImGui_ImplDX11_Shutdown();
+		ImGui_ImplWin32_Shutdown();
+		ImGui::DestroyContext();
+	}
+
 	DX3DLogInfo("Game is shutting down...");
 }
 
@@ -68,5 +87,11 @@ void dx3d::Game::onInternalUpdate()
 
 	m_world->update(deltaTime);
 
-	m_worldRenderer->render(*m_world, m_display->getSwapChain(), deltaTime);
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+	onDrawUi();
+	ImGui::Render();
+
+	m_worldRenderer->render(*m_world, m_display->getSwapChain(), deltaTime, ImGui::GetDrawData(), m_display.get());
 }

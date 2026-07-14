@@ -101,7 +101,7 @@
   <Class Name="dx3d::Game" Collapsed="true">
     <Position X="0.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AQAAAgAIAAAACAAAAAASAAAAAAiAAA0oACBAAEAACAA=</HashCode>
+      <HashCode>AQAAAgAIAAAACAAAAAASAAAAAAiAAA04ACBAAEAACAA=</HashCode>
       <FileName>DX3D\Include\DX3D\Game\Game.h</FileName>
     </TypeIdentifier>
   </Class>
@@ -277,7 +277,7 @@
   <Class Name="MainGame" Collapsed="true">
     <Position X="0.75" Y="1.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AQAAAAAAAAAAAAAAAACAAAAAAAAAAAAgAAAAAAAAAAA=</HashCode>
+      <HashCode>AQAAAAAAAAAAAAAAAACAAAAAAAAAAAAwAQAAAAAAAAA=</HashCode>
       <FileName>Game\MainGame.h</FileName>
     </TypeIdentifier>
   </Class>
@@ -286,6 +286,13 @@
     <TypeIdentifier>
       <HashCode>AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAQAAABA=</HashCode>
       <FileName>Game\Objects\Player.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::SceneUI" Collapsed="true">
+    <Position X="13" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAAAAAAAAAAAIAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\UI\SceneUI.h</FileName>
     </TypeIdentifier>
   </Class>
   <Struct Name="dx3d::BaseDesc" Collapsed="true">
@@ -484,98 +491,98 @@
       <FileName>DX3D\Source\DX3D\Graphics\Mesh\Mesh.h</FileName>
     </TypeIdentifier>
   </Struct>
-  <Struct Name="__unnamed_struct_071a_2" Collapsed="true">
+  <Struct Name="__unnamed_struct_0763_2" Collapsed="true">
     <Position X="13.75" Y="17.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAACAEAAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
       <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
     </TypeIdentifier>
   </Struct>
-  <Struct Name="__unnamed_struct_071a_3" Collapsed="true">
+  <Struct Name="__unnamed_struct_0763_3" Collapsed="true">
     <Position X="17.75" Y="12.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAEAACEAIAYAgAAgAAAAAAAhAAAAABACA=</HashCode>
       <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
     </TypeIdentifier>
   </Struct>
-  <Struct Name="__unnamed_struct_071a_5" Collapsed="true">
+  <Struct Name="__unnamed_struct_0763_5" Collapsed="true">
     <Position X="9.75" Y="17.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAIAAAAAAAABAAAAAAAAAAAAAAACAAAAA=</HashCode>
       <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
     </TypeIdentifier>
   </Struct>
-  <Struct Name="__unnamed_struct_071a_7" Collapsed="true">
+  <Struct Name="__unnamed_struct_0763_7" Collapsed="true">
     <Position X="17.75" Y="7.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAIIAAAAAAIAAACCAAAAAAAEAAAAA=</HashCode>
       <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
     </TypeIdentifier>
   </Struct>
-  <Struct Name="__unnamed_struct_071a_8" Collapsed="true">
+  <Struct Name="__unnamed_struct_0763_8" Collapsed="true">
     <Position X="5.75" Y="17.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAgACBABEAAIAQEDEggMAAIBgAAgAAABAIBAQAAiAgg=</HashCode>
       <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
     </TypeIdentifier>
   </Struct>
-  <Struct Name="__unnamed_struct_071a_10" Collapsed="true">
+  <Struct Name="__unnamed_struct_0763_10" Collapsed="true">
     <Position X="1.75" Y="14.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAEEAAAAAAAAAAQAAAAAAAACAIABAIAAAgAA=</HashCode>
       <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
     </TypeIdentifier>
   </Struct>
-  <Struct Name="__unnamed_struct_071a_11" Collapsed="true">
+  <Struct Name="__unnamed_struct_0763_11" Collapsed="true">
     <Position X="13.75" Y="12.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAIIAAAAgIAAAACCAAAAAAAAAAAAA=</HashCode>
       <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
     </TypeIdentifier>
   </Struct>
-  <Struct Name="__unnamed_struct_071a_12" Collapsed="true">
+  <Struct Name="__unnamed_struct_0763_12" Collapsed="true">
     <Position X="13.75" Y="7.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAEAQAAAIEAJAAgAoAAAgAAAAAAIAAA=</HashCode>
       <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
     </TypeIdentifier>
   </Struct>
-  <Struct Name="__unnamed_struct_071a_13" Collapsed="true">
+  <Struct Name="__unnamed_struct_0763_13" Collapsed="true">
     <Position X="9.75" Y="12.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAEAAAAAAAAABAAAAAAAAAAAAAAA=</HashCode>
       <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
     </TypeIdentifier>
   </Struct>
-  <Struct Name="__unnamed_struct_071a_14" Collapsed="true">
+  <Struct Name="__unnamed_struct_0763_14" Collapsed="true">
     <Position X="5.75" Y="12.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAEAAAAAAAQAAAAAAAAAAAAAAAIAAAIAAIAAAAAA=</HashCode>
       <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
     </TypeIdentifier>
   </Struct>
-  <Struct Name="__unnamed_struct_071a_16" Collapsed="true">
+  <Struct Name="__unnamed_struct_0763_16" Collapsed="true">
     <Position X="9.75" Y="7.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AACAEAIAAAAACAQAAAAAAAAAAAgAAAAAKAABAAAAAAA=</HashCode>
       <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
     </TypeIdentifier>
   </Struct>
-  <Struct Name="__unnamed_struct_071a_17" Collapsed="true">
+  <Struct Name="__unnamed_struct_0763_17" Collapsed="true">
     <Position X="1.75" Y="9.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAIAAAAIAAAAAAAAABAAAAAAAAAAAAAAA=</HashCode>
       <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
     </TypeIdentifier>
   </Struct>
-  <Struct Name="__unnamed_struct_071a_18" Collapsed="true">
+  <Struct Name="__unnamed_struct_0763_18" Collapsed="true">
     <Position X="5.75" Y="7.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAEAAAAAAAAAAgAAAAAAAAAgAAA=</HashCode>
       <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
     </TypeIdentifier>
   </Struct>
-  <Struct Name="__unnamed_struct_071a_19" Collapsed="true">
+  <Struct Name="__unnamed_struct_0763_19" Collapsed="true">
     <Position X="1.75" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>QAAAAEICAgAIAAARAQAgAEhAYAAgAAAAQAggAAAAJgQ=</HashCode>
@@ -750,28 +757,28 @@
       <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
     </TypeIdentifier>
   </Enum>
-  <Enum Name="__unnamed_enum_071a_1" Collapsed="true">
+  <Enum Name="__unnamed_enum_0763_1" Collapsed="true">
     <Position X="55.25" Y="8" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAEAAAAAAAABAAAAAAAAAAEAAABAAAAAAAIAAAAAA=</HashCode>
       <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
     </TypeIdentifier>
   </Enum>
-  <Enum Name="__unnamed_enum_071a_4" Collapsed="true">
+  <Enum Name="__unnamed_enum_0763_4" Collapsed="true">
     <Position X="58.75" Y="8" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAgAAAAAAAA=</HashCode>
       <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
     </TypeIdentifier>
   </Enum>
-  <Enum Name="__unnamed_enum_071a_6" Collapsed="true">
+  <Enum Name="__unnamed_enum_0763_6" Collapsed="true">
     <Position X="60.5" Y="8" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAQAAAAAAAAAAAAAAAAAgAAAAAAAAAIAAAAAAAAAAA=</HashCode>
       <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
     </TypeIdentifier>
   </Enum>
-  <Enum Name="__unnamed_enum_071a_15" Collapsed="true">
+  <Enum Name="__unnamed_enum_0763_15" Collapsed="true">
     <Position X="57" Y="8" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAECAAAABAAIAAAAAAAgAAAAAAAAAAAAAA=</HashCode>

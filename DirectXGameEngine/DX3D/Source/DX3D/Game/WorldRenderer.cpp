@@ -17,6 +17,8 @@
 #include <DX3D/Resource/MaterialResource.h>
 #include <DX3D/Resource/TextureResource.h>
 
+#include <imgui_impl_dx11.h>
+
 #include <DX3D/Math/Vec3.h>
 #include <fstream>
 #include <ranges>
@@ -38,7 +40,7 @@ dx3d::WorldRenderer::WorldRenderer(const WorldRendererDesc& desc) : Base(desc.ba
 	m_sampler = device.createSampler({});
 }
 
-void dx3d::WorldRenderer::render(const World& world, SwapChain& swapChain, f32 deltaTime)
+void dx3d::WorldRenderer::render(const World& world, SwapChain& swapChain, f32 deltaTime, ImDrawData* uiDrawData, const Display* uiDisplay)
 {
 	auto size = swapChain.getSize();
 
@@ -116,6 +118,16 @@ void dx3d::WorldRenderer::render(const World& world, SwapChain& swapChain, f32 d
 		}
 
 		m_graphicsDevice.executeCommandList(context);
+		
+		// Scene rendering uses a deferred context. ImGui renders through the
+		// immediate context, so bind this swap chain's target there explicitly
+		// before submitting the UI draw data.
+		auto* renderTarget = swapChain.getRenderTargetView();
+		m_graphicsDevice.getNativeContext()->OMSetRenderTargets(1, &renderTarget, nullptr);
+
+		// render UI data
+		ImGui_ImplDX11_RenderDrawData(uiDrawData);
+
 		swapChain.present();
 	}
 }

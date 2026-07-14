@@ -52,6 +52,8 @@ namespace dx3d
 	class MaterialResource;
 	class TextureResource;
 
+	class SceneUI;
+
 	using i32 = int;
 	using ui32 = unsigned int;
 	using f32 = float;

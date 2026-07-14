@@ -21,6 +21,7 @@ namespace dx3d
 	protected:
 		virtual void onCreate() {}
 		virtual void onUpdate(f32 deltaTime) {}
+		virtual void onDrawUi() {}
 	private:
 		void onInternalUpdate();
 	private:
@@ -33,6 +34,7 @@ namespace dx3d
 
 		UniquePtr<WorldRenderer> m_worldRenderer{};
 		bool m_isRunning{ true };
+		bool m_imguiInitialized{ false };
 
 		std::chrono::steady_clock::time_point m_previousTime{};
 	};

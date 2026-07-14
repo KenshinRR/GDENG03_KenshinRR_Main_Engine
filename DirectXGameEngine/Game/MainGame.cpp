@@ -17,6 +17,9 @@ void MainGame::onCreate()
 	auto woodTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base/"DirectXGameEngine/Game/Assets/Textures/wood.jpg").c_str());
 	auto floorTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base / "DirectXGameEngine/Game/Assets/Textures/floor.jpg").c_str());
 
+	// UI initilization
+	m_SceneUI = std::make_unique<dx3d::SceneUI>(dx3d::BaseDesc{ getLogger() });
+
 	// Create mesh resources (reusable)
 	auto cubeMesh = dx3d::MeshFactory::createCubeMesh();
 	auto sphereMesh = dx3d::MeshFactory::createSphereMesh(20, 20);
@@ -140,4 +143,9 @@ void MainGame::onCreate()
 void MainGame::onUpdate(dx3d::f32 deltaTime)
 {
 	Game::onUpdate(deltaTime);
+}
+
+void MainGame::onDrawUi()
+{
+	m_SceneUI->draw();
 }

@@ -158,6 +158,7 @@
     <ClCompile Include="DX3D\Source\DX3D\Game\Win32\Win32Game.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Game\GameObject.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Game\WorldRenderer.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\EventBroadcasting\EventBroadcastManager.cpp" />
     <ClCompile Include="Game\main.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Window\Win32\Win32Window.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\GraphicsDevice.cpp" />
@@ -190,8 +191,11 @@
     <ClCompile Include="IMGUI\imgui_impl_win32.cpp" />
     <ClCompile Include="IMGUI\imgui_tables.cpp" />
     <ClCompile Include="IMGUI\imgui_widgets.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\UI\MainMenuBarUI.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\EventBroadcasting\Parameters.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DX3D\Include\DX3D\EventBroadcasting\EventNames.h" />
     <ClInclude Include="DX3D\Include\DX3D\UI\BaseUI.h" />
     <ClInclude Include="DX3D\Include\DX3D\Component\CameraComponent.h" />
     <ClInclude Include="DX3D\Include\DX3D\Component\CubeComponent.h" />
@@ -227,6 +231,7 @@
     <ClInclude Include="DX3D\Include\DX3D\Game\World.h" />
     <ClInclude Include="DX3D\Include\DX3D\Game\GameObject.h" />
     <ClInclude Include="DX3D\Vendor\stb-image\include\stb-image\stb_image.h" />
+    <ClInclude Include="DX3D\Include\DX3D\EventBroadcasting\EventBroadcastManager.h" />
     <ClInclude Include="Game\MainGame.h" />
     <ClInclude Include="DX3D\Include\DX3D\Component\TransformComponent.h" />
     <ClInclude Include="DX3D\Include\DX3D\Input\InputSystem.h" />
@@ -250,6 +255,8 @@
     <ClInclude Include="IMGUI\imstb_rectpack.h" />
     <ClInclude Include="IMGUI\imstb_textedit.h" />
     <ClInclude Include="IMGUI\imstb_truetype.h" />
+    <ClInclude Include="DX3D\Include\DX3D\UI\MainMenuBarUI.h" />
+    <ClInclude Include="DX3D\Include\DX3D\EventBroadcasting\Parameters.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

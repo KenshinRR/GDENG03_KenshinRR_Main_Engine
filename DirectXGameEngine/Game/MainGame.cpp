@@ -2,6 +2,8 @@
 #include "Objects/Player.h"
 #include <DX3D/Graphics/Mesh/MeshFactory.h>
 #include <DX3D/Component/MeshComponent.h>
+#include <DX3D/UI/SceneUI.h>
+#include <DX3D/UI/MainMenuBarUI.h>
 #include <filesystem>
 
 
@@ -17,9 +19,14 @@ void MainGame::onCreate()
 	auto woodTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base/"DirectXGameEngine/Game/Assets/Textures/wood.jpg").c_str());
 	auto floorTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base / "DirectXGameEngine/Game/Assets/Textures/floor.jpg").c_str());
 
-	// UI initilization
-	m_SceneUI = std::make_unique<dx3d::SceneUI>(dx3d::BaseDesc{ getLogger() });
+	auto logo = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base / "DirectXGameEngine/Game/Assets/Textures/dlsuLogo.png").c_str());
 
+	// UI initilization
+	std::unique_ptr<dx3d::SceneUI> scene_UI = std::make_unique<dx3d::SceneUI>(dx3d::BaseDesc{ getLogger() });
+	scene_UI->setLogo(logo);
+	m_UIs.push_back(std::move(scene_UI));
+	m_UIs.push_back(std::make_unique<dx3d::MainMenuBarUI>(dx3d::BaseDesc{ getLogger() }));
+	
 	// Create mesh resources (reusable)
 	auto cubeMesh = dx3d::MeshFactory::createCubeMesh();
 	auto sphereMesh = dx3d::MeshFactory::createSphereMesh(20, 20);
@@ -147,5 +154,8 @@ void MainGame::onUpdate(dx3d::f32 deltaTime)
 
 void MainGame::onDrawUi()
 {
-	m_SceneUI->draw();
+	for (auto& m_UI : m_UIs)
+	{
+		m_UI->draw();
+	}
 }

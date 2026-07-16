@@ -1,0 +1,40 @@
+#include <DX3D/UI/MainMenuBarUI.h>
+
+#include <DX3D/EventBroadcasting/EventBroadcastManager.h>
+#include <DX3D/EventBroadcasting/EventNames.h>
+
+// ImGui's DragFloat3 range uses FLT_MAX.
+#include <cfloat>
+#include <imgui.h>
+
+dx3d::MainMenuBarUI::MainMenuBarUI(const BaseDesc& desc) : BaseUI(desc)
+{
+}
+
+dx3d::MainMenuBarUI::~MainMenuBarUI()
+{
+}
+
+void dx3d::MainMenuBarUI::draw()
+{
+	if (ImGui::BeginMainMenuBar())
+	{
+		if (ImGui::BeginMenu("File"))
+		{
+			if (ImGui::MenuItem("Toggle Color Picker"))
+			{
+				EventBroadcastManager::getInstance().postEvent(EventNames::ON_COLORPICKER_POPUP);
+			}
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("About"))
+		{
+			if (ImGui::MenuItem("Credits"))
+			{
+				EventBroadcastManager::getInstance().postEvent(EventNames::ON_CREDITS_POPUP);
+			}
+			ImGui::EndMenu();
+		}
+	}
+	ImGui::EndMainMenuBar();
+}

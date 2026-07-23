@@ -2,6 +2,8 @@
 #include <DX3D/Core/Core.h>
 #include <DX3D/Core/Logger.h>
 #include <DX3D/Math/Rect.h>
+#include <DX3D/Math/Vec3.h>
+#include <vector>
 
 namespace dx3d
 {
@@ -113,6 +115,26 @@ namespace dx3d
 	};
 
 	struct TextureResourceDesc
+	{
+		ResourceDesc base;
+		GraphicsDevice& graphicsDevice;
+	};
+
+	struct Vertex
+	{
+		Vec3 position;
+	};
+
+	struct MeshDesc
+	{
+		std::vector<Vertex> vertices{};   // pointer to vertex array
+		//ui32 vertexCount{};         // number of vertices
+
+		std::vector<ui32> indices{};      // pointer to index array
+		//ui32 indexCount{};          // number of indices
+	};
+
+	struct MeshResourceDesc
 	{
 		ResourceDesc base;
 		GraphicsDevice& graphicsDevice;

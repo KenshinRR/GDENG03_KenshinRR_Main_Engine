@@ -1,8 +1,10 @@
 #include <DX3D/Graphics/Mesh/Mesh.h>
+#include <DX3D/Core/Core.h>
 
-dx3d::Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<ui32>& indices)
-	: m_vertices(vertices), m_indices(indices)
+dx3d::Mesh::Mesh(const MeshDesc& desc, const GraphicsResourceDesc& gDesc) : GraphicsResource(gDesc)
 {
+	m_vertices = desc.vertices;
+	m_indices = desc.indices;
 }
 
 const dx3d::Vertex* dx3d::Mesh::getVertices() const noexcept

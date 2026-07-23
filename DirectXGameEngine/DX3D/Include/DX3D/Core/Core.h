@@ -51,9 +51,14 @@ namespace dx3d
 	class Resource;
 	class MaterialResource;
 	class TextureResource;
+	class MeshResource;
+	class MeshFactory;
 
 	class SceneUI;
 
+	class Mesh;
+	class Vec3;
+	
 	using i32 = int;
 	using ui32 = unsigned int;
 	using f32 = float;

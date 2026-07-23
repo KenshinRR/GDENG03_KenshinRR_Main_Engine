@@ -1,20 +1,17 @@
 #pragma once
 #include <DX3D/Core/Core.h>
+#include <DX3D/Core/Common.h>
 #include <DX3D/Math/Vec3.h>
 #include <DX3D/Math/Vec4.h>
 #include <vector>
+#include <DX3D/Graphics/GraphicsResource.h>
 
 namespace dx3d
 {
-	struct Vertex
-	{
-		Vec3 position;
-	};
-
-	class Mesh
+	class Mesh : public GraphicsResource
 	{
 	public:
-		Mesh(const std::vector<Vertex>& vertices, const std::vector<ui32>& indices);
+		Mesh(const MeshDesc& desc, const GraphicsResourceDesc& gDesc);
 
 		const Vertex* getVertices() const noexcept;
 		ui32 getVertexCount() const noexcept;
@@ -25,5 +22,7 @@ namespace dx3d
 	private:
 		std::vector<Vertex> m_vertices;
 		std::vector<ui32> m_indices;
+
+
 	};
 }

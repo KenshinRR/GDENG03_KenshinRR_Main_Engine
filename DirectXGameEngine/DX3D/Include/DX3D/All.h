@@ -4,6 +4,7 @@
 
 #include <DX3D/Resource/TextureResource.h>
 #include <DX3D/Resource/MaterialResource.h>
+#include <DX3D/Resource/MeshResource.h>
 #include <DX3D/Resource/ResourceManager.h>
 
 #include <DX3D/Component/TransformComponent.h>

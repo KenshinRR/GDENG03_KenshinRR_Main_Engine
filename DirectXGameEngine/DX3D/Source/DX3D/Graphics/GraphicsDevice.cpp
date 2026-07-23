@@ -9,6 +9,7 @@
 #include <DX3D/Graphics/RenderSystem/ConstantBuffer/ConstantBuffer.h>
 
 #include <DX3D/Graphics/Texture.h>
+#include <DX3D/Graphics/Mesh/Mesh.h>
 #include <DX3D/Graphics/Sampler.h>
 #include <DX3D/Graphics/GraphicsPipelineLayout.h>
 
@@ -88,6 +89,11 @@ dx3d::RefPtr<dx3d::IndexBuffer> dx3d::GraphicsDevice::createIndexBuffer(const In
 dx3d::RefPtr<dx3d::Texture> dx3d::GraphicsDevice::createTexture(const TextureDesc& desc)
 {
 	return std::make_shared<Texture>(desc, getGraphicsResourceDesc());
+}
+
+dx3d::RefPtr<dx3d::Mesh> dx3d::GraphicsDevice::createMesh(const MeshDesc& desc)
+{
+	return std::make_shared<Mesh>(desc, getGraphicsResourceDesc());
 }
 
 dx3d::RefPtr<dx3d::Sampler> dx3d::GraphicsDevice::createSampler(const SamplerDesc& desc)

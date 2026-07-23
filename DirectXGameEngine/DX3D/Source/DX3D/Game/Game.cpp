@@ -9,6 +9,7 @@
 #include <DX3D/Game/GameObject.h>
 #include <DX3D/Game/WorldRenderer.h>
 #include <DX3D/Resource/ResourceManager.h>
+#include <DX3D/Graphics/Mesh/MeshFactory.h>
 
 #include <imgui.h>
 #include <imgui_impl_dx11.h>
@@ -25,6 +26,7 @@ dx3d::Game::Game(const GameDesc& desc)
 	m_graphicsDevice = std::make_shared<GraphicsDevice>(GraphicsDeviceDesc{ *m_logger });
 	m_display = std::make_unique<Display>(DisplayDesc{ {*m_logger,desc.windowSize},*m_graphicsDevice }); auto context = SystemContext{ *m_graphicsDevice };
 	m_resourceManager = std::make_unique<ResourceManager>(ResourceManagerDesc{ {*m_logger},context });
+	m_meshFactory = std::make_unique<MeshFactory>(ResourceManagerDesc{ {*m_logger},context });
 
 	m_world = std::make_unique<World>(WorldDesc{ BaseDesc{*m_logger}, GameContext{*m_inputSystem, *m_resourceManager,*m_graphicsDevice} });
 	m_worldRenderer = std::make_unique<WorldRenderer>(WorldRendererDesc{ {*m_logger},*m_graphicsDevice });
@@ -72,6 +74,16 @@ dx3d::InputSystem& dx3d::Game::getInputSystem() noexcept
 dx3d::ResourceManager& dx3d::Game::getResourceManager() noexcept
 {
 	return *m_resourceManager;
+}
+
+dx3d::MeshFactory& dx3d::Game::getMeshFactory() noexcept
+{
+	return *m_meshFactory;
+}
+
+dx3d::GraphicsDevice& dx3d::Game::getGraphicsDevice() noexcept
+{
+	return *m_graphicsDevice;
 }
 
 void dx3d::Game::onInternalUpdate()

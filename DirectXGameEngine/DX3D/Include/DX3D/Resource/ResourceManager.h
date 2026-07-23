@@ -3,6 +3,7 @@
 #include <string>
 #include <DX3D/Core/Common.h>
 #include <DX3D/Resource/Resource.h>
+#include <DX3D/Graphics/Mesh/Mesh.h>
 
 
 namespace dx3d

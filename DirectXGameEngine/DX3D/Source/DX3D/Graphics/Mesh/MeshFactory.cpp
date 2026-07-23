@@ -1,5 +1,14 @@
 ﻿#include <DX3D/Graphics/Mesh/MeshFactory.h>
+#include <DX3D/Graphics/GraphicsDevice.h>
+#include <DX3D/Resource/MeshResource.h>
+#include <DX3D/Graphics/Mesh/Mesh.h>
 #include <cmath>
+
+
+dx3d::MeshFactory::MeshFactory(const ResourceManagerDesc& desc)
+	: Base(desc.base), m_context(desc.context)
+{
+}
 
 dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCubeMesh()
 {
@@ -37,7 +46,7 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCubeMesh()
 		1,0,7
 	};
 
-	return std::make_shared<Mesh>(vertices, indices);
+	return m_context.graphicsDevice.createMesh({ vertices, indices });
 }
 
 dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createSphereMesh(ui32 stacks, ui32 slices)
@@ -98,7 +107,7 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createSphereMesh(ui32 stacks, ui32 s
 		}
 	}
 
-	return std::make_shared<Mesh>(vertices, indices);
+	return m_context.graphicsDevice.createMesh({ vertices, indices });
 }
 
 dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCapsuleMesh(f32 radius, f32 height, ui32 segments, ui32 rings)
@@ -225,7 +234,7 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCapsuleMesh(f32 radius, f32 he
 
 
 
-	return std::make_shared<Mesh>(vertices, indices);
+	return m_context.graphicsDevice.createMesh({ vertices, indices });
 }
 
 dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCylinderMesh(f32 radius, f32 height, ui32 segments)
@@ -341,7 +350,7 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCylinderMesh(f32 radius, f32 h
 		indices.push_back(bottom2);
 	}
 
-	return std::make_shared<Mesh>(vertices, indices);
+	return m_context.graphicsDevice.createMesh({ vertices, indices });
 }
 
 dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createPlaneMesh(f32 width, f32 height, ui32 widthSegments, ui32 heightSegments)
@@ -390,7 +399,7 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createPlaneMesh(f32 width, f32 heigh
 		}
 	}
 
-	return std::make_shared<Mesh>(vertices, indices);
+	return m_context.graphicsDevice.createMesh({ vertices, indices });
 }
 
 dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCircleMesh(f32 radius, ui32 segments)
@@ -425,5 +434,5 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCircleMesh(f32 radius, ui32 se
 		indices.push_back(i + 1);
 	}
 
-	return std::make_shared<Mesh>(vertices, indices);
+	return m_context.graphicsDevice.createMesh({ vertices, indices });
 }

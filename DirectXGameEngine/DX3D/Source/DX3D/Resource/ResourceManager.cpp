@@ -1,6 +1,8 @@
 #include <DX3D/Resource/ResourceManager.h>
 #include <DX3D/Resource/MaterialResource.h>
 #include <DX3D/Resource/TextureResource.h>
+#include <DX3D/Resource/MeshResource.h>
+#include <DX3D/Graphics/Mesh/Mesh.h>
 #include <filesystem>
 
 dx3d::ResourceManager::ResourceManager(const ResourceManagerDesc& desc) : Base(desc.base), m_context(desc.context)
@@ -11,11 +13,6 @@ dx3d::RefPtr<dx3d::Resource> dx3d::ResourceManager::createResourceFromFileConcre
 {
 	std::filesystem::path resourcePath{ file_path };
 	auto ext = resourcePath.extension();
-
-	/*DX3DLogInfo("CWD: {}", std::filesystem::current_path().string().c_str());
-	DX3DLogInfo("Requested resource path: {}", resourcePath.string().c_str());
-	DX3DLogInfo("Absolute path: {}", std::filesystem::absolute(resourcePath).string().c_str());
-	DX3DLogInfo("Exists? {}", std::filesystem::exists(std::filesystem::absolute(resourcePath)));*/
 
 	auto it = m_resources.find(file_path);
 	if (it != m_resources.end())
@@ -37,8 +34,10 @@ dx3d::RefPtr<dx3d::Resource> dx3d::ResourceManager::createResourceFromFileConcre
 	{
 		if (!ext.compare(L".hlsl") || !ext.compare(L".fx"))
 			resPtr = std::make_shared<MaterialResource>(MaterialResourceDesc{ getResourceDesc(file_path), m_context.graphicsDevice });
-		if (!ext.compare(L".jpg") || !ext.compare(L".png"))
+		else if (!ext.compare(L".jpg") || !ext.compare(L".png"))
 			resPtr = std::make_shared<TextureResource>(TextureResourceDesc{ getResourceDesc(file_path), m_context.graphicsDevice });
+		else if (!ext.compare(L".obj"))
+			resPtr = std::make_shared<MeshResource>(MeshResourceDesc{ getResourceDesc(file_path), m_context.graphicsDevice });
 	}
 	catch (...)
 	{

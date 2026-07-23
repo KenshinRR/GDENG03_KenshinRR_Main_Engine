@@ -28,12 +28,14 @@ void MainGame::onCreate()
 	m_UIs.push_back(std::make_unique<dx3d::MainMenuBarUI>(dx3d::BaseDesc{ getLogger() }));
 	
 	// Create mesh resources (reusable)
-	auto cubeMesh = dx3d::MeshFactory::createCubeMesh();
-	auto sphereMesh = dx3d::MeshFactory::createSphereMesh(20, 20);
-	auto capsuleMesh = dx3d::MeshFactory::createCapsuleMesh(0.5f, 2.0f);
-	auto cylinderMesh = dx3d::MeshFactory::createCylinderMesh(0.5f, 2.0f);
-	auto planeMesh = dx3d::MeshFactory::createPlaneMesh(10.0f, 10.0f);
-	auto circleMesh = dx3d::MeshFactory::createCircleMesh(0.5f, 32);
+	auto cubeMesh = getMeshFactory().createCubeMesh();
+	auto sphereMesh = getMeshFactory().createSphereMesh(20, 20);
+	auto capsuleMesh = getMeshFactory().createCapsuleMesh(0.5f, 2.0f);
+	auto cylinderMesh = getMeshFactory().createCylinderMesh(0.5f, 2.0f);
+	auto planeMesh = getMeshFactory().createPlaneMesh(10.0f, 10.0f);
+	auto circleMesh = getMeshFactory().createCircleMesh(0.5f, 32);
+
+	auto teapotMesh = getResourceManager().createResourceFromFile<dx3d::MeshResource>((base / "DirectXGameEngine/Game/Assets/3D Objects/teapot.obj").c_str());
 
 	//// Create a floor with plane
 	//auto floor = world.createGameObject<dx3d::GameObject>();
@@ -62,19 +64,19 @@ void MainGame::onCreate()
 
 	srand((unsigned int)time(NULL));
 
+	auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base / "DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
+	if (basicMat)
+	{
+		auto matData = dx3d::Vec3(1, 1, 1);
+		basicMat->setData(std::as_bytes(std::span{ &matData, 1 }));
+		basicMat->setTexture(0, woodTex);
+	}
+
 	// Creating cubes
-	for (auto y = -2; y < 3; y++)
+	/*for (auto y = -2; y < 3; y++)
 	{
 		for (auto x = -2; x < 3; x++)
 		{
-			auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base/"DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
-			if (basicMat)
-			{
-				auto matData = dx3d::Vec3(1, 1, 1);
-				basicMat->setData(std::as_bytes(std::span{ &matData, 1 }));
-				basicMat->setTexture(0, woodTex);
-			}
-
 			auto cube = world.createGameObject<dx3d::GameObject>();
 			auto comp = cube->createOrGetComponent<dx3d::MeshComponent>();
 			comp->setMaterial(basicMat);
@@ -84,61 +86,15 @@ void MainGame::onCreate()
 			cube->getTransform().setPosition({ x * 1.4f, 0.25f + 0.05f, y * 1.4f });
 			cube->getTransform().setRotation({ 0,roty,0 });
 		}
-	}
-
-
-	// Create cubes
-	/*for (auto y = -2; y < 3; y++)
-	{
-		for (auto x = -2; x < 3; x++)
-		{
-			auto cube = world.createGameObject<dx3d::GameObject>();
-			auto cube_meshComponent = cube->createOrGetComponent<dx3d::MeshComponent>();
-			cube_meshComponent->setMesh(cubeMesh);
-			auto height = (rand() % 120) + (80.0f);
-			height /= 100.0f;
-
-			auto width = (rand() % 600) + (200.0f);
-			width /= 1000.0f;
-
-			cube->getTransform().setScale({ width, height, width });
-			cube->getTransform().setPosition({ x * 1.4f, (height / 2.0f) - 1.0f, y * 1.4f });
-		}
 	}*/
 
-	// Create a capsule
-	/*auto capsule = world.createGameObject<dx3d::GameObject>();
-	auto capsuleMeshComp = capsule->createOrGetComponent<dx3d::MeshComponent>();
-	capsuleMeshComp->setMesh(capsuleMesh);
-	capsule->getTransform().setPosition({ -3.0f, 1.0f, 0.0f });
-	capsule->getTransform().setRotation({-1.57f, 0.0f, 0.0f});*/
-
-	// Create a cylinder
-	/*auto cylinder = world.createGameObject<dx3d::GameObject>();
-	auto cylinderMeshComp = cylinder->createOrGetComponent<dx3d::MeshComponent>();
-	cylinderMeshComp->setMesh(cylinderMesh);
-	cylinder->getTransform().setPosition({ 3.0f, 1.0f, 0.0f });*/
-
-	// Creating a cube
-	/*auto cube = world.createGameObject<dx3d::GameObject>();
-	auto cube_meshComponent = cube->createOrGetComponent<dx3d::MeshComponent>();
-	cube_meshComponent->setMesh(cubeMesh);
-	cube->getTransform().setScale({ 1.0f, 1.0f, 1.0f });
-	cube->getTransform().setPosition({ 0.0f, 0.0f, 0.0f });*/
-
-	//// Create a sphere
-	//auto sphere = world.createGameObject<dx3d::GameObject>();
-	//auto sphere_meshComponent = sphere->createOrGetComponent<dx3d::MeshComponent>();
-	//sphere_meshComponent->setMesh(sphereMesh);
-	//sphere->getTransform().setScale({ 1.0f, 1.0f, 1.0f });
-	//sphere->getTransform().setPosition({ -1.0f, 1.0f, 0.0f });
-
-	//// Create a circle object
-	//auto circle = world.createGameObject<dx3d::GameObject>();
-	//auto circleMeshComp = circle->createOrGetComponent<dx3d::MeshComponent>();
-	//circleMeshComp->setMesh(circleMesh);
-	//circle->getTransform().setPosition({ 1.0f, 1.0f, 0.0f });
-	//circle->getTransform().setRotation({ 1.57f, 0.0f, 0.0f}); // rotate 90 degrees on X-axis
+	// Create a teapot
+	auto teapot = world.createGameObject<dx3d::GameObject>();
+	auto teapotMeshComponent = teapot->createOrGetComponent<dx3d::MeshComponent>();
+	teapotMeshComponent->setMaterial(basicMat);
+	teapotMeshComponent->setMesh(teapotMesh->getMesh());
+	teapot->getTransform().setPosition({ 0.0f, 1.0f, 0.0f });
+	teapot->getTransform().setRotation({ 0.0f, 0.0f, 0.0f });
 
 	auto player = world.createGameObject<Player>();
 	player->getTransform().setPosition({ 0, 1, -2 });

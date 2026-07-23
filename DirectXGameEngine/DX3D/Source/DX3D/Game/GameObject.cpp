@@ -42,6 +42,11 @@ dx3d::ResourceManager& dx3d::GameObject::getResourceManager() noexcept
 	return m_gameContext.resourceManager;
 }
 
+void dx3d::GameObject::setName(std::string name)
+{
+	m_name = name;
+}
+
 dx3d::Component* dx3d::GameObject::getComponentInternal(size_t id)
 {
 	auto it = m_components.find(id);

@@ -2,8 +2,12 @@
 #include "Objects/Player.h"
 #include <DX3D/Graphics/Mesh/MeshFactory.h>
 #include <DX3D/Component/MeshComponent.h>
+
 #include <DX3D/UI/SceneUI.h>
 #include <DX3D/UI/MainMenuBarUI.h>
+#include <DX3D/UI/InspectorUI.h>
+#include <DX3D/UI/HierarchyUI.h>
+
 #include <filesystem>
 
 
@@ -25,7 +29,11 @@ void MainGame::onCreate()
 	std::unique_ptr<dx3d::SceneUI> scene_UI = std::make_unique<dx3d::SceneUI>(dx3d::BaseDesc{ getLogger() });
 	scene_UI->setLogo(logo);
 	m_UIs.push_back(std::move(scene_UI));
+	std::unique_ptr<dx3d::HierarchyUI> hierarchy_UI = std::make_unique<dx3d::HierarchyUI>(dx3d::BaseDesc{ getLogger() });
+	hierarchy_UI->setGameObjectList(&world.getGameObjectList());
+	m_UIs.push_back(std::move(hierarchy_UI));
 	m_UIs.push_back(std::make_unique<dx3d::MainMenuBarUI>(dx3d::BaseDesc{ getLogger() }));
+	m_UIs.push_back(std::make_unique<dx3d::InspectorUI>(dx3d::BaseDesc{ getLogger() }));
 	
 	// Create mesh resources (reusable)
 	auto cubeMesh = getMeshFactory().createCubeMesh();
@@ -44,8 +52,20 @@ void MainGame::onCreate()
 	//floor->getTransform().setScale({ 1.0f, 0.0f, 1.0f });
 	//floor->getTransform().setPosition({ 0.0f, -1.0f, 0.0f });
 
+	auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base / "DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
+
+
+	// Create a teapot
+	auto teapot = world.createGameObject<dx3d::GameObject>();
+	auto teapotMeshComponent = teapot->createOrGetComponent<dx3d::MeshComponent>();
+	teapotMeshComponent->setMaterial(basicMat);
+	teapotMeshComponent->setMesh(teapotMesh->getMesh());
+	teapot->getTransform().setPosition({ 0.0f, 1.0f, 0.0f });
+	teapot->getTransform().setRotation({ 0.0f, 0.0f, 0.0f });
+
+	// Creating the floor
 	{
-		auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base/"DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
+		auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base / "DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
 		if (basicMat)
 		{
 			auto matData = dx3d::Vec3(1, 1, 1);
@@ -63,38 +83,33 @@ void MainGame::onCreate()
 	}
 
 	srand((unsigned int)time(NULL));
-
-	auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base / "DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
-	if (basicMat)
 	{
-		auto matData = dx3d::Vec3(1, 1, 1);
-		basicMat->setData(std::as_bytes(std::span{ &matData, 1 }));
-		basicMat->setTexture(0, woodTex);
-	}
+		auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base / "DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
 
-	// Creating cubes
-	/*for (auto y = -2; y < 3; y++)
-	{
-		for (auto x = -2; x < 3; x++)
+		if (basicMat)
 		{
-			auto cube = world.createGameObject<dx3d::GameObject>();
-			auto comp = cube->createOrGetComponent<dx3d::MeshComponent>();
-			comp->setMaterial(basicMat);
-			comp->setMesh(cubeMesh);
-			auto roty = (rand() % 628) / 100.0f;
-			cube->getTransform().setScale({ 0.5,0.5,0.5 });
-			cube->getTransform().setPosition({ x * 1.4f, 0.25f + 0.05f, y * 1.4f });
-			cube->getTransform().setRotation({ 0,roty,0 });
+			auto matData = dx3d::Vec3(1, 1, 1);
+			basicMat->setData(std::as_bytes(std::span{ &matData, 1 }));
+			basicMat->setTexture(0, woodTex);
 		}
-	}*/
 
-	// Create a teapot
-	auto teapot = world.createGameObject<dx3d::GameObject>();
-	auto teapotMeshComponent = teapot->createOrGetComponent<dx3d::MeshComponent>();
-	teapotMeshComponent->setMaterial(basicMat);
-	teapotMeshComponent->setMesh(teapotMesh->getMesh());
-	teapot->getTransform().setPosition({ 0.0f, 1.0f, 0.0f });
-	teapot->getTransform().setRotation({ 0.0f, 0.0f, 0.0f });
+		// Creating cubes
+		for (float y = -2; y < 3; y++)
+		{
+			for (float x = -2; x < 3; x++)
+			{
+				auto cube = world.createGameObject<dx3d::GameObject>();
+				cube->setName("Cube");
+				auto comp = cube->createOrGetComponent<dx3d::MeshComponent>();
+				comp->setMaterial(basicMat);
+				comp->setMesh(cubeMesh);
+				auto roty = (rand() % 628) / 100.0f;
+				cube->getTransform().setScale({ 0.5,0.5,0.5 });
+				cube->getTransform().setPosition({ x * 1.4f, 0.25f + 0.05f, y * 1.4f });
+				cube->getTransform().setRotation({ 0,roty,0 });
+			}
+		}
+	}
 
 	auto player = world.createGameObject<Player>();
 	player->getTransform().setPosition({ 0, 1, -2 });

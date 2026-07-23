@@ -184,6 +184,7 @@
     <ClCompile Include="DX3D\Source\DX3D\Graphics\GraphicsPipelineLayout.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Sampler.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\UI\SceneUI.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\UI\HierarchyUI.cpp" />
     <ClCompile Include="IMGUI\imgui.cpp" />
     <ClCompile Include="IMGUI\imgui_demo.cpp" />
     <ClCompile Include="IMGUI\imgui_draw.cpp" />
@@ -194,6 +195,7 @@
     <ClCompile Include="DX3D\Source\DX3D\UI\MainMenuBarUI.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\EventBroadcasting\Parameters.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Resource\MeshResource.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\UI\InspectorUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX3D\Include\DX3D\EventBroadcasting\EventNames.h" />
@@ -248,6 +250,7 @@
     <ClInclude Include="DX3D\Source\DX3D\Graphics\GraphicsPipelineLayout.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\Sampler.h" />
     <ClInclude Include="DX3D\Include\DX3D\UI\SceneUI.h" />
+    <ClInclude Include="DX3D\Include\DX3D\UI\HierarchyUI.h" />
     <ClInclude Include="IMGUI\imconfig.h" />
     <ClInclude Include="IMGUI\imgui.h" />
     <ClInclude Include="IMGUI\imgui_impl_dx11.h" />
@@ -259,6 +262,7 @@
     <ClInclude Include="DX3D\Include\DX3D\UI\MainMenuBarUI.h" />
     <ClInclude Include="DX3D\Include\DX3D\EventBroadcasting\Parameters.h" />
     <ClInclude Include="DX3D\Include\DX3D\Resource\MeshResource.h" />
+    <ClInclude Include="DX3D\Include\DX3D\UI\InspectorUI.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

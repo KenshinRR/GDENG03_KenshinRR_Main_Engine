@@ -52,11 +52,3 @@ dx3d::MaterialResource* dx3d::MeshComponent::getMaterial()
 {
 	return m_material.get();
 }
-
-// Create temporary buffers (ideally cache these)
-			/*auto vb = m_graphicsDevice.createVertexBuffer({
-				vertexData, vertexCount, sizeof(Vertex)
-				});
-			auto ib = m_graphicsDevice.createIndexBuffer({
-				indexData, indexCount
-				});*/

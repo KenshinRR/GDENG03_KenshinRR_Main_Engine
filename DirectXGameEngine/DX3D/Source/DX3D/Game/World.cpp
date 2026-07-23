@@ -41,6 +41,11 @@ void dx3d::World::update(f32 deltaTime)
     m_dirtyTransforms.clear();
 }
 
+const std::unordered_map<size_t, std::vector<dx3d::UniquePtr<dx3d::GameObject>>>& dx3d::World::getGameObjectList()
+{
+    return m_objects;
+}
+
 dx3d::GameObject* dx3d::World::createGameObjectInternal(UniquePtr<GameObject>& object)
 {
 	if (!object) return {};

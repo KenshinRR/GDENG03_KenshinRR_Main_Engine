@@ -37,6 +37,9 @@ namespace dx3d
 		World& getWorld() noexcept;
 		InputSystem& getInputSystem() noexcept;
 		ResourceManager& getResourceManager() noexcept;
+
+		void setName(std::string name);
+		std::string getName() { return m_name; }
 	protected:
 		virtual void onCreate() {}
 		virtual void onUpdate(f32 deltaTime) {}
@@ -45,6 +48,7 @@ namespace dx3d
 		Component* createComponentInternal(UniquePtr<Component>& component);
 		Component* getComponentInternal(size_t id);
 	private:
+		std::string m_name = "GameObject";
 		std::unordered_map<size_t, UniquePtr<Component>> m_components{};
 
 		TransformComponent* m_transform{};

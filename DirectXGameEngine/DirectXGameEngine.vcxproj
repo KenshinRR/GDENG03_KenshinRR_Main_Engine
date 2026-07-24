@@ -196,6 +196,8 @@
     <ClCompile Include="DX3D\Source\DX3D\EventBroadcasting\Parameters.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Resource\MeshResource.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\UI\InspectorUI.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\Mesh\ImportedMeshContainer.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\UI\ImportedMaterialContainer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX3D\Include\DX3D\EventBroadcasting\EventNames.h" />
@@ -263,6 +265,8 @@
     <ClInclude Include="DX3D\Include\DX3D\EventBroadcasting\Parameters.h" />
     <ClInclude Include="DX3D\Include\DX3D\Resource\MeshResource.h" />
     <ClInclude Include="DX3D\Include\DX3D\UI\InspectorUI.h" />
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\Mesh\ImportedMeshContainer.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Resource\ImportedMaterialContainer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

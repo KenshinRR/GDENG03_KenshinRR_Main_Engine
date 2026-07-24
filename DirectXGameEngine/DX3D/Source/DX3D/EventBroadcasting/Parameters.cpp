@@ -18,6 +18,11 @@ void dx3d::Parameters::PutExtra(std::string paramName, GameObject* value)
 	this->ptrGameObjectData[paramName] = (value);
 }
 
+void dx3d::Parameters::PutExtra(std::string paramName, std::string value)
+{
+	this->stringData[paramName] = value;
+}
+
 uint32_t dx3d::Parameters::GetUInt32Extra(std::string paramName, uint32_t def_value)
 {
 	if (this->uint32Data.contains(paramName))
@@ -35,6 +40,18 @@ dx3d::GameObject* dx3d::Parameters::GetGameObjectPtr(std::string paramName, Game
 	if (this->ptrGameObjectData.contains(paramName))
 	{
 		return this->ptrGameObjectData[paramName];
+	}
+	else
+	{
+		return def_value;
+	}
+}
+
+std::string dx3d::Parameters::GetStringExtra(std::string paramName, std::string def_value)
+{
+	if (this->stringData.contains(paramName))
+	{
+		return this->stringData[paramName];
 	}
 	else
 	{

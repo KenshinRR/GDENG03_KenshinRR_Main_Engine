@@ -6,12 +6,13 @@
 #include <DX3D/EventBroadcasting/Parameters.h>
 
 #include <DX3D/Component/TransformComponent.h>
+#include <DX3D/Component/MeshComponent.h>
 
 dx3d::InspectorUI::InspectorUI(const BaseDesc& desc) : BaseUI(desc)
 {
 	EventBroadcastManager::getInstance().addObserver
 	(
-		EventNames::ON_ADD_GAMEOBJECT,
+		EventNames::ON_GAMEOBJECT_SELECTED,
 		[this](dx3d::Parameters& params)
 		{
 			m_selectedGameObject = params.GetGameObjectPtr("Selected", NULL);
@@ -35,6 +36,21 @@ void dx3d::InspectorUI::draw()
 				ImGui::Text("No game object selected.");
 				ImGui::End();
 				return;
+			}
+
+			// Add GameObject button
+			if (ImGui::Button("Add New Component"))
+			{
+				ImGui::OpenPopup("ComponentOptionsPopup");
+			}
+
+			if (ImGui::BeginPopup("ComponentOptionsPopup"))
+			{
+				if (ImGui::MenuItem("Add Mesh Component"))
+				{
+					m_selectedGameObject->createOrGetComponent<dx3d::MeshComponent>();
+				}
+				ImGui::EndPopup();
 			}
 
 			if (ImGui::BeginTabBar("##INSPECTOR")) // create tab bar with id

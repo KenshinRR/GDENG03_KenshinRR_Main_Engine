@@ -18,6 +18,33 @@ void dx3d::HierarchyUI::draw()
 	{
 		if (ImGui::Begin("Hierarchy", &m_showHierarchy))
 		{
+            // Add GameObject button
+            if (ImGui::Button("Add New GameObject"))
+            {
+                ImGui::OpenPopup("GameObjectOptionsPopup");
+            }
+
+            if (ImGui::BeginPopup("GameObjectOptionsPopup"))
+            {
+                Parameters param;
+                if (ImGui::MenuItem("Add Empty Game Object"))
+                {
+                    EventBroadcastManager::getInstance().postEvent(EventNames::ON_ADD_GAMEOBJECT);
+                }
+                if (ImGui::MenuItem("Add Bunny"))
+                {
+                    param.PutExtra("Key", "Bunny");
+                    EventBroadcastManager::getInstance().postEvent(EventNames::ON_ADD_3D_OBJECT, param);
+                }
+                if (ImGui::MenuItem("Add Armadillo"))
+                {
+                    param.PutExtra("Key", "Armadillo");
+                    EventBroadcastManager::getInstance().postEvent(EventNames::ON_ADD_3D_OBJECT, param);
+                }
+                ImGui::EndPopup();
+            }
+
+
             // Make sure we actually have a list set
             if (!m_gameObjects || m_gameObjects->empty())
             {
@@ -45,7 +72,7 @@ void dx3d::HierarchyUI::draw()
                         Parameters param;
                         param.PutExtra("Selected", obj);
 
-                        EventBroadcastManager::getInstance().postEvent(EventNames::ON_ADD_GAMEOBJECT, param);
+                        EventBroadcastManager::getInstance().postEvent(EventNames::ON_GAMEOBJECT_SELECTED, param);
                     }
                     g_it++;
                 }

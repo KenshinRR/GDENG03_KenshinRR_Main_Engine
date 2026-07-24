@@ -36,6 +36,9 @@ namespace dx3d
 
 		const std::unordered_map<size_t, std::vector<UniquePtr<GameObject>>>& getGameObjectList();
 
+		GameObject* AddEmptyGameObject();
+		GameObject* Add3DModelGameObject(std::string key);
+
 	private:
 		GameObject* createGameObjectInternal(UniquePtr<GameObject>& object);
 		void addComponentInternal(Component& component);

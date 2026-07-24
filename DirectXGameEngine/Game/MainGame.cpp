@@ -8,6 +8,9 @@
 #include <DX3D/UI/InspectorUI.h>
 #include <DX3D/UI/HierarchyUI.h>
 
+#include <DX3D/Graphics/Mesh/ImportedMeshContainer.h>
+#include <DX3D/Resource/ImportedMaterialContainer.h>
+
 #include <filesystem>
 
 
@@ -22,6 +25,7 @@ void MainGame::onCreate()
 	std::filesystem::path base = std::filesystem::current_path().parent_path();
 	auto woodTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base/"DirectXGameEngine/Game/Assets/Textures/wood.jpg").c_str());
 	auto floorTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base / "DirectXGameEngine/Game/Assets/Textures/floor.jpg").c_str());
+	auto brickTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base / "DirectXGameEngine/Game/Assets/Textures/brick.png").c_str());
 
 	auto logo = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base / "DirectXGameEngine/Game/Assets/Textures/dlsuLogo.png").c_str());
 
@@ -43,7 +47,13 @@ void MainGame::onCreate()
 	auto planeMesh = getMeshFactory().createPlaneMesh(10.0f, 10.0f);
 	auto circleMesh = getMeshFactory().createCircleMesh(0.5f, 32);
 
+	// Importing Meshes
 	auto teapotMesh = getResourceManager().createResourceFromFile<dx3d::MeshResource>((base / "DirectXGameEngine/Game/Assets/3D Objects/teapot.obj").c_str());
+	dx3d::ImportedMeshContainer::getInstance().addMesh("Teapot", teapotMesh);
+	auto bunnyMesh = getResourceManager().createResourceFromFile<dx3d::MeshResource>((base / "DirectXGameEngine/Game/Assets/3D Objects/bunny.obj").c_str());
+	dx3d::ImportedMeshContainer::getInstance().addMesh("Bunny", bunnyMesh);
+	auto armadilloMesh = getResourceManager().createResourceFromFile<dx3d::MeshResource>((base / "DirectXGameEngine/Game/Assets/3D Objects/armadillo.obj").c_str());
+	dx3d::ImportedMeshContainer::getInstance().addMesh("Armadillo", armadilloMesh);
 
 	//// Create a floor with plane
 	//auto floor = world.createGameObject<dx3d::GameObject>();
@@ -53,15 +63,25 @@ void MainGame::onCreate()
 	//floor->getTransform().setPosition({ 0.0f, -1.0f, 0.0f });
 
 	auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base / "DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
-
+	dx3d::ImportedMaterialContainer::getInstance().addMaterial("Basic", basicMat);
 
 	// Create a teapot
-	auto teapot = world.createGameObject<dx3d::GameObject>();
-	auto teapotMeshComponent = teapot->createOrGetComponent<dx3d::MeshComponent>();
-	teapotMeshComponent->setMaterial(basicMat);
-	teapotMeshComponent->setMesh(teapotMesh->getMesh());
-	teapot->getTransform().setPosition({ 0.0f, 1.0f, 0.0f });
-	teapot->getTransform().setRotation({ 0.0f, 0.0f, 0.0f });
+	{
+		auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base / "DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
+		if (basicMat)
+		{
+			auto matData = dx3d::Vec3(1, 1, 1);
+			basicMat->setData(std::as_bytes(std::span{ &matData, 1 }));
+			basicMat->setTexture(0, brickTex);
+		}
+
+		auto teapot = world.createGameObject<dx3d::GameObject>();
+		auto teapotMeshComponent = teapot->createOrGetComponent<dx3d::MeshComponent>();
+		teapotMeshComponent->setMaterial(basicMat);
+		teapotMeshComponent->setMesh(teapotMesh->getMesh());
+		teapot->getTransform().setPosition({ 0.0f, 1.0f, 0.0f });
+		teapot->getTransform().setRotation({ 0.0f, 0.0f, 0.0f });
+	}
 
 	// Creating the floor
 	{

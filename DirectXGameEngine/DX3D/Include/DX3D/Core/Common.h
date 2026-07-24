@@ -127,11 +127,8 @@ namespace dx3d
 
 	struct MeshDesc
 	{
-		std::vector<Vertex> vertices{};   // pointer to vertex array
-		//ui32 vertexCount{};         // number of vertices
-
-		std::vector<ui32> indices{};      // pointer to index array
-		//ui32 indexCount{};          // number of indices
+		std::vector<Vertex> vertices{};
+		std::vector<ui32> indices{};
 	};
 
 	struct MeshResourceDesc

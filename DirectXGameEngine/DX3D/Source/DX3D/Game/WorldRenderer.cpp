@@ -291,10 +291,12 @@ void dx3d::WorldRenderer::renderForDisplay(const World& world, Display& display,
 void dx3d::WorldRenderer::renderToTexture(const World& world, int width, int height)
 {
 	auto* ctx = m_deviceContext->getNativeContext();
-	ctx->OMSetRenderTargets(1, m_offscreenRTV.GetAddressOf(), nullptr);
+	ctx->OMSetRenderTargets(1, m_offscreenRTV.GetAddressOf(), m_offscreenDSV.Get());
 
+	// Clear both color and depth
 	const float clearColor[4] = { 0.27f, 0.39f, 0.55f, 1.0f };
 	ctx->ClearRenderTargetView(m_offscreenRTV.Get(), clearColor);
+	ctx->ClearDepthStencilView(m_offscreenDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	D3D11_VIEWPORT vp{};
 	vp.TopLeftX = 0.0f;
@@ -317,6 +319,7 @@ void dx3d::WorldRenderer::createOffscreenTarget(int width, int height)
 		return;
 	}
 
+	// --- Color texture ---
 	D3D11_TEXTURE2D_DESC desc{};
 	desc.Width = width;
 	desc.Height = height;
@@ -324,38 +327,40 @@ void dx3d::WorldRenderer::createOffscreenTarget(int width, int height)
 	desc.ArraySize = 1;
 	desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	desc.SampleDesc.Count = 1;
-	desc.SampleDesc.Quality = 0;
 	desc.Usage = D3D11_USAGE_DEFAULT;
 	desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-	desc.CPUAccessFlags = 0;
-	desc.MiscFlags = 0;
 
 	HRESULT hr = device->CreateTexture2D(&desc, nullptr, &m_offscreenTex);
-	if (FAILED(hr)) {
-		DX3DLogError("CreateTexture2D failed!\n");
-		return;
-	}
+	if (FAILED(hr)) { DX3DLogError("CreateTexture2D failed!"); return; }
 
 	hr = device->CreateRenderTargetView(m_offscreenTex.Get(), nullptr, &m_offscreenRTV);
-	if (FAILED(hr)) {
-		DX3DLogError("CreateRenderTargetView failed!\n");
-		return;
-	}
+	if (FAILED(hr)) { DX3DLogError("CreateRenderTargetView failed!"); return; }
 
-	// Explicit SRV descriptor
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = desc.Format;
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	srvDesc.Texture2D.MipLevels = 1;
-
 	hr = device->CreateShaderResourceView(m_offscreenTex.Get(), &srvDesc, &m_offscreenSRV);
-	if (FAILED(hr)) {
-		DX3DLogError("CreateShaderResourceView failed!\n");
-		return;
-	}
+	if (FAILED(hr)) { DX3DLogError("CreateShaderResourceView failed!"); return; }
 
+	// --- Depth/stencil texture ---
+	D3D11_TEXTURE2D_DESC depthDesc{};
+	depthDesc.Width = width;
+	depthDesc.Height = height;
+	depthDesc.MipLevels = 1;
+	depthDesc.ArraySize = 1;
+	depthDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthDesc.SampleDesc.Count = 1;
+	depthDesc.Usage = D3D11_USAGE_DEFAULT;
+	depthDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> depthTex;
+	hr = device->CreateTexture2D(&depthDesc, nullptr, &depthTex);
+	if (FAILED(hr)) { DX3DLogError("CreateDepthTexture failed!\n"); return; }
+
+	hr = device->CreateDepthStencilView(depthTex.Get(), nullptr, &m_offscreenDSV);
+	if (FAILED(hr)) { DX3DLogError("CreateDepthStencilView failed!\n"); return; }
 }
 
 void dx3d::WorldRenderer::renderScene(const World& world, int width, int height)

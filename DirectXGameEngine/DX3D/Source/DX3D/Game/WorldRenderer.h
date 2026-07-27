@@ -56,6 +56,7 @@ namespace dx3d
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_offscreenTex;
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_offscreenRTV;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_offscreenSRV;
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_offscreenDSV;
 
 		std::vector<Texture*> m_textures{};
 

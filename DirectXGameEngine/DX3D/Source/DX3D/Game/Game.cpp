@@ -30,8 +30,6 @@ dx3d::Game::Game(const GameDesc& desc)
 	m_windowSize = desc.windowSize;
 	// Adding intial displays
 	addDisplay();
-	addDisplay();
-	addDisplay();
 
 	auto context = SystemContext{ *m_graphicsDevice };
 	m_resourceManager = std::make_unique<ResourceManager>(ResourceManagerDesc{ {*m_logger}, context });
@@ -46,6 +44,11 @@ dx3d::Game::Game(const GameDesc& desc)
 	EventBroadcastManager::getInstance().addObserver(
 		EventNames::ON_WINDOW_NEW, 
 		[this]() { ++m_pendingDisplayAdditions; });
+
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;   // Keyboard controls
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;       // Enable Docking
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;     // Enable Multi-Viewport
 
 	DX3DLogInfo("Game Initialized!");
 }
@@ -84,6 +87,7 @@ void dx3d::Game::onInternalUpdate()
 	std::chrono::duration<f32> delta = currentTime - m_previousTime;
 	m_previousTime = currentTime;
 	auto deltaTime = delta.count();
+	ImGuiIO& io = ImGui::GetIO();
 
 	// Update each display痴 input system separately
 	for (auto& display : m_displays)
@@ -116,10 +120,17 @@ void dx3d::Game::onInternalUpdate()
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
+		ImGui::DockSpaceOverViewport();
 		onDrawUi(*display);
 		ImGui::Render();
 
 		m_worldRenderer->renderForDisplay(*m_world, *display, deltaTime, ImGui::GetDrawData());
+
+		// Handle multiple viewports
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+		}
 	}
 
 	while (m_pendingDisplayAdditions > 0)
@@ -146,6 +157,14 @@ void dx3d::Game::initializeDisplayImGui(Display& display)
 {
 	auto* context = ImGui::CreateContext();
 	display.setImGuiContext(context);
+
+	// Style
+	ImGuiIO& io = ImGui::GetIO();
+	ImGuiStyle& style = ImGui::GetStyle();
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+		style.WindowRounding = 0.0f;
+		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+	}
 
 	ImGui::SetCurrentContext(context);
 	ImGui::StyleColorsDark();

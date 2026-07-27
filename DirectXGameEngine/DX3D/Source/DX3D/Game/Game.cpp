@@ -125,13 +125,14 @@ void dx3d::Game::onInternalUpdate()
 		onDrawUi(*display);
 		ImGui::Render();
 
-		m_worldRenderer->renderForDisplay(*m_world, *display, deltaTime, ImGui::GetDrawData());
-
 		// Handle multiple viewports
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
 		}
+
+		m_worldRenderer->renderForDisplay(*m_world, *display, deltaTime, ImGui::GetDrawData());
+
 	}
 
 	while (m_pendingDisplayAdditions > 0)

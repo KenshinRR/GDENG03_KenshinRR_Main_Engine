@@ -1,4 +1,4 @@
-#include <DX3D/Game/WorldRenderer.h>
+﻿#include <DX3D/Game/WorldRenderer.h>
 #include <DX3D/Game/Display.h>
 
 #include <DX3D/Graphics/GraphicsDevice.h>
@@ -194,9 +194,6 @@ void dx3d::WorldRenderer::renderWorldViewport(const World& world)
 		ImGui::Image((ImTextureID)m_offscreenSRV.Get(), avail);
 	}
 
-	// Show texture
-	ImGui::Image((ImTextureID)m_offscreenSRV.Get(), avail);
-
 	ImGui::End();
 
 }
@@ -293,11 +290,11 @@ void dx3d::WorldRenderer::renderForDisplay(const World& world, Display& display,
 
 void dx3d::WorldRenderer::renderToTexture(const World& world, int width, int height)
 {
-	auto& context = *m_deviceContext;
-	context.getNativeContext()->OMSetRenderTargets(1, m_offscreenRTV.GetAddressOf(), nullptr);
+	auto* ctx = m_deviceContext->getNativeContext();
+	ctx->OMSetRenderTargets(1, m_offscreenRTV.GetAddressOf(), nullptr);
 
 	const float clearColor[4] = { 0.27f, 0.39f, 0.55f, 1.0f };
-	context.getNativeContext()->ClearRenderTargetView(m_offscreenRTV.Get(), clearColor);
+	ctx->ClearRenderTargetView(m_offscreenRTV.Get(), clearColor);
 
 	D3D11_VIEWPORT vp{};
 	vp.TopLeftX = 0.0f;
@@ -306,7 +303,10 @@ void dx3d::WorldRenderer::renderToTexture(const World& world, int width, int hei
 	vp.Height = static_cast<float>(height);
 	vp.MinDepth = 0.0f;
 	vp.MaxDepth = 1.0f;
-	context.getNativeContext()->RSSetViewports(1, &vp);
+	ctx->RSSetViewports(1, &vp);
+
+	// 🔑 Call the shared scene rendering
+	renderScene(world, width, height);
 }
 
 void dx3d::WorldRenderer::createOffscreenTarget(int width, int height)
@@ -356,4 +356,71 @@ void dx3d::WorldRenderer::createOffscreenTarget(int width, int height)
 	}
 
 
+}
+
+void dx3d::WorldRenderer::renderScene(const World& world, int width, int height)
+{
+	auto& context = *m_deviceContext;
+
+	// Camera setup (similar to renderForDisplay)
+	ui32 numComponents = 0;
+	auto cameras = world.getComponents<CameraComponent>(numComponents);
+	if (numComponents > 0) {
+		CameraData cameraData{};
+		auto* cam = cameras[0];
+		cameraData.view = cam->getViewMatrix();
+		cam->setViewportSize({ width, height });
+		cameraData.proj = cam->getProjectionMatrix();
+		cameraData.cameraPosition = Vec4(
+			cam->getGameObject().getTransform().getPosition().x,
+			cam->getGameObject().getTransform().getPosition().y,
+			cam->getGameObject().getTransform().getPosition().z,
+			1.0f
+		);
+		context.updateConstantBuffer(*m_cameraCb, std::as_bytes(std::span{ &cameraData, 1 }));
+	}
+
+	// Light setup
+	LightData lightData{};
+	lightData.lightDirection = Vec4(0.577f, -0.577f, 0.577f, 0.0f);
+	lightData.lightColor = Vec4(1.0f, 0.95f, 0.9f, 1.0f);
+	lightData.ambientColor = Vec4(0.2f, 0.22f, 0.25f, 1.0f);
+	context.updateConstantBuffer(*m_lightCb, std::as_bytes(std::span{ &lightData, 1 }));
+
+	// Mesh loop (copied from renderForDisplay)
+	auto components = world.getComponents<MeshComponent>(numComponents);
+	for (auto i : std::views::iota(0u, numComponents)) {
+		auto component = components[i];
+		auto& transform = component->getGameObject().getTransform();
+		auto mesh = component->getMesh();
+		auto material = component->getMaterial();
+
+		if (material) {
+			ObjectData objectData{};
+			objectData.world = transform.getAffineWorldMatrix();
+
+			context.setGraphicsPipelineState(material->getGraphicsPipelineState());
+			context.updateConstantBuffer(*m_objectCb, std::as_bytes(std::span{ &objectData, 1 }));
+			context.updateConstantBuffer(*m_materialCb, material->getData());
+			ConstantBuffer* cbs[] = { m_objectCb.get(), m_cameraCb.get(), m_materialCb.get(), m_lightCb.get() };
+			context.setConstantBuffers(std::span<ConstantBuffer*>{cbs});
+
+			auto vb = component->getOrCreateVertexBuffer(m_graphicsDevice);
+			auto ib = component->getOrCreateIndexBuffer(m_graphicsDevice);
+
+			m_textures.clear();
+			m_textures.resize(material->getNumTextures());
+			for (auto t : std::views::iota(0u, m_textures.size())) {
+				auto tex = material->getTexture(t);
+				if (tex) m_textures[t] = &tex->getTexture();
+			}
+			context.setTextures(std::span<Texture*>{m_textures});
+
+			context.setVertexBuffer(*vb);
+			context.setIndexBuffer(*ib);
+			context.drawIndexedTriangleList(mesh->getIndexCount(), 0u, 0u);
+		}
+	}
+
+	m_graphicsDevice.executeCommandList(context);
 }

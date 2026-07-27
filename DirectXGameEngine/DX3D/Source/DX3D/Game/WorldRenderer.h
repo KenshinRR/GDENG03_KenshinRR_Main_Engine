@@ -25,6 +25,8 @@ namespace dx3d
 
 		void renderWorldViewport(const World& world);
 
+		void renderScene(const World& world, int width, int height);
+
 	private:
 		struct alignas(16) ObjectData
 		{

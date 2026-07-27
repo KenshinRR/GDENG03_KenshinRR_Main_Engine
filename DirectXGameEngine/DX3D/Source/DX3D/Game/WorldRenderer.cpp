@@ -196,6 +196,22 @@ void dx3d::WorldRenderer::renderWorldViewport(const World& world)
 
 	ImGui::End();
 
+	ImGui::Begin("Game View");
+
+	if (newW > 0 && newH > 0 && (newW != texW || newH != texH)) {
+		texW = newW;
+		texH = newH;
+		createOffscreenTarget(texW, texH);
+	}
+
+	// Only render if we have a valid target
+	if (texW > 0 && texH > 0 && m_offscreenSRV) {
+		renderToTexture(world, texW, texH);
+		ImGui::Image((ImTextureID)m_offscreenSRV.Get(), avail);
+	}
+
+	ImGui::End();
+
 }
 
 void dx3d::WorldRenderer::renderForDisplay(const World& world, Display& display, f32 deltaTime, ImDrawData* uiDrawData)

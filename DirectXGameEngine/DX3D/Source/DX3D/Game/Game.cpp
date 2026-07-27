@@ -11,6 +11,7 @@
 #include <DX3D/Resource/ResourceManager.h>
 #include <DX3D/EventBroadcasting/EventBroadcastManager.h>
 #include <DX3D/EventBroadcasting/EventNames.h>
+#include <DX3D/Graphics/RenderSystem/SwapChain/SwapChain.h>
 
 // ADDED: Engine-level setup for Dear ImGui's Win32 and DirectX 11 backends.
 #include <imgui.h>
@@ -30,8 +31,6 @@ dx3d::Game::Game(const GameDesc& desc)
 	m_windowSize = desc.windowSize;
 	// Adding intial displays
 	addDisplay();
-	addDisplay();
-	addDisplay();
 
 	auto context = SystemContext{ *m_graphicsDevice };
 	m_resourceManager = std::make_unique<ResourceManager>(ResourceManagerDesc{ {*m_logger}, context });
@@ -46,6 +45,11 @@ dx3d::Game::Game(const GameDesc& desc)
 	EventBroadcastManager::getInstance().addObserver(
 		EventNames::ON_WINDOW_NEW, 
 		[this]() { ++m_pendingDisplayAdditions; });
+
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;   // Keyboard controls
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;       // Enable Docking
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;     // Enable Multi-Viewport
 
 	DX3DLogInfo("Game Initialized!");
 }
@@ -84,6 +88,7 @@ void dx3d::Game::onInternalUpdate()
 	std::chrono::duration<f32> delta = currentTime - m_previousTime;
 	m_previousTime = currentTime;
 	auto deltaTime = delta.count();
+	ImGuiIO& io = ImGui::GetIO();
 
 	// Update each display痴 input system separately
 	for (auto& display : m_displays)
@@ -116,10 +121,15 @@ void dx3d::Game::onInternalUpdate()
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
+		ImGui::DockSpaceOverViewport();
+		m_worldRenderer->renderWorldViewport(*m_world);
 		onDrawUi(*display);
 		ImGui::Render();
 
 		m_worldRenderer->renderForDisplay(*m_world, *display, deltaTime, ImGui::GetDrawData());
+
+		
+
 	}
 
 	while (m_pendingDisplayAdditions > 0)
@@ -149,9 +159,19 @@ void dx3d::Game::initializeDisplayImGui(Display& display)
 
 	ImGui::SetCurrentContext(context);
 	ImGui::StyleColorsDark();
+
 	ImGui_ImplWin32_Init(display.getHandle());
 	ImGui_ImplDX11_Init(m_graphicsDevice->getNativeDevice(), m_graphicsDevice->getNativeContext());
+
+	// Force ImGui to create its DX11 device objects for this context
+	ImGui_ImplDX11_CreateDeviceObjects();
+
+	// Set DisplaySize
+	ImGuiIO& io = ImGui::GetIO();
+	auto size = display.getSwapChain().getSize();
+	io.DisplaySize = ImVec2((float)size.width, (float)size.height);
 }
+
 
 void dx3d::Game::shutdownDisplayImGui(Display& display)
 {

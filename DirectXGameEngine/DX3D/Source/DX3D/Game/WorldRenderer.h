@@ -6,6 +6,8 @@
 #include <DX3D/Math/Vec2.h>
 #include <DX3D/Math/Mat4x4.h>
 #include <vector>
+#include <wrl/client.h>
+#include <d3d11.h>
 
 struct ImDrawData;
 namespace dx3d
@@ -17,7 +19,13 @@ namespace dx3d
 
 		void render(const World& world, SwapChain& swapChain, f32 deltaTime);
 		void renderForDisplay(const World& world, Display& display, f32 deltaTime, ImDrawData* uiDrawData);
-		void renderForDisplays(const World& world, const std::vector<UniquePtr<Display>>& displays, f32 deltaTime, ImDrawData* uiDrawData);
+		void renderToTexture(const World& world, int width, int height);
+
+		void createOffscreenTarget(int width, int height);
+
+		void renderWorldViewport(const World& world);
+
+		void renderScene(const World& world, int width, int height);
 
 	private:
 		struct alignas(16) ObjectData
@@ -44,6 +52,11 @@ namespace dx3d
 		RefPtr<ConstantBuffer> m_materialCb{};
 		RefPtr<ConstantBuffer> m_lightCb{};
 		RefPtr<Sampler> m_sampler{};
+
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_offscreenTex;
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_offscreenRTV;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_offscreenSRV;
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_offscreenDSV;
 
 		std::vector<Texture*> m_textures{};
 

@@ -167,3 +167,8 @@ void dx3d::DeviceContext::clearRaster()
 {
 	m_context->RSSetState(nullptr);
 }
+
+ID3D11DeviceContext* dx3d::DeviceContext::getNativeContext() const
+{
+	return m_context.Get();
+}

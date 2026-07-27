@@ -112,23 +112,23 @@ void MainGame::onCreate()
 			camComp->setProjectionMode(dx3d::ProjectionMode::Perspective);
 			display->setRenderMode(dx3d::Display::RenderMode::Lit);
 		}
-		else if (displayIndex == 1)
-		{
-			// Viewport 2 (Top Down, Lit)
-			camera->getTransform().setPosition({ 0.0f, 10.0f, 0.0f });
-			camera->getTransform().setRotation({ 1.5708f, 0.0f, 0.0f });
-			camComp->setProjectionMode(dx3d::ProjectionMode::Orthographic);
-			display->setRenderMode(dx3d::Display::RenderMode::Lit);
-		}
-		else if (displayIndex == 2)
-		{
-			// Viewport 3 (Perspective, Wireframe)
-			camera->getTransform().setPosition({ 0.0f, 1.0f, -2.0f });
-			camera->getTransform().setRotation({ 0.0f, 0.0f, 0.0f });
-			camComp->setProjectionMode(dx3d::ProjectionMode::Perspective);
-			display->setRenderMode(dx3d::Display::RenderMode::Wireframe);
-		}
-		displayIndex++;
+		//else if (displayIndex == 1)
+		//{
+		//	// Viewport 2 (Top Down, Lit)
+		//	camera->getTransform().setPosition({ 0.0f, 10.0f, 0.0f });
+		//	camera->getTransform().setRotation({ 1.5708f, 0.0f, 0.0f });
+		//	camComp->setProjectionMode(dx3d::ProjectionMode::Orthographic);
+		//	display->setRenderMode(dx3d::Display::RenderMode::Lit);
+		//}
+		//else if (displayIndex == 2)
+		//{
+		//	// Viewport 3 (Perspective, Wireframe)
+		//	camera->getTransform().setPosition({ 0.0f, 1.0f, -2.0f });
+		//	camera->getTransform().setRotation({ 0.0f, 0.0f, 0.0f });
+		//	camComp->setProjectionMode(dx3d::ProjectionMode::Perspective);
+		//	display->setRenderMode(dx3d::Display::RenderMode::Wireframe);
+		//}
+		//displayIndex++;
 	}
 	auto player = world.createGameObject<Player>();
 	player->getTransform().setPosition({ 0, 1, -2 });

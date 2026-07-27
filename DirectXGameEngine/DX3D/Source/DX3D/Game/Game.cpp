@@ -11,6 +11,7 @@
 #include <DX3D/Resource/ResourceManager.h>
 #include <DX3D/EventBroadcasting/EventBroadcastManager.h>
 #include <DX3D/EventBroadcasting/EventNames.h>
+#include <DX3D/Graphics/RenderSystem/SwapChain/SwapChain.h>
 
 // ADDED: Engine-level setup for Dear ImGui's Win32 and DirectX 11 backends.
 #include <imgui.h>
@@ -125,13 +126,9 @@ void dx3d::Game::onInternalUpdate()
 		onDrawUi(*display);
 		ImGui::Render();
 
-		// Handle multiple viewports
-		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-			ImGui::UpdatePlatformWindows();
-			ImGui::RenderPlatformWindowsDefault();
-		}
-
 		m_worldRenderer->renderForDisplay(*m_world, *display, deltaTime, ImGui::GetDrawData());
+
+		
 
 	}
 
@@ -160,19 +157,21 @@ void dx3d::Game::initializeDisplayImGui(Display& display)
 	auto* context = ImGui::CreateContext();
 	display.setImGuiContext(context);
 
-	// Style
-	ImGuiIO& io = ImGui::GetIO();
-	ImGuiStyle& style = ImGui::GetStyle();
-	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-		style.WindowRounding = 0.0f;
-		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-	}
-
 	ImGui::SetCurrentContext(context);
 	ImGui::StyleColorsDark();
+
 	ImGui_ImplWin32_Init(display.getHandle());
 	ImGui_ImplDX11_Init(m_graphicsDevice->getNativeDevice(), m_graphicsDevice->getNativeContext());
+
+	// Force ImGui to create its DX11 device objects for this context
+	ImGui_ImplDX11_CreateDeviceObjects();
+
+	// Set DisplaySize
+	ImGuiIO& io = ImGui::GetIO();
+	auto size = display.getSwapChain().getSize();
+	io.DisplaySize = ImVec2((float)size.width, (float)size.height);
 }
+
 
 void dx3d::Game::shutdownDisplayImGui(Display& display)
 {

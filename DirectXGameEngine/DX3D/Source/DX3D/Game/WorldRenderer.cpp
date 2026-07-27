@@ -286,6 +286,13 @@ void dx3d::WorldRenderer::renderForDisplay(const World& world, Display& display,
 		ImGui_ImplDX11_RenderDrawData(uiDrawData);
 	}
 	swapChain.present();
+
+	// Handle multiple viewports
+	ImGuiIO& io = ImGui::GetIO();
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+		ImGui::UpdatePlatformWindows();
+		ImGui::RenderPlatformWindowsDefault();
+	}
 }
 
 void dx3d::WorldRenderer::renderToTexture(const World& world, int width, int height)

@@ -27,6 +27,8 @@ namespace dx3d
 
 		void clearRaster();
 
+		ID3D11DeviceContext* getNativeContext() const;
+
 	private:
 
 		

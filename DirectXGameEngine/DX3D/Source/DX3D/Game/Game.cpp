@@ -121,6 +121,7 @@ void dx3d::Game::onInternalUpdate()
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 		ImGui::DockSpaceOverViewport();
+		m_worldRenderer->renderWorldViewport(*m_world);
 		onDrawUi(*display);
 		ImGui::Render();
 

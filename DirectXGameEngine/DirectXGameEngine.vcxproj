@@ -144,6 +144,7 @@
     <ClCompile Include="DX3D\Source\DX3D\UI\BaseUI.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\UI\InspectorUI.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\EventBroadcasting\EventBroadcastManager.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\UI\HierarchyUI.cpp" />
     <ClCompile Include="IMGUI\imgui.cpp" />
     <ClCompile Include="IMGUI\imgui_draw.cpp" />
     <ClCompile Include="IMGUI\imgui_tables.cpp" />
@@ -249,6 +250,7 @@
     <ClInclude Include="DX3D\Source\DX3D\Graphics\Rasterizer.h" />
     <ClInclude Include="DX3D\Include\DX3D\EventBroadcasting\Parameters.h" />
     <ClInclude Include="DX3D\Include\DX3D\UI\MainMenuBarUI.h" />
+    <ClInclude Include="DX3D\Include\DX3D\UI\HierarchyUI.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

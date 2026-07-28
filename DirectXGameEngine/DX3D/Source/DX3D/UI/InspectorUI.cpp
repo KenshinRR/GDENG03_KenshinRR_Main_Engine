@@ -18,37 +18,52 @@
 
 dx3d::InspectorUI::InspectorUI(const BaseDesc& desc) :BaseUI(desc)
 {
-
-
+	EventBroadcastManager::getInstance().addObserver
+	(
+		EventNames::ON_GAMEOBJECT_SELECTED,
+		[this](dx3d::Parameters& params)
+		{
+			m_selectedGameObject = params.GetGameObjectPtr("Selected", NULL);
+		}
+	);
 }
 
-void dx3d::InspectorUI::draw(GameObject& object, Display& display)
+void dx3d::InspectorUI::draw()
 {
-	std::string windowTitle = "Inspector UI - Window " + std::to_string(display.getID()) + "###InspectorUI_" + std::to_string(display.getID());
+	// std::string windowTitle = "Inspector UI - Window " + std::to_string(display.getID()) + "###InspectorUI_" + std::to_string(display.getID());
 
 	ImGui::SetNextWindowSize(ImVec2(430.0f, 360.0f), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSizeConstraints(ImVec2(430.0f, 300.0f), ImVec2(FLT_MAX, FLT_MAX));
-	if (ImGui::Begin(windowTitle.c_str()))
+	//if (ImGui::Begin(windowTitle.c_str()))
+	if (ImGui::Begin("Inspector"))
 	{
+		// Make sure we actually have a list set
+		if (!m_selectedGameObject || m_selectedGameObject == NULL)
+		{
+			ImGui::Text("No game object selected.");
+			ImGui::End();
+			return;
+		}
+
 		if (ImGui::BeginTabBar("##TestTabs")) // create tab bar with id
 		{
 			if (ImGui::BeginTabItem("Transform"))
 			{
-				drawTransformInspector(object);
+				drawTransformInspector(*m_selectedGameObject);
 				ImGui::EndTabItem();
 			}
 
 			if (ImGui::BeginTabItem("Components"))
 			{
-				drawComponentInspector(object);
+				drawComponentInspector(*m_selectedGameObject);
 				ImGui::EndTabItem();
 			}
 
-			if (ImGui::BeginTabItem("Viewports"))
+			/*if (ImGui::BeginTabItem("Viewports"))
 			{
 				drawViewportPanel(display);
 				ImGui::EndTabItem();
-			}
+			}*/
 
 			if (ImGui::BeginTabItem("Scene"))
 			{
@@ -65,14 +80,9 @@ void dx3d::InspectorUI::draw(GameObject& object, Display& display)
 
 }
 
-void dx3d::InspectorUI::draw()
-{
-}
-
 dx3d::InspectorUI::~InspectorUI()
 {
-
-
+	EventBroadcastManager::getInstance().RemoveObserver(EventNames::ON_GAMEOBJECT_SELECTED);
 }
 
 void dx3d::InspectorUI::drawViewportPanel(Display& display)

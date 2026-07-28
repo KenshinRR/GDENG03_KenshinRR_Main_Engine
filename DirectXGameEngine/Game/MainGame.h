@@ -18,7 +18,7 @@ protected:
 	virtual void onDrawUi(dx3d::Display& display) override; // ADDED: Submits this game's ImGui controls for one display each frame.
 
 private:
+	std::vector< dx3d::UniquePtr<dx3d::BaseUI>> m_UIs{};
 	std::unordered_map<dx3d::ui32, dx3d::UniquePtr<dx3d::InspectorUI>> m_InspectorUIs{};
-	dx3d::UniquePtr<dx3d::MainMenuBarUI> m_MainMenuBarUI{};
 	dx3d::GameObject* m_testObject{}; // ADDED: The centre cube edited by the Transform tab.
 };

@@ -6,6 +6,9 @@
 #include <DX3D/Component/CameraComponent.h>
 #include <filesystem>
 
+#include <DX3D/UI/HierarchyUI.h>
+#include <DX3D/UI/MainMenuBarUI.h>
+
 #include <DX3D/EventBroadcasting/EventBroadcastManager.h>
 #include <DX3D/EventBroadcasting/EventNames.h>
 
@@ -29,7 +32,7 @@ void MainGame::onNewDisplay(dx3d::Display& display)
 	display.getInputSystem().setCursorLocked(false);
 	display.getInputSystem().setCursorVisible(true);
 
-	m_InspectorUIs[display.getID()] = std::make_unique<dx3d::InspectorUI>(dx3d::BaseDesc{ getLogger() });
+	//m_InspectorUIs[display.getID()] = std::make_unique<dx3d::InspectorUI>(dx3d::BaseDesc{ getLogger() });
 }
 
 void MainGame::onCreate()
@@ -40,9 +43,14 @@ void MainGame::onCreate()
 	auto woodTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base/"DirectXGameEngine/Game/Assets/Textures/wood.jpg").c_str());
 	auto floorTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base / "DirectXGameEngine/Game/Assets/Textures/floor.jpg").c_str());
 
-	m_MainMenuBarUI = std::make_unique<dx3d::MainMenuBarUI>(dx3d::BaseDesc{ getLogger() });
-	
-	
+	// UI initialize
+	std::unique_ptr<dx3d::HierarchyUI> hierarchy_UI = std::make_unique<dx3d::HierarchyUI>(dx3d::BaseDesc{ getLogger() });
+	hierarchy_UI->setGameObjectList(&world.getGameObjectList());
+	m_UIs.push_back(std::move(hierarchy_UI));
+
+	m_UIs.push_back(std::make_unique<dx3d::MainMenuBarUI>(dx3d::BaseDesc{ getLogger() }));
+	m_UIs.push_back(std::make_unique<dx3d::InspectorUI>(dx3d::BaseDesc{ getLogger() }));
+
 	// Create mesh resources (reusable)
 	auto cubeMesh = dx3d::MeshFactory::createCubeMesh();
 	auto sphereMesh = dx3d::MeshFactory::createSphereMesh(20, 20);
@@ -159,7 +167,7 @@ void MainGame::onDisplayAdded(dx3d::Display& display)
 
 void MainGame::onDrawUi(dx3d::Display& display)
 {
-	if (m_testObject)
+	/*if (m_testObject)
 	{
 		auto it = m_InspectorUIs.find(display.getID());
 		if (it == m_InspectorUIs.end())
@@ -167,7 +175,10 @@ void MainGame::onDrawUi(dx3d::Display& display)
 			it = m_InspectorUIs.emplace(display.getID(), std::make_unique<dx3d::InspectorUI>(dx3d::BaseDesc{ getLogger() })).first;
 		}
 		it->second->draw(*m_testObject, display);
-	}
+	}*/
 
-	m_MainMenuBarUI->draw();
+	for (auto& m_UI : m_UIs)
+	{
+		m_UI->draw();
+	}
 }

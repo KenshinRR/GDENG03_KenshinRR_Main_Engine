@@ -15,5 +15,8 @@ namespace dx3d
 
 		inline static const std::string ON_WINDOW_DESTROY = "ON_WINDOW_DESTROY";
 		inline static const std::string ON_WINDOW_NEW = "ON_WINDOW_NEW";
+
+		inline static const std::string ON_ADD_EMPTY_GAMEOBJECT = "ON_ADD_EMPTY_GAMEOBJECT";
+		inline static const std::string ON_GAMEOBJECT_SELECTED = "ON_GAMEOBJECT_SELECTED";
     };
 }

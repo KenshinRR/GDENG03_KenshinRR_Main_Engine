@@ -10,7 +10,6 @@ namespace dx3d
 	{
 	public:
 		InspectorUI(const BaseDesc& desc);
-		void draw(GameObject& object, Display& display);
 		void draw() override;
 
 		~InspectorUI();
@@ -20,7 +19,9 @@ namespace dx3d
 		void drawTransformInspector(GameObject& object);
 		void drawComponentInspector(GameObject& object);
 		void drawViewportPanel(Display& display);
-
+	private:
+		GameObject* m_selectedGameObject;
+		//Display& m_display;
 	};
 
 }

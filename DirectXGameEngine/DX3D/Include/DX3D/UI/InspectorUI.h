@@ -1,6 +1,7 @@
 #pragma once
 #include <DX3D/Core/Base.h>
 #include <DX3D/UI/BaseUI.h>
+#include <DX3D/Math/Vec3.h>
 #include <vector>
 
 namespace dx3d
@@ -20,7 +21,14 @@ namespace dx3d
 		void drawComponentInspector(GameObject& object);
 		void drawViewportPanel(Display& display);
 	private:
-		GameObject* m_selectedGameObject;
+		GameObject* m_selectedGameObject{};
+		bool m_isPlayMode{ false };
+		bool m_trackingPositionEdit{ false };
+		bool m_trackingRotationEdit{ false };
+		bool m_trackingScaleEdit{ false };
+		Vec3 m_editStartPosition{};
+		Vec3 m_editStartRotation{};
+		Vec3 m_editStartScale{};
 		//Display& m_display;
 	};
 

@@ -17,6 +17,13 @@ namespace dx3d
 		inline static const std::string ON_WINDOW_NEW = "ON_WINDOW_NEW";
 
 		inline static const std::string ON_ADD_EMPTY_GAMEOBJECT = "ON_ADD_EMPTY_GAMEOBJECT";
+		inline static const std::string ON_ADD_3D_OBJECT = "ON_ADD_3D_OBJECT";
+		inline static const std::string ON_DELETE_GAMEOBJECT = "ON_DELETE_GAMEOBJECT";
+		inline static const std::string ON_SET_GAMEOBJECT_ENABLED = "ON_SET_GAMEOBJECT_ENABLED";
 		inline static const std::string ON_GAMEOBJECT_SELECTED = "ON_GAMEOBJECT_SELECTED";
+		inline static const std::string ON_TRANSFORM_CHANGED = "ON_TRANSFORM_CHANGED";
+		inline static const std::string ON_EDITOR_UNDO = "ON_EDITOR_UNDO";
+		inline static const std::string ON_EDITOR_REDO = "ON_EDITOR_REDO";
+		inline static const std::string ON_EDITOR_PLAY_MODE_CHANGED = "ON_EDITOR_PLAY_MODE_CHANGED";
     };
 }

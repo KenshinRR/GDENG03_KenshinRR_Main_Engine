@@ -30,7 +30,10 @@ void dx3d::World::update(f32 deltaTime)
     for (auto& [typeId, objects] : m_objects)
     {
         for (auto& obj : objects)
-            obj->onUpdate(deltaTime);
+        {
+            if (obj && obj->isEnabled() && !obj->isDeleted())
+                obj->onUpdate(deltaTime);
+        }
     }
 
     //// Update per‑window objects

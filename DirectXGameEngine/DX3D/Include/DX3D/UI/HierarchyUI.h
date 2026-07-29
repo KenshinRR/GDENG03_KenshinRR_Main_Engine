@@ -19,6 +19,7 @@ namespace dx3d
 
 	private:
 		bool m_showHierarchy = true;
+		bool m_isPlayMode = false;
 		const std::unordered_map<size_t, std::vector<UniquePtr<GameObject>>>* m_gameObjects{};
 	};
 

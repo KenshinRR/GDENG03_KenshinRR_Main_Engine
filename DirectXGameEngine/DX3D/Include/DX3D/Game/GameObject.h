@@ -41,6 +41,12 @@ namespace dx3d
 		uint32_t getWindowId() const noexcept { return m_windowId; }
 		void setWindowId(uint32_t id) noexcept { m_windowId = id; }
 
+		bool isEnabled() const noexcept { return m_enabled; }
+		void setEnabled(bool enabled) noexcept { m_enabled = enabled; }
+
+		bool isDeleted() const noexcept { return m_deleted; }
+		void setDeleted(bool deleted) noexcept { m_deleted = deleted; }
+
 		void setName(std::string name);
 		std::string getName() { return m_name; }
 	protected:
@@ -60,6 +66,8 @@ namespace dx3d
 		GameContext m_gameContext;
 		World& m_world;
 		uint32_t m_windowId{ 0 };
+		bool m_enabled{ true };
+		bool m_deleted{ false };
 
 		friend class World;
 	};

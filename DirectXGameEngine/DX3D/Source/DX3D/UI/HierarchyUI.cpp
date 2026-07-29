@@ -1,4 +1,4 @@
-#include <DX3D/UI/HierarchyUI.h>
+﻿#include <DX3D/UI/HierarchyUI.h>
 #include <DX3D/Game/GameObject.h>
 #include <DX3D/EventBroadcasting/EventBroadcastManager.h>
 #include <DX3D/EventBroadcasting/EventNames.h>
@@ -6,10 +6,18 @@
 
 dx3d::HierarchyUI::HierarchyUI(const BaseDesc& desc) : BaseUI(desc)
 {
+    EventBroadcastManager::getInstance().addObserver(
+        EventNames::ON_EDITOR_PLAY_MODE_CHANGED,
+        [this](Parameters& params)
+        {
+            m_isPlayMode = params.GetBoolExtra("IsPlayMode", false);
+        }
+    );
 }
 
 dx3d::HierarchyUI::~HierarchyUI()
 {
+    EventBroadcastManager::getInstance().RemoveObserver(EventNames::ON_EDITOR_PLAY_MODE_CHANGED);
 }
 
 void dx3d::HierarchyUI::draw()
@@ -18,6 +26,14 @@ void dx3d::HierarchyUI::draw()
     {
         if (ImGui::Begin("Hierarchy", &m_showHierarchy))
         {
+            ImGui::TextColored(
+                m_isPlayMode ? ImVec4(1.0f, 0.55f, 0.25f, 1.0f) : ImVec4(0.25f, 0.9f, 0.45f, 1.0f),
+                m_isPlayMode ? "Mode: Play (scene editing locked)" : "Mode: Edit"
+            );
+            ImGui::Separator();
+
+            ImGui::BeginDisabled(m_isPlayMode);
+
             // Add GameObject button
             if (ImGui::Button("Add New GameObject"))
             {
@@ -31,18 +47,15 @@ void dx3d::HierarchyUI::draw()
                 {
                     EventBroadcastManager::getInstance().postEvent(EventNames::ON_ADD_EMPTY_GAMEOBJECT);
                 }
-                /*if (ImGui::MenuItem("Add Bunny"))
+                if (ImGui::MenuItem("Add Cube"))
                 {
-                    param.PutExtra("Key", "Bunny");
+                    param.PutExtra("Key", "Cube");
                     EventBroadcastManager::getInstance().postEvent(EventNames::ON_ADD_3D_OBJECT, param);
                 }
-                if (ImGui::MenuItem("Add Armadillo"))
-                {
-                    param.PutExtra("Key", "Armadillo");
-                    EventBroadcastManager::getInstance().postEvent(EventNames::ON_ADD_3D_OBJECT, param);
-                }*/
                 ImGui::EndPopup();
             }
+
+            ImGui::EndDisabled();
 
 
             // Make sure we actually have a list set
@@ -62,18 +75,47 @@ void dx3d::HierarchyUI::draw()
                 for (auto& objPtr : vec)
                 {
                     GameObject* obj = objPtr.get();
-                    if (!obj) continue;
+                    if (!obj || obj->isDeleted()) continue;
 
-                    // Use the GameObject�s real name accessor
+                    // Use the GameObject’s real name accessor
                     const std::string& name = obj->getName();
 
-                    if (ImGui::Button((name + "##" + std::to_string(key) + std::to_string(g_it)).c_str()))
+                    ImGui::PushID(obj);
+
+                    bool enabled = obj->isEnabled();
+                    ImGui::BeginDisabled(m_isPlayMode);
+                    if (ImGui::Checkbox("##Enabled", &enabled))
+                    {
+                        Parameters param;
+                        param.PutExtra("Target", obj);
+                        param.PutExtra("Enabled", enabled);
+                        EventBroadcastManager::getInstance().postEvent(EventNames::ON_SET_GAMEOBJECT_ENABLED, param);
+                    }
+                    ImGui::EndDisabled();
+
+                    ImGui::SameLine();
+                    if (ImGui::SmallButton(("Select##" + std::to_string(g_it)).c_str()))
                     {
                         Parameters param;
                         param.PutExtra("Selected", obj);
 
                         EventBroadcastManager::getInstance().postEvent(EventNames::ON_GAMEOBJECT_SELECTED, param);
                     }
+
+                    ImGui::SameLine();
+                    ImGui::TextUnformatted(name.c_str());
+
+                    ImGui::SameLine();
+                    ImGui::BeginDisabled(m_isPlayMode);
+                    if (ImGui::SmallButton("Delete"))
+                    {
+                        Parameters param;
+                        param.PutExtra("Target", obj);
+                        EventBroadcastManager::getInstance().postEvent(EventNames::ON_DELETE_GAMEOBJECT, param);
+                    }
+                    ImGui::EndDisabled();
+
+                    ImGui::PopID();
                     g_it++;
                 }
             }
@@ -87,3 +129,4 @@ void dx3d::HierarchyUI::setGameObjectList(const std::unordered_map<size_t, std::
 {
     m_gameObjects = list;
 }
+

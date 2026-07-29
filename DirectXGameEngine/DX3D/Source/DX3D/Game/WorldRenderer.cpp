@@ -97,6 +97,9 @@ void dx3d::WorldRenderer::render(const World& world, SwapChain& swapChain, f32 d
 		{
 
 			auto component = components[i];
+			if (!component->getGameObject().isEnabled() || component->getGameObject().isDeleted())
+				continue;
+
 			cameraData.view = component->getViewMatrix();
 			component->setViewportSize(size);
 			cameraData.proj = component->getProjectionMatrix();
@@ -130,6 +133,9 @@ void dx3d::WorldRenderer::render(const World& world, SwapChain& swapChain, f32 d
 		for (auto i : std::views::iota(0u, numComponents))
 		{
 			auto component = components[i];
+			if (!component->getGameObject().isEnabled() || component->getGameObject().isDeleted())
+				continue;
+
 			auto& transform = component->getGameObject().getTransform();
 			auto mesh = component->getMesh();
 
@@ -261,6 +267,9 @@ void dx3d::WorldRenderer::renderForDisplay(const World& world, Display& display,
 	for (auto i : std::views::iota(0u, numComponents))
 	{
 		auto component = components[i];
+		if (!component->getGameObject().isEnabled() || component->getGameObject().isDeleted())
+			continue;
+
 		auto& transform = component->getGameObject().getTransform();
 		auto mesh = component->getMesh();
 		auto material = component->getMaterial();
@@ -419,6 +428,9 @@ void dx3d::WorldRenderer::renderScene(const World& world, int width, int height)
 	auto components = world.getComponents<MeshComponent>(numComponents);
 	for (auto i : std::views::iota(0u, numComponents)) {
 		auto component = components[i];
+		if (!component->getGameObject().isEnabled() || component->getGameObject().isDeleted())
+			continue;
+
 		auto& transform = component->getGameObject().getTransform();
 		auto mesh = component->getMesh();
 		auto material = component->getMaterial();

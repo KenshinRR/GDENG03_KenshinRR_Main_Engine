@@ -11,6 +11,7 @@
 
 #include <DX3D/EventBroadcasting/EventBroadcastManager.h>
 #include <DX3D/EventBroadcasting/EventNames.h>
+#include <DX3D/EventBroadcasting/Parameters.h>
 
 MainGame::MainGame(const dx3d::GameDesc& desc) : dx3d::Game(desc)
 {
@@ -53,11 +54,20 @@ void MainGame::onCreate()
 
 	// Create mesh resources (reusable)
 	auto cubeMesh = dx3d::MeshFactory::createCubeMesh();
+	m_spawnCubeMesh = cubeMesh;
 	auto sphereMesh = dx3d::MeshFactory::createSphereMesh(20, 20);
 	auto capsuleMesh = dx3d::MeshFactory::createCapsuleMesh(0.5f, 2.0f);
 	auto cylinderMesh = dx3d::MeshFactory::createCylinderMesh(0.5f, 2.0f);
 	auto planeMesh = dx3d::MeshFactory::createPlaneMesh(10.0f, 10.0f);
 	auto circleMesh = dx3d::MeshFactory::createCircleMesh(0.5f, 32);
+
+	m_spawnMaterial = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base / "DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
+	if (m_spawnMaterial)
+	{
+		auto matData = dx3d::Vec3(1, 1, 1);
+		m_spawnMaterial->setData(std::as_bytes(std::span{ &matData, 1 }));
+		m_spawnMaterial->setTexture(0, woodTex);
+	}
 
 	{
 		auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base/"DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
@@ -152,6 +162,7 @@ void MainGame::onCreate()
 		m_InspectorUIs[display->getID()] = std::make_unique<dx3d::InspectorUI>(dx3d::BaseDesc{ getLogger() });
 	}
 
+	registerEditorEvents();
 }
 
 void MainGame::onUpdate(dx3d::f32 deltaTime)
@@ -181,4 +192,170 @@ void MainGame::onDrawUi(dx3d::Display& display)
 	{
 		m_UI->draw();
 	}
+}
+
+void MainGame::registerEditorEvents()
+{
+	auto& events = dx3d::EventBroadcastManager::getInstance();
+
+	events.addObserver(dx3d::EventNames::ON_ADD_EMPTY_GAMEOBJECT, [this]()
+	{
+		if (m_isPlayMode) return;
+
+		auto* object = spawnEditorObject("Empty");
+		if (!object) return;
+
+		object->setDeleted(true);
+		executeEditorCommand(EditorCommand{
+			[object]() { object->setDeleted(true); },
+			[object]() { object->setDeleted(false); }
+		});
+		selectGameObject(object);
+	});
+
+	events.addObserver(dx3d::EventNames::ON_ADD_3D_OBJECT, [this](dx3d::Parameters& params)
+	{
+		if (m_isPlayMode) return;
+
+		auto type = params.GetStringExtra("Key", "Cube");
+		auto* object = spawnEditorObject(type);
+		if (!object) return;
+
+		object->setDeleted(true);
+		executeEditorCommand(EditorCommand{
+			[object]() { object->setDeleted(true); },
+			[object]() { object->setDeleted(false); }
+		});
+		selectGameObject(object);
+	});
+
+	events.addObserver(dx3d::EventNames::ON_DELETE_GAMEOBJECT, [this](dx3d::Parameters& params)
+	{
+		if (m_isPlayMode) return;
+
+		auto* object = params.GetGameObjectPtr("Target", nullptr);
+		if (!object || object->isDeleted()) return;
+
+		executeEditorCommand(EditorCommand{
+			[object]() { object->setDeleted(false); },
+			[object]() { object->setDeleted(true); }
+		});
+		selectGameObject(nullptr);
+	});
+
+	events.addObserver(dx3d::EventNames::ON_SET_GAMEOBJECT_ENABLED, [this](dx3d::Parameters& params)
+	{
+		if (m_isPlayMode) return;
+
+		auto* object = params.GetGameObjectPtr("Target", nullptr);
+		if (!object || object->isDeleted()) return;
+
+		const bool oldValue = object->isEnabled();
+		const bool newValue = params.GetBoolExtra("Enabled", oldValue);
+		if (oldValue == newValue) return;
+
+		executeEditorCommand(EditorCommand{
+			[object, oldValue]() { object->setEnabled(oldValue); },
+			[object, newValue]() { object->setEnabled(newValue); }
+		});
+	});
+
+	events.addObserver(dx3d::EventNames::ON_TRANSFORM_CHANGED, [this](dx3d::Parameters& params)
+	{
+		if (m_isPlayMode) return;
+
+		auto* object = params.GetGameObjectPtr("Target", nullptr);
+		if (!object || object->isDeleted()) return;
+
+		auto property = params.GetStringExtra("Property", "");
+		auto oldValue = params.GetVec3Extra("OldValue", {});
+		auto newValue = params.GetVec3Extra("NewValue", oldValue);
+
+		auto applyValue = [object, property](const dx3d::Vec3& value)
+		{
+			if (property == "Position") object->getTransform().setPosition(value);
+			else if (property == "Rotation") object->getTransform().setRotation(value);
+			else if (property == "Scale") object->getTransform().setScale(value);
+		};
+
+		executeEditorCommand(EditorCommand{
+			[applyValue, oldValue]() { applyValue(oldValue); },
+			[applyValue, newValue]() { applyValue(newValue); }
+		});
+	});
+
+	events.addObserver(dx3d::EventNames::ON_EDITOR_UNDO, [this]() { undoEditorCommand(); });
+	events.addObserver(dx3d::EventNames::ON_EDITOR_REDO, [this]() { redoEditorCommand(); });
+	events.addObserver(dx3d::EventNames::ON_EDITOR_PLAY_MODE_CHANGED, [this](dx3d::Parameters& params)
+	{
+		setPlayMode(params.GetBoolExtra("IsPlayMode", false));
+	});
+}
+
+void MainGame::executeEditorCommand(EditorCommand command)
+{
+	if (m_isPlayMode) return;
+
+	command.redo();
+	m_undoStack.push_back(command);
+	if (m_undoStack.size() > MaxUndoCommands)
+	{
+		m_undoStack.erase(m_undoStack.begin());
+	}
+	m_redoStack.clear();
+}
+
+void MainGame::undoEditorCommand()
+{
+	if (m_isPlayMode || m_undoStack.empty()) return;
+
+	auto command = m_undoStack.back();
+	m_undoStack.pop_back();
+	command.undo();
+	m_redoStack.push_back(command);
+}
+
+void MainGame::redoEditorCommand()
+{
+	if (m_isPlayMode || m_redoStack.empty()) return;
+
+	auto command = m_redoStack.back();
+	m_redoStack.pop_back();
+	command.redo();
+	m_undoStack.push_back(command);
+}
+
+void MainGame::setPlayMode(bool isPlayMode)
+{
+	m_isPlayMode = isPlayMode;
+}
+
+dx3d::GameObject* MainGame::spawnEditorObject(const std::string& type)
+{
+	auto* object = getWorld().createGameObject<dx3d::GameObject>();
+	if (!object) return nullptr;
+
+	++m_spawnedObjectCounter;
+	object->setName(type == "Empty"
+		? "Empty GameObject " + std::to_string(m_spawnedObjectCounter)
+		: "Cube " + std::to_string(m_spawnedObjectCounter));
+
+	object->getTransform().setPosition({ 0.0f, 0.5f, 0.0f });
+	object->getTransform().setScale({ 0.5f, 0.5f, 0.5f });
+
+	if (type == "Cube" && m_spawnCubeMesh && m_spawnMaterial)
+	{
+		auto* mesh = object->createOrGetComponent<dx3d::MeshComponent>();
+		mesh->setMesh(m_spawnCubeMesh);
+		mesh->setMaterial(m_spawnMaterial);
+	}
+
+	return object;
+}
+
+void MainGame::selectGameObject(dx3d::GameObject* object)
+{
+	dx3d::Parameters params;
+	params.PutExtra("Selected", object);
+	dx3d::EventBroadcastManager::getInstance().postEvent(dx3d::EventNames::ON_GAMEOBJECT_SELECTED, params);
 }

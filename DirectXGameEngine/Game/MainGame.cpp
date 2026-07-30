@@ -34,9 +34,13 @@ void MainGame::onNewDisplay(dx3d::Display& display)
 
 void MainGame::onCreate()
 {
+	
+
 	Game::onCreate();
 	auto& world = getWorld();
 	std::filesystem::path base = std::filesystem::current_path().parent_path();
+
+	// note: figure out way to store these in an unordered map or something for the texturews and materials
 	auto woodTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base/"DirectXGameEngine/Game/Assets/Textures/wood.jpg").c_str());
 	auto floorTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base / "DirectXGameEngine/Game/Assets/Textures/floor.jpg").c_str());
 
@@ -44,12 +48,12 @@ void MainGame::onCreate()
 	
 	
 	// Create mesh resources (reusable)
-	auto cubeMesh = dx3d::MeshFactory::createCubeMesh();
-	auto sphereMesh = dx3d::MeshFactory::createSphereMesh(20, 20);
-	auto capsuleMesh = dx3d::MeshFactory::createCapsuleMesh(0.5f, 2.0f);
-	auto cylinderMesh = dx3d::MeshFactory::createCylinderMesh(0.5f, 2.0f);
-	auto planeMesh = dx3d::MeshFactory::createPlaneMesh(10.0f, 10.0f);
-	auto circleMesh = dx3d::MeshFactory::createCircleMesh(0.5f, 32);
+	auto cubeMesh = getMeshFactory().createCubeMesh();
+	auto sphereMesh = getMeshFactory().createSphereMesh(20, 20);
+	auto capsuleMesh = getMeshFactory().createCapsuleMesh(0.5f, 2.0f);
+	auto cylinderMesh = getMeshFactory().createCylinderMesh(0.5f, 2.0f);
+	auto planeMesh = getMeshFactory().createPlaneMesh(10.0f, 10.0f);
+	auto circleMesh = getMeshFactory().createCircleMesh(0.5f, 32);
 
 	{
 		auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base/"DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
@@ -68,6 +72,23 @@ void MainGame::onCreate()
 		floor->getTransform().setPosition({ 0, 0, 0 });
 
 	}
+
+
+	// test object
+	{
+		auto BasMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base / "DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
+		if(BasMat)
+		{
+			auto matData = dx3d::Vec3(1, 1, 1);
+			BasMat->setData(std::as_bytes(std::span{ &matData, 1 }));
+			BasMat->setTexture(0, woodTex);
+		}
+		auto testObj = world.createGameObject<dx3d::GameObject>();
+		testObj->createOrGetComponent<dx3d::MeshComponent>()->setMesh(getMeshFactory().getCustomMesh("Armadillo"));
+		testObj->getComponent<dx3d::MeshComponent>()->setMaterial(BasMat);
+
+	}
+
 
 	srand((unsigned int)time(NULL));
 

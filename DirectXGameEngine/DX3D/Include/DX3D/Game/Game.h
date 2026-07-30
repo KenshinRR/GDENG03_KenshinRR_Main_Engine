@@ -16,7 +16,13 @@ namespace dx3d
 
         virtual World& getWorld() noexcept final;
         virtual Logger& getLogger() noexcept final;
+        
+        // MANAGERS
         virtual ResourceManager& getResourceManager() noexcept final;
+
+        virtual MeshFactory& getMeshFactory() noexcept final;
+
+        //run function
         virtual void run() final;
 
         // New: add/remove displays
@@ -37,6 +43,7 @@ namespace dx3d
         RefPtr<GraphicsDevice> m_graphicsDevice{};
         std::vector<UniquePtr<Display>> m_displays{};   // multiple displays
         UniquePtr<ResourceManager> m_resourceManager{};
+		UniquePtr<MeshFactory> m_meshFactory{};
         UniquePtr<World> m_world{};
         UniquePtr<WorldRenderer> m_worldRenderer{};
         Rect m_windowSize;

@@ -8,7 +8,11 @@
 #include <DX3D/Game/World.h>
 #include <DX3D/Game/GameObject.h>
 #include <DX3D/Game/WorldRenderer.h>
+
+// MANAGERS
 #include <DX3D/Resource/ResourceManager.h>
+#include <DX3D/Graphics/Mesh/MeshFactory.h>
+
 #include <DX3D/EventBroadcasting/EventBroadcastManager.h>
 #include <DX3D/EventBroadcasting/EventNames.h>
 #include <DX3D/Graphics/RenderSystem/SwapChain/SwapChain.h>
@@ -34,6 +38,7 @@ dx3d::Game::Game(const GameDesc& desc)
 
 	auto context = SystemContext{ *m_graphicsDevice };
 	m_resourceManager = std::make_unique<ResourceManager>(ResourceManagerDesc{ {*m_logger}, context });
+	m_meshFactory = std::make_unique<MeshFactory>(MeshFactoryDesc{ {*m_logger} });
 
 	m_world = std::make_unique<World>(WorldDesc{ BaseDesc{*m_logger}, GameContext{m_displays.front()->getInputSystem(), *m_resourceManager, *m_graphicsDevice}});
 
@@ -52,6 +57,9 @@ dx3d::Game::Game(const GameDesc& desc)
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;     // Enable Multi-Viewport
 
 	DX3DLogInfo("Game Initialized!");
+
+	/// testing add Obj mesh data  via meshfactory here
+	m_meshFactory->loadAll();
 }
 
 dx3d::World& dx3d::Game::getWorld() noexcept
@@ -80,6 +88,11 @@ dx3d::Game::~Game()
 dx3d::ResourceManager& dx3d::Game::getResourceManager() noexcept
 {
 	return *m_resourceManager;
+}
+
+dx3d::MeshFactory& dx3d::Game::getMeshFactory() noexcept
+{
+	return *m_meshFactory;
 }
 
 void dx3d::Game::onInternalUpdate()

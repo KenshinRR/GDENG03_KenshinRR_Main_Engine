@@ -15,6 +15,10 @@
 #include <DX3D/Resource/MaterialResource.h>
 #include <DX3D/Resource/TextureResource.h>
 
+#include <DX3D/EventBroadcasting/EventBroadcastManager.h>
+#include <DX3D/EventBroadcasting/EventNames.h>
+#include <DX3D/EventBroadcasting/Parameters.h>
+
 #include <ranges>
 
 dx3d::SceneViewportUI::SceneViewportUI(const BaseDesc& desc, World& world, WorldRenderer& worldRenderer)
@@ -115,6 +119,15 @@ void dx3d::SceneViewportUI::renderWorldViewport()
 	ImGui::Begin(m_name.c_str());
 	ImVec2 avail = ImGui::GetContentRegionAvail();
 
+	if (ImGui::IsWindowFocused()) {
+		Parameters param;
+		param.PutExtra("CameraID", m_camera_ID);
+		EventBroadcastManager::getInstance().postEvent(
+			EventNames::ON_VIEWPORT_FOCUSED,
+			param
+		);
+	}
+
 	// Recreate offscreen target if size changed and valid
 	static int texW = 0, texH = 0;
 	int newW = (int)avail.x;
@@ -140,29 +153,32 @@ void dx3d::SceneViewportUI::renderScene(int width, int height)
 	// Camera setup (similar to renderForDisplay)
 
 	auto& context = *m_deviceContext;
+	ui32 numComponents = 0;
 
 	//Getting the camera
-	ui32 numComponents = 0;
-	auto cameras = m_world.getComponents<CameraComponent>(numComponents);
-	CameraComponent* cam = nullptr;
+	GameObject* cam_obj = m_world.getGameObjectById(m_camera_ID);
+	CameraComponent* cam_component = cam_obj->createOrGetComponent<CameraComponent>();
 
-	for (int i = 0; i < numComponents; i++)
+	/*auto cameras = m_world.getComponents<CameraComponent>(numComponents);
+	CameraComponent* cam_component = nullptr;*/
+
+	/*for (int i = 0; i < numComponents; i++)
 	{
 		if (cameras[i]->getID() == m_camera_ID)
 		{
 			cam = cameras[i];
 		}
-	}
+	}*/
 
-	if (numComponents > 0 && cam != nullptr) {
+	if (cam_component != nullptr) {
 		CameraData cameraData{};
-		cameraData.view = cam->getViewMatrix();
-		cam->setViewportSize({ width, height });
-		cameraData.proj = cam->getProjectionMatrix();
+		cameraData.view = cam_component->getViewMatrix();
+		cam_component->setViewportSize({ width, height });
+		cameraData.proj = cam_component->getProjectionMatrix();
 		cameraData.cameraPosition = Vec4(
-			cam->getGameObject().getTransform().getPosition().x,
-			cam->getGameObject().getTransform().getPosition().y,
-			cam->getGameObject().getTransform().getPosition().z,
+			cam_component->getGameObject().getTransform().getPosition().x,
+			cam_component->getGameObject().getTransform().getPosition().y,
+			cam_component->getGameObject().getTransform().getPosition().z,
 			1.0f
 		);
 		context.updateConstantBuffer(*m_cameraCb, std::as_bytes(std::span{ &cameraData, 1 }));

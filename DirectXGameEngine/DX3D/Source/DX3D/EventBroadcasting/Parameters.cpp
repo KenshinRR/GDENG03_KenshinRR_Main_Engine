@@ -13,6 +13,11 @@ void dx3d::Parameters::PutExtra(std::string paramName, uint32_t value)
 	this->uint32Data[paramName] = (value);
 }
 
+void dx3d::Parameters::PutExtra(std::string paramName, size_t value)
+{
+	this->sizeTData[paramName] = value;
+}
+
 void dx3d::Parameters::PutExtra(std::string paramName, bool value)
 {
 	this->boolData[paramName] = value;
@@ -38,6 +43,18 @@ uint32_t dx3d::Parameters::GetUInt32Extra(std::string paramName, uint32_t def_va
 	if (this->uint32Data.contains(paramName))
 	{
 		return this->uint32Data[paramName];
+	}
+	else
+	{
+		return def_value;
+	}
+}
+
+size_t dx3d::Parameters::GetSizeTExtra(std::string paramName, size_t def_value)
+{
+	if (this->sizeTData.contains(paramName))
+	{
+		return this->sizeTData[paramName];
 	}
 	else
 	{

@@ -61,6 +61,7 @@ namespace dx3d
 		void update(f32 deltaTime);
 
 		const std::unordered_map<size_t, std::vector<UniquePtr<GameObject>>>& getGameObjectList();
+		GameObject* getGameObjectById(size_t id) const noexcept;
 	private:
 		GameObject* createGameObjectInternal(UniquePtr<GameObject>& object);
 		void addComponentInternal(Component& component);

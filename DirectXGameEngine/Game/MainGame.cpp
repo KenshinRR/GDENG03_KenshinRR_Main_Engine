@@ -49,7 +49,7 @@ void MainGame::onNewWorldView(std::string name)
 	camera->getTransform().setRotation({ 0.0f, 0.0f, 0.0f });
 	camComp->setProjectionMode(dx3d::ProjectionMode::Perspective);
 
-	addWorldView(name, camComp->getID());
+	addWorldView(name, camera->getID());
 }
 
 void MainGame::onCreate()

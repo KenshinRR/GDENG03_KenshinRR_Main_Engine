@@ -62,6 +62,8 @@ dx3d::GameObject* dx3d::World::createGameObjectInternal(UniquePtr<GameObject>& o
 {
 	if (!object) return {};
 
+    object.get()->setID(generateId());
+
 	auto ptr = object.get();
 	auto typeId = ptr->getTypeId();
 
@@ -77,6 +79,7 @@ dx3d::GameObject* dx3d::World::createGameObjectInternal(UniquePtr<GameObject>& o
 void dx3d::World::addComponentInternal(Component& component)
 {
 	auto typeId = component.getTypeId();
+    component.setID(generateId());
 	m_components[typeId].push_back(&component);
 }
 

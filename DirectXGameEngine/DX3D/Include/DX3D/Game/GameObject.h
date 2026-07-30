@@ -49,6 +49,9 @@ namespace dx3d
 
 		void setName(std::string name);
 		std::string getName() { return m_name; }
+
+		void setID(size_t _id) { m_ID = _id; }
+		size_t getID() { return m_ID; }
 	protected:
 		virtual void onCreate() {}
 		virtual void onUpdate(f32 deltaTime) {}
@@ -58,6 +61,7 @@ namespace dx3d
 		Component* getComponentInternal(size_t id);
 	private:
 		std::string m_name = "GameObject";
+		size_t m_ID;
 		InputSystem* m_windowInput;
 		std::unordered_map<size_t, UniquePtr<Component>> m_components{};
 

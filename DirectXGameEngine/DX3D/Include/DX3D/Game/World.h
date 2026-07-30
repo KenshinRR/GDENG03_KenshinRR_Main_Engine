@@ -67,6 +67,12 @@ namespace dx3d
 		void addDirtyTransformInternal(TransformComponent& component);
 
 		Component* const* getComponentsInternal(size_t typeId, ui32* numComponents) const noexcept;
+
+		size_t generateId() {
+			static size_t counter = 0;
+			return ++counter;
+		}
+
 	private:
 		enum class EventType
 		{

@@ -441,3 +441,89 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCircleMesh(f32 radius, ui32 se
 
 	return std::make_shared<Mesh>(vertices, indices);
 }
+
+dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::loadMeshFromFile(const std::string& filepath)
+{
+	return RefPtr<Mesh>();
+}
+
+dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createMesh(const std::vector<Vertex>& vertices, const std::vector<ui32>& indices)
+{
+	if (vertices.empty() || indices.empty() || indices.size() % 3 != 0)
+		return nullptr;
+
+	for (const auto index : indices)
+	{
+		if (index >= vertices.size())
+			return nullptr;
+	}
+
+	return std::make_shared<Mesh>(vertices, indices);
+}
+
+
+/// HELPER FUNCTIONS FOR LoadMesh
+
+namespace
+{
+	struct ObjIndex { int position = 0; int texcoord = 0; int normal = 0; };
+
+	// OBJ indices are one-based; negative values are relative to the latest record.
+	int resolveObjIndex(int index, size_t count)
+	{
+		if (index > 0) return index - 1;
+		if (index < 0) return static_cast<int>(count) + index;
+		return -1;
+	}
+
+	bool parseObjIndex(const std::string& token, ObjIndex& result)
+	{
+		try
+		{
+			const auto firstSlash = token.find('/');
+			if (firstSlash == std::string::npos) { result.position = std::stoi(token); return true; }
+			result.position = std::stoi(token.substr(0, firstSlash));
+			const auto secondSlash = token.find('/', firstSlash + 1);
+			if (secondSlash == std::string::npos)
+			{
+				const auto uv = token.substr(firstSlash + 1);
+				if (!uv.empty()) result.texcoord = std::stoi(uv);
+				return true;
+			}
+			const auto uv = token.substr(firstSlash + 1, secondSlash - firstSlash - 1);
+			const auto normal = token.substr(secondSlash + 1);
+			if (!uv.empty()) result.texcoord = std::stoi(uv);
+			if (!normal.empty()) result.normal = std::stoi(normal);
+			return true;
+		}
+		catch (const std::exception&) { return false; }
+	}
+
+	// Some OBJ files, including the Stanford bunny, contain geometry only.  Give
+	// those meshes a stable spherical projection instead of sampling texture
+	// coordinate (0, 0) for every vertex.
+	dx3d::Vec2 generateFallbackTexcoord(const dx3d::Vec3& position, const dx3d::Vec3& minimum, const dx3d::Vec3& maximum)
+	{
+		const dx3d::Vec3 centre{
+			(minimum.x + maximum.x) * 0.5f,
+			(minimum.y + maximum.y) * 0.5f,
+			(minimum.z + maximum.z) * 0.5f
+		};
+		const dx3d::Vec3 halfExtent{
+			std::max((maximum.x - minimum.x) * 0.5f, 0.0001f),
+			std::max((maximum.y - minimum.y) * 0.5f, 0.0001f),
+			std::max((maximum.z - minimum.z) * 0.5f, 0.0001f)
+		};
+		const dx3d::Vec3 direction = dx3d::Vec3::normalize({
+			(position.x - centre.x) / halfExtent.x,
+			(position.y - centre.y) / halfExtent.y,
+			(position.z - centre.z) / halfExtent.z
+			});
+
+		constexpr dx3d::f32 Pi = 3.14159265358979323846f;
+		return {
+			std::atan2(direction.z, direction.x) / (2.0f * Pi) + 0.5f,
+			0.5f - std::asin(std::clamp(direction.y, -1.0f, 1.0f)) / Pi
+		};
+	}
+}

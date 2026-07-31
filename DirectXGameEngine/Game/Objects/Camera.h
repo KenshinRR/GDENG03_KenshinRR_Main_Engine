@@ -10,10 +10,13 @@ public:
 	void SetPerspective();
 	void SetOrthographic();
 
+	void ToggleControl(bool control_status) { isControllable = control_status; }
+
 	//void TestHi();
 protected:
 	virtual void onCreate();
 	virtual void onUpdate(dx3d::f32 deltaTime);
 private:
 	bool toggleWire{ false };
+	bool isControllable{ false };
 };

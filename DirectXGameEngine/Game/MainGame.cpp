@@ -22,6 +22,7 @@ void MainGame::onNewDisplay(dx3d::Display& display)
 	auto& world = getWorld();
 
 	auto camera = world.createGameObjectForWindow<Camera>(display.getID(), display.getInputSystem());
+	camera->setName("Camera");
 	auto* camComp = camera->createOrGetComponent<dx3d::CameraComponent>();
 	display.setCamera(camComp);
 
@@ -34,6 +35,21 @@ void MainGame::onNewDisplay(dx3d::Display& display)
 	display.getInputSystem().setCursorVisible(true);
 
 	//m_InspectorUIs[display.getID()] = std::make_unique<dx3d::InspectorUI>(dx3d::BaseDesc{ getLogger() });
+}
+
+void MainGame::onNewWorldView(std::string name)
+{
+	auto& world = getWorld();
+
+	auto camera = world.createGameObject<Camera>();
+	camera->setName(name + " Camera");
+	auto* camComp = camera->createOrGetComponent<dx3d::CameraComponent>();
+
+	camera->getTransform().setPosition({ 0.0f, 1.0f, -2.0f });
+	camera->getTransform().setRotation({ 0.0f, 0.0f, 0.0f });
+	camComp->setProjectionMode(dx3d::ProjectionMode::Perspective);
+
+	addWorldView(name, camera->getID());
 }
 
 void MainGame::onCreate()
@@ -119,6 +135,7 @@ void MainGame::onCreate()
 	for (auto& display : getDisplays())
 	{
 		auto camera = world.createGameObjectForWindow<Camera>(display->getID(), display->getInputSystem());
+		camera->setName("Player Camera");
 		auto* camComp = camera->createOrGetComponent<dx3d::CameraComponent>();
 		display->setCamera(camComp);
 
@@ -148,8 +165,8 @@ void MainGame::onCreate()
 		//}
 		//displayIndex++;
 	}
-	auto player = world.createGameObject<Player>();
-	player->getTransform().setPosition({ 0, 1, -2 });
+	/*auto player = world.createGameObject<Player>();
+	player->getTransform().setPosition({ 0, 1, -2 });*/
 
 	/*auto& display2 = getDisplays()[1];
 	auto camera = world.createGameObjectForWindow<Camera>(display2->getID(), display2->getInputSystem());
@@ -161,6 +178,10 @@ void MainGame::onCreate()
 		display->getInputSystem().setCursorVisible(true);
 		m_InspectorUIs[display->getID()] = std::make_unique<dx3d::InspectorUI>(dx3d::BaseDesc{ getLogger() });
 	}
+	
+	// Adding world views
+	onNewWorldView("Editor View");
+	onNewWorldView("Game View");
 
 	registerEditorEvents();
 }

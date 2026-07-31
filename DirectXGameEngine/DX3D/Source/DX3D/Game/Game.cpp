@@ -59,6 +59,11 @@ dx3d::World& dx3d::Game::getWorld() noexcept
 	return *m_world;
 }
 
+dx3d::WorldRenderer& dx3d::Game::getWorldRenderer() noexcept
+{
+	return *m_worldRenderer;
+}
+
 dx3d::Logger& dx3d::Game::getLogger() noexcept
 {
 	return *m_logger;
@@ -90,7 +95,7 @@ void dx3d::Game::onInternalUpdate()
 	auto deltaTime = delta.count();
 	ImGuiIO& io = ImGui::GetIO();
 
-	// Update each display痴 input system separately
+	// Update each display's input system separately
 	for (auto& display : m_displays)
 	{
 		if (display->hasFocus())
@@ -98,6 +103,11 @@ void dx3d::Game::onInternalUpdate()
 			display->getInputSystem().update();
 		}
 	}
+
+	// TODO: Update each viewport's input system seperately
+	//
+
+	//
 
 	onUpdate(deltaTime);
 	m_world->update(deltaTime);
@@ -122,13 +132,19 @@ void dx3d::Game::onInternalUpdate()
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
 		ImGui::DockSpaceOverViewport();
-		m_worldRenderer->renderWorldViewport(*m_world);
+		onRenderSceneViewports();
 		onDrawUi(*display);
 		ImGui::Render();
 
 		m_worldRenderer->renderForDisplay(*m_world, *display, deltaTime, ImGui::GetDrawData());
 
-		
+
+		// Handle multiple viewports
+		ImGuiIO& io = ImGui::GetIO();
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+		}
 
 	}
 
@@ -150,6 +166,26 @@ void dx3d::Game::addDisplay()
 	auto display = std::make_unique<Display>(DisplayDesc{ {*m_logger, m_windowSize}, *m_graphicsDevice });
 	initializeDisplayImGui(*display);
 	m_displays.push_back(std::move(display));
+}
+
+void dx3d::Game::addWorldView(std::string name, size_t camera_ID)
+{
+	std::unique_ptr<dx3d::SceneViewportUI> new_SceneViewportUI = std::make_unique<dx3d::SceneViewportUI>(
+		dx3d::BaseDesc{ getLogger() }, 
+		getWorld(), 
+		getWorldRenderer()
+	);
+	new_SceneViewportUI->setName(name);
+	new_SceneViewportUI->setID(camera_ID);
+	m_sceneViewportUIs.push_back(std::move(new_SceneViewportUI));
+}
+
+void dx3d::Game::onRenderSceneViewports()
+{
+	for (auto& vp : m_sceneViewportUIs)
+	{
+		vp->draw();
+	}
 }
 
 void dx3d::Game::initializeDisplayImGui(Display& display)

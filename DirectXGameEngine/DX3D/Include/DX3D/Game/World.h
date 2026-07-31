@@ -61,12 +61,19 @@ namespace dx3d
 		void update(f32 deltaTime);
 
 		const std::unordered_map<size_t, std::vector<UniquePtr<GameObject>>>& getGameObjectList();
+		GameObject* getGameObjectById(size_t id) const noexcept;
 	private:
 		GameObject* createGameObjectInternal(UniquePtr<GameObject>& object);
 		void addComponentInternal(Component& component);
 		void addDirtyTransformInternal(TransformComponent& component);
 
 		Component* const* getComponentsInternal(size_t typeId, ui32* numComponents) const noexcept;
+
+		size_t generateId() {
+			static size_t counter = 0;
+			return ++counter;
+		}
+
 	private:
 		enum class EventType
 		{

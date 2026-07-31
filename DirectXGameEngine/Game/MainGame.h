@@ -13,6 +13,7 @@ public:
 	explicit MainGame(const dx3d::GameDesc& desc);
 
 	void onNewDisplay(dx3d::Display& display);
+	void onNewWorldView(std::string name);
 
 protected:
 	virtual void onCreate();

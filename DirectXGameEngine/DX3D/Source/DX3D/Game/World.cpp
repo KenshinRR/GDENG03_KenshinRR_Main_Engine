@@ -58,9 +58,26 @@ const std::unordered_map<size_t, std::vector<dx3d::UniquePtr<dx3d::GameObject>>>
     return m_objects;
 }
 
+dx3d::GameObject* dx3d::World::getGameObjectById(size_t id) const noexcept
+{
+    for (const auto& [typeId, objects] : m_objects)
+    {
+        for (const auto& obj : objects)
+        {
+            if (obj && obj->getID() == id && !obj->isDeleted())
+            {
+                return obj.get();
+            }
+        }
+    }
+    return nullptr; // Not found
+}
+
 dx3d::GameObject* dx3d::World::createGameObjectInternal(UniquePtr<GameObject>& object)
 {
 	if (!object) return {};
+
+    object.get()->setID(generateId());
 
 	auto ptr = object.get();
 	auto typeId = ptr->getTypeId();
@@ -77,6 +94,7 @@ dx3d::GameObject* dx3d::World::createGameObjectInternal(UniquePtr<GameObject>& o
 void dx3d::World::addComponentInternal(Component& component)
 {
 	auto typeId = component.getTypeId();
+    component.setID(generateId());
 	m_components[typeId].push_back(&component);
 }
 

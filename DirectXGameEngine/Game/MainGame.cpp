@@ -69,13 +69,16 @@ void MainGame::onCreate()
 	m_UIs.push_back(std::make_unique<dx3d::InspectorUI>(dx3d::BaseDesc{ getLogger() }));
 
 	// Create mesh resources (reusable)
-	auto cubeMesh = dx3d::MeshFactory::createCubeMesh();
+	auto cubeMesh = getMeshFactory().createCubeMesh();
 	m_spawnCubeMesh = cubeMesh;
-	auto sphereMesh = dx3d::MeshFactory::createSphereMesh(20, 20);
-	auto capsuleMesh = dx3d::MeshFactory::createCapsuleMesh(0.5f, 2.0f);
-	auto cylinderMesh = dx3d::MeshFactory::createCylinderMesh(0.5f, 2.0f);
-	auto planeMesh = dx3d::MeshFactory::createPlaneMesh(10.0f, 10.0f);
-	auto circleMesh = dx3d::MeshFactory::createCircleMesh(0.5f, 32);
+	auto sphereMesh = getMeshFactory().createSphereMesh(20, 20);
+	auto capsuleMesh = getMeshFactory().createCapsuleMesh(0.5f, 2.0f);
+	auto cylinderMesh = getMeshFactory().createCylinderMesh(0.5f, 2.0f);
+	auto planeMesh = getMeshFactory().createPlaneMesh(10.0f, 10.0f);
+	auto circleMesh = getMeshFactory().createCircleMesh(0.5f, 32);
+	
+
+
 
 	m_spawnMaterial = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base / "DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
 	if (m_spawnMaterial)
@@ -100,6 +103,18 @@ void MainGame::onCreate()
 		floorMeshComp->setMaterial(basicMat);
 		floor->getTransform().setScale({ 6.8f, 0.1f, 6.8f });
 		floor->getTransform().setPosition({ 0, 0, 0 });
+
+		///  test object
+
+	
+		
+		auto armaDObject = world.createGameObject<dx3d::GameObject>();
+		
+		armaDObject->createOrGetComponent<dx3d::MeshComponent>()->setMesh(getMeshFactory().getCustomMesh("Armadillo"));
+		armaDObject->createOrGetComponent<dx3d::MeshComponent>()->setMaterial(basicMat);
+		armaDObject->getTransform().setScale({ 0.5f, 0.5f, 0.5f });
+	
+	
 
 	}
 

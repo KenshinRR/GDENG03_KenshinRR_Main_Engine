@@ -2,6 +2,7 @@
 #include <DX3D/Core/Base.h>
 #include <DX3D/Core/Core.h>
 #include <DX3D/Game/Display.h>
+#include <DX3D/UI/SceneViewportUI.h>
 #include <chrono>
 #include <vector>
 
@@ -15,6 +16,7 @@ namespace dx3d
         virtual ~Game();
 
         virtual World& getWorld() noexcept final;
+        virtual WorldRenderer& getWorldRenderer() noexcept final;
         virtual Logger& getLogger() noexcept final;
         
         // MANAGERS
@@ -25,15 +27,20 @@ namespace dx3d
         //run function
         virtual void run() final;
 
-        // New: add/remove displays
+        // add/remove displays
         void addDisplay();
         const std::vector<UniquePtr<Display>>& getDisplays() const noexcept { return m_displays; }
+
+        // add/remove world view
+        void addWorldView(std::string name, size_t camera_ID);
+
+        void onRenderSceneViewports();
 
 	protected:
 		virtual void onCreate() {}
 		virtual void onUpdate(f32 deltaTime) {}
 		virtual void onDisplayAdded(Display& display) {}
-		virtual void onDrawUi(Display& display) {} // ADDED: Derived games submit ImGui widgets for the display currently being rendered.
+		virtual void onDrawUi(Display& display) {} // Derived games submit ImGui widgets for the display currently being rendered.
     private:
         void onInternalUpdate();
 		void initializeDisplayImGui(Display& display);
@@ -42,6 +49,7 @@ namespace dx3d
         UniquePtr<Logger> m_logger{};
         RefPtr<GraphicsDevice> m_graphicsDevice{};
         std::vector<UniquePtr<Display>> m_displays{};   // multiple displays
+        std::vector< dx3d::UniquePtr<dx3d::SceneViewportUI>> m_sceneViewportUIs{};
         UniquePtr<ResourceManager> m_resourceManager{};
 		UniquePtr<MeshFactory> m_meshFactory{};
         UniquePtr<World> m_world{};
@@ -49,7 +57,7 @@ namespace dx3d
         Rect m_windowSize;
 		bool m_isRunning{ true };
 
-		bool m_imguiInitialized{ false }; // ADDED: Tracks whether display ImGui contexts may be shut down.
+		bool m_imguiInitialized{ false }; // Tracks whether display ImGui contexts may be shut down.
 		ui32 m_pendingDisplayAdditions{};
 
         std::chrono::steady_clock::time_point m_previousTime{};

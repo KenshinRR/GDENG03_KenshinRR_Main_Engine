@@ -3,7 +3,7 @@
 
 namespace dx3d
 {
-	class MainMenuBarUI : BaseUI
+	class MainMenuBarUI : public BaseUI
 	{
 	public:
 		MainMenuBarUI(const BaseDesc& desc);

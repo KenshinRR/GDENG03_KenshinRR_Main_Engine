@@ -6,8 +6,12 @@
 #include <DX3D/Component/CameraComponent.h>
 #include <filesystem>
 
+#include <DX3D/UI/HierarchyUI.h>
+#include <DX3D/UI/MainMenuBarUI.h>
+
 #include <DX3D/EventBroadcasting/EventBroadcastManager.h>
 #include <DX3D/EventBroadcasting/EventNames.h>
+#include <DX3D/EventBroadcasting/Parameters.h>
 
 MainGame::MainGame(const dx3d::GameDesc& desc) : dx3d::Game(desc)
 {
@@ -18,6 +22,7 @@ void MainGame::onNewDisplay(dx3d::Display& display)
 	auto& world = getWorld();
 
 	auto camera = world.createGameObjectForWindow<Camera>(display.getID(), display.getInputSystem());
+	camera->setName("Camera");
 	auto* camComp = camera->createOrGetComponent<dx3d::CameraComponent>();
 	display.setCamera(camComp);
 
@@ -29,31 +34,56 @@ void MainGame::onNewDisplay(dx3d::Display& display)
 	display.getInputSystem().setCursorLocked(false);
 	display.getInputSystem().setCursorVisible(true);
 
-	m_InspectorUIs[display.getID()] = std::make_unique<dx3d::InspectorUI>(dx3d::BaseDesc{ getLogger() });
+	//m_InspectorUIs[display.getID()] = std::make_unique<dx3d::InspectorUI>(dx3d::BaseDesc{ getLogger() });
+}
+
+void MainGame::onNewWorldView(std::string name)
+{
+	auto& world = getWorld();
+
+	auto camera = world.createGameObject<Camera>();
+	camera->setName(name + " Camera");
+	auto* camComp = camera->createOrGetComponent<dx3d::CameraComponent>();
+
+	camera->getTransform().setPosition({ 0.0f, 1.0f, -2.0f });
+	camera->getTransform().setRotation({ 0.0f, 0.0f, 0.0f });
+	camComp->setProjectionMode(dx3d::ProjectionMode::Perspective);
+
+	addWorldView(name, camera->getID());
 }
 
 void MainGame::onCreate()
 {
-	
-
 	Game::onCreate();
 	auto& world = getWorld();
 	std::filesystem::path base = std::filesystem::current_path().parent_path();
-
-	// note: figure out way to store these in an unordered map or something for the texturews and materials
 	auto woodTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base/"DirectXGameEngine/Game/Assets/Textures/wood.jpg").c_str());
 	auto floorTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base / "DirectXGameEngine/Game/Assets/Textures/floor.jpg").c_str());
 
-	m_MainMenuBarUI = std::make_unique<dx3d::MainMenuBarUI>(dx3d::BaseDesc{ getLogger() });
-	
-	
+	// UI initialize
+	std::unique_ptr<dx3d::HierarchyUI> hierarchy_UI = std::make_unique<dx3d::HierarchyUI>(dx3d::BaseDesc{ getLogger() });
+	hierarchy_UI->setGameObjectList(&world.getGameObjectList());
+	m_UIs.push_back(std::move(hierarchy_UI));
+
+	m_UIs.push_back(std::make_unique<dx3d::MainMenuBarUI>(dx3d::BaseDesc{ getLogger() }));
+	m_UIs.push_back(std::make_unique<dx3d::InspectorUI>(dx3d::BaseDesc{ getLogger() }));
+
 	// Create mesh resources (reusable)
-	auto cubeMesh = getMeshFactory().createCubeMesh();
-	auto sphereMesh = getMeshFactory().createSphereMesh(20, 20);
-	auto capsuleMesh = getMeshFactory().createCapsuleMesh(0.5f, 2.0f);
-	auto cylinderMesh = getMeshFactory().createCylinderMesh(0.5f, 2.0f);
-	auto planeMesh = getMeshFactory().createPlaneMesh(10.0f, 10.0f);
-	auto circleMesh = getMeshFactory().createCircleMesh(0.5f, 32);
+	auto cubeMesh = dx3d::MeshFactory::createCubeMesh();
+	m_spawnCubeMesh = cubeMesh;
+	auto sphereMesh = dx3d::MeshFactory::createSphereMesh(20, 20);
+	auto capsuleMesh = dx3d::MeshFactory::createCapsuleMesh(0.5f, 2.0f);
+	auto cylinderMesh = dx3d::MeshFactory::createCylinderMesh(0.5f, 2.0f);
+	auto planeMesh = dx3d::MeshFactory::createPlaneMesh(10.0f, 10.0f);
+	auto circleMesh = dx3d::MeshFactory::createCircleMesh(0.5f, 32);
+
+	m_spawnMaterial = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base / "DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
+	if (m_spawnMaterial)
+	{
+		auto matData = dx3d::Vec3(1, 1, 1);
+		m_spawnMaterial->setData(std::as_bytes(std::span{ &matData, 1 }));
+		m_spawnMaterial->setTexture(0, woodTex);
+	}
 
 	{
 		auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base/"DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
@@ -72,23 +102,6 @@ void MainGame::onCreate()
 		floor->getTransform().setPosition({ 0, 0, 0 });
 
 	}
-
-
-	// test object
-	{
-		auto BasMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base / "DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
-		if(BasMat)
-		{
-			auto matData = dx3d::Vec3(1, 1, 1);
-			BasMat->setData(std::as_bytes(std::span{ &matData, 1 }));
-			BasMat->setTexture(0, woodTex);
-		}
-		auto testObj = world.createGameObject<dx3d::GameObject>();
-		testObj->createOrGetComponent<dx3d::MeshComponent>()->setMesh(getMeshFactory().getCustomMesh("Armadillo"));
-		testObj->getComponent<dx3d::MeshComponent>()->setMaterial(BasMat);
-
-	}
-
 
 	srand((unsigned int)time(NULL));
 
@@ -122,6 +135,7 @@ void MainGame::onCreate()
 	for (auto& display : getDisplays())
 	{
 		auto camera = world.createGameObjectForWindow<Camera>(display->getID(), display->getInputSystem());
+		camera->setName("Player Camera");
 		auto* camComp = camera->createOrGetComponent<dx3d::CameraComponent>();
 		display->setCamera(camComp);
 
@@ -151,8 +165,8 @@ void MainGame::onCreate()
 		//}
 		//displayIndex++;
 	}
-	auto player = world.createGameObject<Player>();
-	player->getTransform().setPosition({ 0, 1, -2 });
+	/*auto player = world.createGameObject<Player>();
+	player->getTransform().setPosition({ 0, 1, -2 });*/
 
 	/*auto& display2 = getDisplays()[1];
 	auto camera = world.createGameObjectForWindow<Camera>(display2->getID(), display2->getInputSystem());
@@ -164,7 +178,12 @@ void MainGame::onCreate()
 		display->getInputSystem().setCursorVisible(true);
 		m_InspectorUIs[display->getID()] = std::make_unique<dx3d::InspectorUI>(dx3d::BaseDesc{ getLogger() });
 	}
+	
+	// Adding world views
+	onNewWorldView("Editor View");
+	onNewWorldView("Game View");
 
+	registerEditorEvents();
 }
 
 void MainGame::onUpdate(dx3d::f32 deltaTime)
@@ -180,7 +199,7 @@ void MainGame::onDisplayAdded(dx3d::Display& display)
 
 void MainGame::onDrawUi(dx3d::Display& display)
 {
-	if (m_testObject)
+	/*if (m_testObject)
 	{
 		auto it = m_InspectorUIs.find(display.getID());
 		if (it == m_InspectorUIs.end())
@@ -188,7 +207,176 @@ void MainGame::onDrawUi(dx3d::Display& display)
 			it = m_InspectorUIs.emplace(display.getID(), std::make_unique<dx3d::InspectorUI>(dx3d::BaseDesc{ getLogger() })).first;
 		}
 		it->second->draw(*m_testObject, display);
+	}*/
+
+	for (auto& m_UI : m_UIs)
+	{
+		m_UI->draw();
+	}
+}
+
+void MainGame::registerEditorEvents()
+{
+	auto& events = dx3d::EventBroadcastManager::getInstance();
+
+	events.addObserver(dx3d::EventNames::ON_ADD_EMPTY_GAMEOBJECT, [this]()
+	{
+		if (m_isPlayMode) return;
+
+		auto* object = spawnEditorObject("Empty");
+		if (!object) return;
+
+		object->setDeleted(true);
+		executeEditorCommand(EditorCommand{
+			[object]() { object->setDeleted(true); },
+			[object]() { object->setDeleted(false); }
+		});
+		selectGameObject(object);
+	});
+
+	events.addObserver(dx3d::EventNames::ON_ADD_3D_OBJECT, [this](dx3d::Parameters& params)
+	{
+		if (m_isPlayMode) return;
+
+		auto type = params.GetStringExtra("Key", "Cube");
+		auto* object = spawnEditorObject(type);
+		if (!object) return;
+
+		object->setDeleted(true);
+		executeEditorCommand(EditorCommand{
+			[object]() { object->setDeleted(true); },
+			[object]() { object->setDeleted(false); }
+		});
+		selectGameObject(object);
+	});
+
+	events.addObserver(dx3d::EventNames::ON_DELETE_GAMEOBJECT, [this](dx3d::Parameters& params)
+	{
+		if (m_isPlayMode) return;
+
+		auto* object = params.GetGameObjectPtr("Target", nullptr);
+		if (!object || object->isDeleted()) return;
+
+		executeEditorCommand(EditorCommand{
+			[object]() { object->setDeleted(false); },
+			[object]() { object->setDeleted(true); }
+		});
+		selectGameObject(nullptr);
+	});
+
+	events.addObserver(dx3d::EventNames::ON_SET_GAMEOBJECT_ENABLED, [this](dx3d::Parameters& params)
+	{
+		if (m_isPlayMode) return;
+
+		auto* object = params.GetGameObjectPtr("Target", nullptr);
+		if (!object || object->isDeleted()) return;
+
+		const bool oldValue = object->isEnabled();
+		const bool newValue = params.GetBoolExtra("Enabled", oldValue);
+		if (oldValue == newValue) return;
+
+		executeEditorCommand(EditorCommand{
+			[object, oldValue]() { object->setEnabled(oldValue); },
+			[object, newValue]() { object->setEnabled(newValue); }
+		});
+	});
+
+	events.addObserver(dx3d::EventNames::ON_TRANSFORM_CHANGED, [this](dx3d::Parameters& params)
+	{
+		if (m_isPlayMode) return;
+
+		auto* object = params.GetGameObjectPtr("Target", nullptr);
+		if (!object || object->isDeleted()) return;
+
+		auto property = params.GetStringExtra("Property", "");
+		auto oldValue = params.GetVec3Extra("OldValue", {});
+		auto newValue = params.GetVec3Extra("NewValue", oldValue);
+
+		auto applyValue = [object, property](const dx3d::Vec3& value)
+		{
+			if (property == "Position") object->getTransform().setPosition(value);
+			else if (property == "Rotation") object->getTransform().setRotation(value);
+			else if (property == "Scale") object->getTransform().setScale(value);
+		};
+
+		executeEditorCommand(EditorCommand{
+			[applyValue, oldValue]() { applyValue(oldValue); },
+			[applyValue, newValue]() { applyValue(newValue); }
+		});
+	});
+
+	events.addObserver(dx3d::EventNames::ON_EDITOR_UNDO, [this]() { undoEditorCommand(); });
+	events.addObserver(dx3d::EventNames::ON_EDITOR_REDO, [this]() { redoEditorCommand(); });
+	events.addObserver(dx3d::EventNames::ON_EDITOR_PLAY_MODE_CHANGED, [this](dx3d::Parameters& params)
+	{
+		setPlayMode(params.GetBoolExtra("IsPlayMode", false));
+	});
+}
+
+void MainGame::executeEditorCommand(EditorCommand command)
+{
+	if (m_isPlayMode) return;
+
+	command.redo();
+	m_undoStack.push_back(command);
+	if (m_undoStack.size() > MaxUndoCommands)
+	{
+		m_undoStack.erase(m_undoStack.begin());
+	}
+	m_redoStack.clear();
+}
+
+void MainGame::undoEditorCommand()
+{
+	if (m_isPlayMode || m_undoStack.empty()) return;
+
+	auto command = m_undoStack.back();
+	m_undoStack.pop_back();
+	command.undo();
+	m_redoStack.push_back(command);
+}
+
+void MainGame::redoEditorCommand()
+{
+	if (m_isPlayMode || m_redoStack.empty()) return;
+
+	auto command = m_redoStack.back();
+	m_redoStack.pop_back();
+	command.redo();
+	m_undoStack.push_back(command);
+}
+
+void MainGame::setPlayMode(bool isPlayMode)
+{
+	m_isPlayMode = isPlayMode;
+}
+
+dx3d::GameObject* MainGame::spawnEditorObject(const std::string& type)
+{
+	auto* object = getWorld().createGameObject<dx3d::GameObject>();
+	if (!object) return nullptr;
+
+	++m_spawnedObjectCounter;
+	object->setName(type == "Empty"
+		? "Empty GameObject " + std::to_string(m_spawnedObjectCounter)
+		: "Cube " + std::to_string(m_spawnedObjectCounter));
+
+	object->getTransform().setPosition({ 0.0f, 0.5f, 0.0f });
+	object->getTransform().setScale({ 0.5f, 0.5f, 0.5f });
+
+	if (type == "Cube" && m_spawnCubeMesh && m_spawnMaterial)
+	{
+		auto* mesh = object->createOrGetComponent<dx3d::MeshComponent>();
+		mesh->setMesh(m_spawnCubeMesh);
+		mesh->setMaterial(m_spawnMaterial);
 	}
 
-	m_MainMenuBarUI->draw();
+	return object;
+}
+
+void MainGame::selectGameObject(dx3d::GameObject* object)
+{
+	dx3d::Parameters params;
+	params.PutExtra("Selected", object);
+	dx3d::EventBroadcastManager::getInstance().postEvent(dx3d::EventNames::ON_GAMEOBJECT_SELECTED, params);
 }

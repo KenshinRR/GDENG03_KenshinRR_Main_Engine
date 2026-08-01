@@ -3,9 +3,17 @@
 #include <algorithm>
 #include <DX3D/EventBroadcasting/EventBroadcastManager.h>
 #include <DX3D/EventBroadcasting/EventNames.h>
+#include <DX3D/EventBroadcasting/Parameters.h>
 
 Camera::Camera(const dx3d::GameObjectDesc& desc) : dx3d::GameObject(desc)
 {
+	dx3d::EventBroadcastManager::getInstance().addObserver(
+		dx3d::EventNames::ON_VIEWPORT_FOCUSED,
+		[this](dx3d::Parameters& params)
+		{
+			isControllable = (getID() == params.GetSizeTExtra("CameraID", 0));
+		}
+	);
 }
 
 Camera::~Camera()
@@ -63,6 +71,8 @@ void Camera::onCreate()
 
 void Camera::onUpdate(dx3d::f32 deltaTime)
 {
+	if (!isControllable) return;
+
 	auto& input = getInputSystem();
 	auto* m_camera = getComponent<dx3d::CameraComponent>();
 

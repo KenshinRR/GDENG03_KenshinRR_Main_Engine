@@ -18,37 +18,76 @@
 
 dx3d::InspectorUI::InspectorUI(const BaseDesc& desc) :BaseUI(desc)
 {
-
-
+	EventBroadcastManager::getInstance().addObserver
+	(
+		EventNames::ON_GAMEOBJECT_SELECTED,
+		[this](dx3d::Parameters& params)
+		{
+			m_selectedGameObject = params.GetGameObjectPtr("Selected", NULL);
+		}
+	);
+	EventBroadcastManager::getInstance().addObserver
+	(
+		EventNames::ON_EDITOR_PLAY_MODE_CHANGED,
+		[this](dx3d::Parameters& params)
+		{
+			m_isPlayMode = params.GetBoolExtra("IsPlayMode", false);
+		}
+	);
 }
 
-void dx3d::InspectorUI::draw(GameObject& object, Display& display)
+void dx3d::InspectorUI::draw()
 {
-	std::string windowTitle = "Inspector UI - Window " + std::to_string(display.getID()) + "###InspectorUI_" + std::to_string(display.getID());
+	// std::string windowTitle = "Inspector UI - Window " + std::to_string(display.getID()) + "###InspectorUI_" + std::to_string(display.getID());
 
 	ImGui::SetNextWindowSize(ImVec2(430.0f, 360.0f), ImGuiCond_FirstUseEver);
 	ImGui::SetNextWindowSizeConstraints(ImVec2(430.0f, 300.0f), ImVec2(FLT_MAX, FLT_MAX));
-	if (ImGui::Begin(windowTitle.c_str()))
+	//if (ImGui::Begin(windowTitle.c_str()))
+	if (ImGui::Begin("Inspector"))
 	{
+		// Make sure we actually have a list set
+		if (!m_selectedGameObject || m_selectedGameObject == NULL || m_selectedGameObject->isDeleted())
+		{
+			ImGui::Text("No game object selected.");
+			ImGui::End();
+			return;
+		}
+
+		ImGui::Text("Selected: %s", m_selectedGameObject->getName().c_str());
+		ImGui::SameLine();
+		ImGui::BeginDisabled(m_isPlayMode);
+		if (ImGui::SmallButton("Delete Selected"))
+		{
+			Parameters params;
+			params.PutExtra("Target", m_selectedGameObject);
+			EventBroadcastManager::getInstance().postEvent(EventNames::ON_DELETE_GAMEOBJECT, params);
+			m_selectedGameObject = nullptr;
+			ImGui::EndDisabled();
+			ImGui::End();
+			return;
+		}
+		ImGui::EndDisabled();
+		ImGui::Separator();
+
 		if (ImGui::BeginTabBar("##TestTabs")) // create tab bar with id
 		{
 			if (ImGui::BeginTabItem("Transform"))
 			{
-				drawTransformInspector(object);
+				drawTransformInspector(*m_selectedGameObject);
 				ImGui::EndTabItem();
 			}
 
 			if (ImGui::BeginTabItem("Components"))
 			{
-				drawComponentInspector(object);
+				drawComponentInspector(*m_selectedGameObject);
 				ImGui::EndTabItem();
 			}
 
-			if (ImGui::BeginTabItem("Viewports"))
+			/*if (ImGui::BeginTabItem("Viewports"))
 			{
 				drawViewportPanel(display);
 				ImGui::EndTabItem();
-			}
+			}*/
 
 			if (ImGui::BeginTabItem("Scene"))
 			{
@@ -65,14 +104,10 @@ void dx3d::InspectorUI::draw(GameObject& object, Display& display)
 
 }
 
-void dx3d::InspectorUI::draw()
-{
-}
-
 dx3d::InspectorUI::~InspectorUI()
 {
-
-
+	EventBroadcastManager::getInstance().RemoveObserver(EventNames::ON_GAMEOBJECT_SELECTED);
+	EventBroadcastManager::getInstance().RemoveObserver(EventNames::ON_EDITOR_PLAY_MODE_CHANGED);
 }
 
 void dx3d::InspectorUI::drawViewportPanel(Display& display)
@@ -158,6 +193,23 @@ void dx3d::InspectorUI::drawGameObjectPanel(World& world)
 
 void dx3d::InspectorUI::drawTransformInspector(GameObject& object) // draw the inspector tab
 {
+	if (m_isPlayMode)
+	{
+		ImGui::TextColored(ImVec4(1.0f, 0.55f, 0.25f, 1.0f), "Play Mode: object manipulation is locked.");
+	}
+
+	bool enabled = object.isEnabled();
+	ImGui::BeginDisabled(m_isPlayMode);
+	if (ImGui::Checkbox("Enabled", &enabled))
+	{
+		Parameters params;
+		params.PutExtra("Target", &object);
+		params.PutExtra("Enabled", enabled);
+		EventBroadcastManager::getInstance().postEvent(EventNames::ON_SET_GAMEOBJECT_ENABLED, params);
+	}
+	ImGui::EndDisabled();
+	ImGui::Separator();
+
 	auto& transform = object.getTransform();
 
 	auto pos = transform.getPosition();
@@ -168,10 +220,27 @@ void dx3d::InspectorUI::drawTransformInspector(GameObject& object) // draw the i
 	float r[3] = { rot.x, rot.y, rot.z };
 	float s[3] = { scale.x, scale.y, scale.z };
 
+	ImGui::BeginDisabled(m_isPlayMode || !object.isEnabled());
+
 	// Position
 	if (ImGui::DragFloat3("Position", p, 0.05f, -FLT_MAX, FLT_MAX, "%.3f"))
 	{
 		transform.setPosition({ p[0], p[1], p[2] });
+	}
+	if (ImGui::IsItemActivated())
+	{
+		m_trackingPositionEdit = true;
+		m_editStartPosition = pos;
+	}
+	if (ImGui::IsItemDeactivatedAfterEdit() && m_trackingPositionEdit)
+	{
+		Parameters params;
+		params.PutExtra("Target", &object);
+		params.PutExtra("Property", "Position");
+		params.PutExtra("OldValue", m_editStartPosition);
+		params.PutExtra("NewValue", transform.getPosition());
+		EventBroadcastManager::getInstance().postEvent(EventNames::ON_TRANSFORM_CHANGED, params);
+		m_trackingPositionEdit = false;
 	}
 
 	// Rotation 
@@ -179,12 +248,44 @@ void dx3d::InspectorUI::drawTransformInspector(GameObject& object) // draw the i
 	{
 		transform.setRotation({ r[0], r[1], r[2] });
 	}
+	if (ImGui::IsItemActivated())
+	{
+		m_trackingRotationEdit = true;
+		m_editStartRotation = rot;
+	}
+	if (ImGui::IsItemDeactivatedAfterEdit() && m_trackingRotationEdit)
+	{
+		Parameters params;
+		params.PutExtra("Target", &object);
+		params.PutExtra("Property", "Rotation");
+		params.PutExtra("OldValue", m_editStartRotation);
+		params.PutExtra("NewValue", transform.getRotation());
+		EventBroadcastManager::getInstance().postEvent(EventNames::ON_TRANSFORM_CHANGED, params);
+		m_trackingRotationEdit = false;
+	}
 
 	// Scale
 	if (ImGui::DragFloat3("Scale", s, 0.01f, 0.0f, FLT_MAX, "%.3f"))
 	{
 		transform.setScale({ s[0], s[1], s[2] });
 	}
+	if (ImGui::IsItemActivated())
+	{
+		m_trackingScaleEdit = true;
+		m_editStartScale = scale;
+	}
+	if (ImGui::IsItemDeactivatedAfterEdit() && m_trackingScaleEdit)
+	{
+		Parameters params;
+		params.PutExtra("Target", &object);
+		params.PutExtra("Property", "Scale");
+		params.PutExtra("OldValue", m_editStartScale);
+		params.PutExtra("NewValue", transform.getScale());
+		EventBroadcastManager::getInstance().postEvent(EventNames::ON_TRANSFORM_CHANGED, params);
+		m_trackingScaleEdit = false;
+	}
+
+	ImGui::EndDisabled();
 }
 
 void dx3d::InspectorUI::drawComponentInspector(GameObject& object)

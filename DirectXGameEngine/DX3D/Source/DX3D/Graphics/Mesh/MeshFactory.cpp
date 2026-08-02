@@ -1,5 +1,31 @@
 #include <DX3D/Graphics/Mesh/MeshFactory.h>
+#include <algorithm>
 #include <cmath>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <unordered_map>
+
+namespace
+{
+	struct ObjIndex { int position = 0; int texcoord = 0; int normal = 0; };
+	int resolveObjIndex(int index, size_t count);
+	bool parseObjIndex(const std::string& token, ObjIndex& result);
+	dx3d::Vec2 generateFallbackTexcoord(const dx3d::Vec3& position, const dx3d::Vec3& minimum, const dx3d::Vec3& maximum);
+}
+
+dx3d::MeshFactory::MeshFactory(const MeshFactoryDesc& desc) : Base(desc.base)
+{
+}
+
+// set all loading obj here
+
+
+void dx3d::MeshFactory::loadAll()
+{
+	this->loadMeshFromFile("Armadillo", "Assets/Objects/armadillo.obj");
+}
+
 
 dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCubeMesh()
 {
@@ -440,4 +466,195 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCircleMesh(f32 radius, ui32 se
 	}
 
 	return std::make_shared<Mesh>(vertices, indices);
+}
+
+// get the mesh here
+dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::getCustomMesh(const std::string& name) 
+{
+	 auto mesh = m_ObjMesh.find(name);
+	return mesh != m_ObjMesh.end() ? mesh->second : nullptr; //if entry in obj is found and the stored value is not empty
+}
+
+
+// custom OBJ
+
+void dx3d::MeshFactory::loadMeshFromFile(const std::string& name, const std::string& filepath)
+{
+	std::ifstream file(filepath);
+	if (!file) return;
+
+	std::vector<Vec3> positions;
+	std::vector<Vec2> texcoords;
+	std::vector<Vec3> normals;
+	std::vector<Vertex> vertices;
+	std::vector<ui32> indices;
+	std::unordered_map<std::string, ui32> vertexCache;
+	// position bounds
+	Vec3 positionMinimum{};
+	Vec3 positionMaximum{};
+	bool hasPositionBounds = false;
+	std::string line;
+
+	while (std::getline(file, line)) // while file exists
+	{
+		std::istringstream stream(line); // read and parse data
+		std::string command;
+		stream >> command;
+		if (command == "v") // object position bounds of an obj
+		{
+			Vec3 position;
+			if (!(stream >> position.x >> position.y >> position.z)) return ;
+			positions.push_back(position);
+			if (!hasPositionBounds)
+			{
+				positionMinimum = positionMaximum = position;
+				hasPositionBounds = true;
+			}
+			else
+			{
+				positionMinimum.x = std::min(positionMinimum.x, position.x);
+				positionMinimum.y = std::min(positionMinimum.y, position.y);
+				positionMinimum.z = std::min(positionMinimum.z, position.z);
+				positionMaximum.x = std::max(positionMaximum.x, position.x);
+				positionMaximum.y = std::max(positionMaximum.y, position.y);
+				positionMaximum.z = std::max(positionMaximum.z, position.z);
+			}
+		}
+		else if (command == "vt") // texture coordinates
+		{
+			Vec2 texcoord;
+			if (!(stream >> texcoord.x >> texcoord.y)) return;
+			// OBJ UVs start at the lower edge; Direct3D texture coordinates start at the top.
+			texcoord.y = 1.0f - texcoord.y; // from top to bottom
+			texcoords.push_back(texcoord);
+		}
+		else if (command == "vn") // normals
+		{
+			Vec3 normal;
+			if (!(stream >> normal.x >> normal.y >> normal.z)) return ;
+			normals.push_back(Vec3::normalize(normal));
+		}
+		
+		
+		else if (command == "f") // faces
+		{
+			std::vector<ObjIndex> face;
+			std::string token;
+			while (stream >> token)
+			{
+				// OBJ permits an inline comment after a face definition.
+				if (token.starts_with('#')) break;
+				ObjIndex index;
+				if (!parseObjIndex(token, index)) return ;
+				index.position = resolveObjIndex(index.position, positions.size());
+				index.texcoord = index.texcoord ? resolveObjIndex(index.texcoord, texcoords.size()) : -1;
+				index.normal = index.normal ? resolveObjIndex(index.normal, normals.size()) : -1;
+				if (index.position < 0 || index.position >= static_cast<int>(positions.size()) || index.texcoord >= static_cast<int>(texcoords.size()) || index.normal >= static_cast<int>(normals.size())) return ;
+				face.push_back(index);
+			}
+			if (face.size() < 3) return ;
+			// Fan triangulation supports triangles, quads, and convex OBJ polygons.
+			for (size_t i = 1; i + 1 < face.size(); ++i)
+			{
+				const ObjIndex triangle[] = { face[0], face[i], face[i + 1] };
+				const Vec3& a = positions[triangle[0].position]; const Vec3& b = positions[triangle[1].position]; const Vec3& c = positions[triangle[2].position];
+				const Vec3 generatedNormal = Vec3::normalize(Vec3((b.y - a.y) * (c.z - a.z) - (b.z - a.z) * (c.y - a.y), (b.z - a.z) * (c.x - a.x) - (b.x - a.x) * (c.z - a.z), (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)));
+				for (const ObjIndex& index : triangle)
+				{
+					// Do not share vertices without OBJ normals: each face needs its own flat normal.
+					const std::string key = index.normal >= 0 ? std::to_string(index.position) + "/" + std::to_string(index.texcoord) + "/" + std::to_string(index.normal) : std::string{};
+					auto cached = key.empty() ? vertexCache.end() : vertexCache.find(key);
+					if (cached != vertexCache.end()) { indices.push_back(cached->second); continue; }
+					const Vec3& position = positions[index.position];
+					const Vec2 texcoord = index.texcoord >= 0
+						? texcoords[index.texcoord]
+						: generateFallbackTexcoord(position, positionMinimum, positionMaximum);
+					const Vertex vertex{ position, texcoord, index.normal >= 0 ? normals[index.normal] : generatedNormal };
+					const ui32 vertexIndex = static_cast<ui32>(vertices.size());
+					vertices.push_back(vertex); indices.push_back(vertexIndex);
+					if (!key.empty()) vertexCache.emplace(key, vertexIndex);
+				}
+			}
+		}
+	}
+	m_ObjMesh[name] = createMesh(vertices, indices);
+}
+
+dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createMesh(const std::vector<Vertex>& vertices, const std::vector<ui32>& indices)
+{
+	if (vertices.empty() || indices.empty() || indices.size() % 3 != 0)
+		return nullptr;
+
+	for (const auto index : indices)
+	{
+		if (index >= vertices.size())
+			return nullptr;
+	}
+
+	return std::make_shared<Mesh>(vertices, indices);
+}
+
+
+/// HELPER FUNCTIONS FOR LoadMesh
+
+namespace
+{
+	// OBJ indices are one-based; negative values are relative to the latest record.
+	int resolveObjIndex(int index, size_t count)
+	{
+		if (index > 0) return index - 1;
+		if (index < 0) return static_cast<int>(count) + index;
+		return -1;
+	}
+
+	bool parseObjIndex(const std::string& token, ObjIndex& result)
+	{
+		try
+		{
+			const auto firstSlash = token.find('/');
+			if (firstSlash == std::string::npos) { result.position = std::stoi(token); return true; }
+			result.position = std::stoi(token.substr(0, firstSlash));
+			const auto secondSlash = token.find('/', firstSlash + 1);
+			if (secondSlash == std::string::npos)
+			{
+				const auto uv = token.substr(firstSlash + 1);
+				if (!uv.empty()) result.texcoord = std::stoi(uv);
+				return true;
+			}
+			const auto uv = token.substr(firstSlash + 1, secondSlash - firstSlash - 1);
+			const auto normal = token.substr(secondSlash + 1);
+			if (!uv.empty()) result.texcoord = std::stoi(uv);
+			if (!normal.empty()) result.normal = std::stoi(normal);
+			return true;
+		}
+		catch (const std::exception&) { return false; }
+	}
+
+	// Some OBJ files, including the Stanford bunny, contain geometry only.  Give
+	// those meshes a stable spherical projection instead of sampling texture
+	// coordinate (0, 0) for every vertex.
+	dx3d::Vec2 generateFallbackTexcoord(const dx3d::Vec3& position, const dx3d::Vec3& minimum, const dx3d::Vec3& maximum)
+	{
+		const dx3d::Vec3 centre{
+			(minimum.x + maximum.x) * 0.5f,
+			(minimum.y + maximum.y) * 0.5f,
+			(minimum.z + maximum.z) * 0.5f
+		};
+		const dx3d::Vec3 halfExtent{
+			std::max((maximum.x - minimum.x) * 0.5f, 0.0001f),
+			std::max((maximum.y - minimum.y) * 0.5f, 0.0001f),
+			std::max((maximum.z - minimum.z) * 0.5f, 0.0001f)
+		};
+		const dx3d::Vec3 direction = dx3d::Vec3::normalize({
+			(position.x - centre.x) / halfExtent.x,
+			(position.y - centre.y) / halfExtent.y,
+			(position.z - centre.z) / halfExtent.z
+			});
+
+		constexpr dx3d::f32 Pi = 3.14159265358979323846f;
+		return {
+			std::atan2(direction.z, direction.x) / (2.0f * Pi) + 0.5f,
+			0.5f - std::asin(std::clamp(direction.y, -1.0f, 1.0f)) / Pi
+		};
+	}
 }

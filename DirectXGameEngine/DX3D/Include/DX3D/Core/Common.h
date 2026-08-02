@@ -135,6 +135,11 @@ namespace dx3d
 		SystemContext context;
 	};
 
+	struct MeshFactoryDesc
+	{
+		BaseDesc base;
+	};
+
 	struct WorldDesc
 	{
 		BaseDesc base;

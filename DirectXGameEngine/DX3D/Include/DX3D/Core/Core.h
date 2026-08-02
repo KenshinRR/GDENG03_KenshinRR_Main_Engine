@@ -48,12 +48,13 @@ namespace dx3d
 	class WorldRenderer;
 
 	class ResourceManager;
+	
 	class Resource;
 	class MaterialResource;
 	class TextureResource;
 
 	// new stuff here
-
+	class MeshFactory;
 	class InspectorUI;
 	class MainMenuBarUI;
 	class Rasterizer;

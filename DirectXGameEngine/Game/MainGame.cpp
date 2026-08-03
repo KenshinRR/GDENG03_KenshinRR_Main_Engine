@@ -105,17 +105,12 @@ void MainGame::onCreate()
 		floor->getTransform().setPosition({ 0, 0, 0 });
 
 		///  test object
-
-	
-		
-		auto armaDObject = world.createGameObject<dx3d::GameObject>();
-		
-		armaDObject->createOrGetComponent<dx3d::MeshComponent>()->setMesh(getMeshFactory().getCustomMesh("Armadillo"));
-		armaDObject->createOrGetComponent<dx3d::MeshComponent>()->setMaterial(basicMat);
-		armaDObject->getTransform().setScale({ 0.5f, 0.5f, 0.5f });
-	
-	
-
+		//commented out since I don't have the model for me -Ira uncomment if you have the model in your project folder
+		//auto armaDObject = world.createGameObject<dx3d::GameObject>();
+		//
+		//armaDObject->createOrGetComponent<dx3d::MeshComponent>()->setMesh(getMeshFactory().getCustomMesh("Armadillo"));
+		//armaDObject->createOrGetComponent<dx3d::MeshComponent>()->setMaterial(basicMat);
+		//armaDObject->getTransform().setScale({ 0.5f, 0.5f, 0.5f });
 	}
 
 	srand((unsigned int)time(NULL));
@@ -318,6 +313,25 @@ void MainGame::registerEditorEvents()
 			[applyValue, oldValue]() { applyValue(oldValue); },
 			[applyValue, newValue]() { applyValue(newValue); }
 		});
+	});
+
+	events.addObserver(dx3d::EventNames::ON_SET_PARENT, [this](dx3d::Parameters& params)
+	{
+		if (m_isPlayMode) return;
+
+		auto* child = params.GetGameObjectPtr("Child", nullptr);
+		auto* newParent = params.GetGameObjectPtr("Parent", nullptr);
+
+		if (!child || child->isDeleted()) return;
+		if (child == newParent) return;
+
+		auto* oldParent = child->getParent();
+		if (oldParent == newParent) return;
+
+		executeEditorCommand(EditorCommand{
+			[child, oldParent]() { child->setParent(oldParent); },
+			[child, newParent]() { child->setParent(newParent); }
+			});
 	});
 
 	events.addObserver(dx3d::EventNames::ON_EDITOR_UNDO, [this]() { undoEditorCommand(); });

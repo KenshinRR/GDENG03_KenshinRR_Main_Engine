@@ -9,18 +9,20 @@ namespace dx3d
 
 	class HierarchyUI : public BaseUI
 	{
-	public:
-		HierarchyUI(const BaseDesc& desc);
-		~HierarchyUI();
+		public:
+			HierarchyUI(const BaseDesc& desc);
+			~HierarchyUI();
 
-		void draw() override;
+			void draw() override;
 
-		void setGameObjectList(const std::unordered_map<size_t, std::vector<UniquePtr<GameObject>>>* list);
-
-	private:
-		bool m_showHierarchy = true;
-		bool m_isPlayMode = false;
-		const std::unordered_map<size_t, std::vector<UniquePtr<GameObject>>>* m_gameObjects{};
+			void setGameObjectList(const std::unordered_map<size_t, std::vector<UniquePtr<GameObject>>>* list);
+		private:
+			void drawGameObjectNode(GameObject* obj);
+		private:
+			bool m_showHierarchy = true;
+			bool m_isPlayMode = false;
+			const std::unordered_map<size_t, std::vector<UniquePtr<GameObject>>>* m_gameObjects{};
+			GameObject* m_selectedObject{ nullptr };
 	};
 
 }

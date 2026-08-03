@@ -97,7 +97,7 @@ void dx3d::WorldRenderer::render(const World& world, SwapChain& swapChain, f32 d
 		{
 
 			auto component = components[i];
-			if (!component->getGameObject().isEnabled() || component->getGameObject().isDeleted())
+			if (!component->getGameObject().isActiveInHierarchy())
 				continue;
 
 			cameraData.view = component->getViewMatrix();
@@ -133,7 +133,7 @@ void dx3d::WorldRenderer::render(const World& world, SwapChain& swapChain, f32 d
 		for (auto i : std::views::iota(0u, numComponents))
 		{
 			auto component = components[i];
-			if (!component->getGameObject().isEnabled() || component->getGameObject().isDeleted())
+			if (!component->getGameObject().isActiveInHierarchy())
 				continue;
 
 			auto& transform = component->getGameObject().getTransform();
@@ -225,7 +225,7 @@ void dx3d::WorldRenderer::renderForDisplay(const World& world, Display& display,
 	for (auto i : std::views::iota(0u, numComponents))
 	{
 		auto component = components[i];
-		if (!component->getGameObject().isEnabled() || component->getGameObject().isDeleted())
+		if (!component->getGameObject().isActiveInHierarchy())
 			continue;
 
 		auto& transform = component->getGameObject().getTransform();

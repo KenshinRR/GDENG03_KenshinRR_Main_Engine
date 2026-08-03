@@ -52,6 +52,13 @@ namespace dx3d
 
 		void setID(size_t _id) { m_ID = _id; }
 		size_t getID() { return m_ID; }
+
+		void setParent(GameObject* newParent);
+		GameObject* getParent() const noexcept { return m_parent; }
+		const std::vector<GameObject*>& getChildren() const noexcept { return m_children; }
+		bool isDescendantOf(const GameObject* potentialAncestor) const;
+		bool isActiveInHierarchy() const noexcept;
+
 	protected:
 		virtual void onCreate() {}
 		virtual void onUpdate(f32 deltaTime) {}
@@ -72,6 +79,9 @@ namespace dx3d
 		uint32_t m_windowId{ 0 };
 		bool m_enabled{ true };
 		bool m_deleted{ false };
+
+		GameObject* m_parent{ nullptr };
+		std::vector<GameObject*> m_children{};
 
 		friend class World;
 	};

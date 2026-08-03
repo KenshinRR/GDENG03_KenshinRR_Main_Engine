@@ -2,6 +2,8 @@
 #include <DX3D/Game/Component.h>
 #include <DX3D/Component/TransformComponent.h>
 #include <DX3D/Game/World.h>
+#include <cmath>
+#include <algorithm>
 
 dx3d::GameObject::GameObject(const GameObjectDesc& desc) : 
 	Identifiable(desc.base),
@@ -55,129 +57,89 @@ void dx3d::GameObject::setParent(GameObject* newParent)
     if (m_parent == newParent || newParent == this) return;
     if (newParent && !newParent->isDeleted() && newParent->isDescendantOf(this)) return;
 
-    // Helper lambda to calculate true accumulated World Rotation across the entire parent chain
-    auto calculateWorldRotation = [](GameObject* obj) -> Vec3 {
-        Vec3 totalRot = { 0.0f, 0.0f, 0.0f };
-        GameObject* current = obj;
-        while (current)
-        {
-            Vec3 rot = current->getTransform().getRotation();
-            totalRot.x += rot.x;
-            totalRot.y += rot.y;
-            totalRot.z += rot.z;
-            current = current->getParent();
-        }
-        return totalRot;
-        };
+    // Capture current World Matrix BEFORE hierarchy change
+    Mat4x4 worldMat = getTransform().getAffineWorldMatrix();
 
-    // 1. Get current World Position, TRUE World Rotation, and World Scale BEFORE changing parents
-    Mat4x4 currentWorldMat = getTransform().getAffineWorldMatrix();
-
-    auto row0 = currentWorldMat.row(0);
-    auto row1 = currentWorldMat.row(1);
-    auto row2 = currentWorldMat.row(2);
-    auto row3 = currentWorldMat.row(3);
-
-    Vec3 worldPos = { row3.x, row3.y, row3.z };
-    Vec3 worldRot = calculateWorldRotation(this); // Calculated true accumulated World Rotation
-    Vec3 worldScale = {
-        std::sqrt(row0.x * row0.x + row0.y * row0.y + row0.z * row0.z),
-        std::sqrt(row1.x * row1.x + row1.y * row1.y + row1.z * row1.z),
-        std::sqrt(row2.x * row2.x + row2.y * row2.y + row2.z * row2.z)
-    };
-
-    // 2. Remove from old parent
+    // Unlink from current parent
     if (m_parent)
     {
         std::erase(m_parent->m_children, this);
     }
 
-    // 3. Assign new parent
+    // Assign new parent
     m_parent = (newParent && !newParent->isDeleted()) ? newParent : nullptr;
 
-    // 4. Calculate new local transform
     if (m_parent)
     {
         m_parent->m_children.push_back(this);
 
+        // Get parent's world matrix
         Mat4x4 parentWorldMat = m_parent->getTransform().getAffineWorldMatrix();
+        Mat4x4 invParentMat = Mat4x4::inverse(parentWorldMat);
 
-        auto pRow0 = parentWorldMat.row(0);
-        auto pRow1 = parentWorldMat.row(1);
-        auto pRow2 = parentWorldMat.row(2);
-        auto pRow3 = parentWorldMat.row(3);
+        // Calculate local matrix: Local = World * Inverse(ParentWorld)
+        Mat4x4 localMat = worldMat * invParentMat;
 
-        Vec3 parentWorldPos = { pRow3.x, pRow3.y, pRow3.z };
-        Vec3 parentWorldRot = calculateWorldRotation(m_parent); // Parent's true World Rotation
+        // Extract position from row 3
+        Vec4 row3 = localMat.row(3);
+        Vec3 newPos = { row3.x, row3.y, row3.z };
 
-        Vec3 parentWorldScale = {
-            std::sqrt(pRow0.x * pRow0.x + pRow0.y * pRow0.y + pRow0.z * pRow0.z),
-            std::sqrt(pRow1.x * pRow1.x + pRow1.y * pRow1.y + pRow1.z * pRow1.z),
-            std::sqrt(pRow2.x * pRow2.x + pRow2.y * pRow2.y + pRow2.z * pRow2.z)
-        };
+        // Extract ROW vectors (not columns!) for toEulerAngles
+        Vec4 row0 = localMat.row(0);
+        Vec4 row1 = localMat.row(1);
+        Vec4 row2 = localMat.row(2);
 
-        // Extract parent's normalized orientation axes (X, Y, Z basis vectors)
-        Vec3 pAxisX = {
-            (parentWorldScale.x != 0.0f) ? pRow0.x / parentWorldScale.x : 0.0f,
-            (parentWorldScale.x != 0.0f) ? pRow0.y / parentWorldScale.x : 0.0f,
-            (parentWorldScale.x != 0.0f) ? pRow0.z / parentWorldScale.x : 0.0f
-        };
-        Vec3 pAxisY = {
-            (parentWorldScale.y != 0.0f) ? pRow1.x / parentWorldScale.y : 0.0f,
-            (parentWorldScale.y != 0.0f) ? pRow1.y / parentWorldScale.y : 0.0f,
-            (parentWorldScale.y != 0.0f) ? pRow1.z / parentWorldScale.y : 0.0f
-        };
-        Vec3 pAxisZ = {
-            (parentWorldScale.z != 0.0f) ? pRow2.x / parentWorldScale.z : 0.0f,
-            (parentWorldScale.z != 0.0f) ? pRow2.y / parentWorldScale.z : 0.0f,
-            (parentWorldScale.z != 0.0f) ? pRow2.z / parentWorldScale.z : 0.0f
-        };
+        Vec3 r0 = { row0.x, row0.y, row0.z };
+        Vec3 r1 = { row1.x, row1.y, row1.z };
+        Vec3 r2 = { row2.x, row2.y, row2.z };
 
-        // Distance vector in world space
-        Vec3 relPos = {
-            worldPos.x - parentWorldPos.x,
-            worldPos.y - parentWorldPos.y,
-            worldPos.z - parentWorldPos.z
-        };
+        // Extract scale from row lengths
+        Vec3 newScale;
+        newScale.x = r0.length();
+        newScale.y = r1.length();
+        newScale.z = r2.length();
 
-        // Project relative vector onto parent's local basis axes
-        Vec3 unrotatedPos = {
-            relPos.x * pAxisX.x + relPos.y * pAxisX.y + relPos.z * pAxisX.z,
-            relPos.x * pAxisY.x + relPos.y * pAxisY.y + relPos.z * pAxisY.z,
-            relPos.x * pAxisZ.x + relPos.y * pAxisZ.y + relPos.z * pAxisZ.z
-        };
+        // Remove scale from rotation vectors
+        if (newScale.x > 0.00001f) r0 = r0 / newScale.x;
+        if (newScale.y > 0.00001f) r1 = r1 / newScale.y;
+        if (newScale.z > 0.00001f) r2 = r2 / newScale.z;
 
-        // New Local Position
-        Vec3 newLocalPos = {
-            (parentWorldScale.x != 0.0f) ? unrotatedPos.x / parentWorldScale.x : unrotatedPos.x,
-            (parentWorldScale.y != 0.0f) ? unrotatedPos.y / parentWorldScale.y : unrotatedPos.y,
-            (parentWorldScale.z != 0.0f) ? unrotatedPos.z / parentWorldScale.z : unrotatedPos.z
-        };
+        // toEulerAngles expects ROW vectors
+        Vec3 newRot = Mat4x4::toEulerAngles(r0, r1, r2);
 
-        // New Local Scale
-        Vec3 newLocalScale = {
-            (parentWorldScale.x != 0.0f) ? worldScale.x / parentWorldScale.x : worldScale.x,
-            (parentWorldScale.y != 0.0f) ? worldScale.y / parentWorldScale.y : worldScale.y,
-            (parentWorldScale.z != 0.0f) ? worldScale.z / parentWorldScale.z : worldScale.z
-        };
-
-        // New Local Rotation (World Rotation minus Parent World Rotation)
-        Vec3 newLocalRot = {
-            worldRot.x - parentWorldRot.x,
-            worldRot.y - parentWorldRot.y,
-            worldRot.z - parentWorldRot.z
-        };
-
-        getTransform().setPosition(newLocalPos);
-        getTransform().setScale(newLocalScale);
-        getTransform().setRotation(newLocalRot);
+        // Apply the calculated local transform
+        getTransform().setPosition(newPos);
+        getTransform().setRotation(newRot);
+        getTransform().setScale(newScale);
     }
     else
     {
-        // UNPARENTING: Restores full accumulated world rotation, position, and scale
+        // Unparenting: extract world matrix components
+        Vec4 worldRow3 = worldMat.row(3);
+        Vec3 worldPos = { worldRow3.x, worldRow3.y, worldRow3.z };
+
+        Vec4 worldRow0 = worldMat.row(0);
+        Vec4 worldRow1 = worldMat.row(1);
+        Vec4 worldRow2 = worldMat.row(2);
+
+        Vec3 wr0 = { worldRow0.x, worldRow0.y, worldRow0.z };
+        Vec3 wr1 = { worldRow1.x, worldRow1.y, worldRow1.z };
+        Vec3 wr2 = { worldRow2.x, worldRow2.y, worldRow2.z };
+
+        Vec3 worldScale;
+        worldScale.x = wr0.length();
+        worldScale.y = wr1.length();
+        worldScale.z = wr2.length();
+
+        if (worldScale.x > 0.00001f) wr0 = wr0 / worldScale.x;
+        if (worldScale.y > 0.00001f) wr1 = wr1 / worldScale.y;
+        if (worldScale.z > 0.00001f) wr2 = wr2 / worldScale.z;
+
+        Vec3 worldRot = Mat4x4::toEulerAngles(wr0, wr1, wr2);
+
         getTransform().setPosition(worldPos);
-        getTransform().setScale(worldScale);
         getTransform().setRotation(worldRot);
+        getTransform().setScale(worldScale);
     }
 }
 

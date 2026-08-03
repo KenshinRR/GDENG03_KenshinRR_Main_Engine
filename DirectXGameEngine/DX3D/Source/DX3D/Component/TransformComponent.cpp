@@ -76,24 +76,27 @@ void dx3d::TransformComponent::updateWorldMatrix() noexcept
 
 	m_dirty = false;
 
-	//Compute Local Matrices
+	// Compute Local Rigid Matrix (Rotation * Translation)
 	Mat4x4 localRigid =
 		Mat4x4::rotateX(m_rotation.x) *
 		Mat4x4::rotateY(m_rotation.y) *
 		Mat4x4::rotateZ(m_rotation.z) *
 		Mat4x4::translate(m_position);
 
+	// Compute Local Affine Matrix (Scale * Rigid)
 	Mat4x4 localAffine =
 		Mat4x4::scale(m_scale) *
 		localRigid;
 
-	//Check for Parent Hierarchy
+	// Check for Parent Hierarchy
 	GameObject* parent = getGameObject().getParent();
 	if (parent)
 	{
 		auto& parentTransform = parent->getTransform();
 
-		//Local * Parent World Matrix
+		// For row-vector convention: World = Local * ParentWorld
+		// But your multiplication order seems to be Local * Parent based on the operator*
+		// Let's keep it consistent with what works, but fix the rigid/affine separation
 		m_rigidWorldMatrix = localRigid * parentTransform.getRigidWorldMatrix();
 		m_affineWorldMatrix = localAffine * parentTransform.getAffineWorldMatrix();
 	}

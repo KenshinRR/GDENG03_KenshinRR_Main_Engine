@@ -77,14 +77,14 @@ void dx3d::GameObject::setParent(GameObject* newParent)
         Mat4x4 parentWorldMat = m_parent->getTransform().getAffineWorldMatrix();
         Mat4x4 invParentMat = Mat4x4::inverse(parentWorldMat);
 
-        // Calculate local matrix: Local = World * Inverse(ParentWorld)
+        // Calculate local matrix
         Mat4x4 localMat = worldMat * invParentMat;
 
         // Extract position from row 3
         Vec4 row3 = localMat.row(3);
         Vec3 newPos = { row3.x, row3.y, row3.z };
 
-        // Extract ROW vectors (not columns!) for toEulerAngles
+        // Extract ROW vectors for rotation/scale decomposition
         Vec4 row0 = localMat.row(0);
         Vec4 row1 = localMat.row(1);
         Vec4 row2 = localMat.row(2);
@@ -99,13 +99,13 @@ void dx3d::GameObject::setParent(GameObject* newParent)
         newScale.y = r1.length();
         newScale.z = r2.length();
 
-        // Remove scale from rotation vectors
-        if (newScale.x > 0.00001f) r0 = r0 / newScale.x;
-        if (newScale.y > 0.00001f) r1 = r1 / newScale.y;
-        if (newScale.z > 0.00001f) r2 = r2 / newScale.z;
+        // Remove scale to get pure rotation matrix
+        if (newScale.x > 0.00001f) { r0 = r0 / newScale.x; }
+        if (newScale.y > 0.00001f) { r1 = r1 / newScale.y; }
+        if (newScale.z > 0.00001f) { r2 = r2 / newScale.z; }
 
-        // toEulerAngles expects ROW vectors
-        Vec3 newRot = Mat4x4::toEulerAngles(r0, r1, r2);
+        // Use the correct Euler angle extraction for X*Y*Z order
+        Vec3 newRot = Mat4x4::toEulerAnglesXYZ(r0, r1, r2);
 
         // Apply the calculated local transform
         getTransform().setPosition(newPos);
@@ -135,7 +135,7 @@ void dx3d::GameObject::setParent(GameObject* newParent)
         if (worldScale.y > 0.00001f) wr1 = wr1 / worldScale.y;
         if (worldScale.z > 0.00001f) wr2 = wr2 / worldScale.z;
 
-        Vec3 worldRot = Mat4x4::toEulerAngles(wr0, wr1, wr2);
+        Vec3 worldRot = Mat4x4::toEulerAnglesXYZ(wr0, wr1, wr2);
 
         getTransform().setPosition(worldPos);
         getTransform().setRotation(worldRot);

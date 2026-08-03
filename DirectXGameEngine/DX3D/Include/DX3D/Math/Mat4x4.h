@@ -214,6 +214,41 @@ namespace dx3d
 				return euler;
 			}
 
+			static Vec3 toEulerAnglesXYZ(const Vec3& r0, const Vec3& r1, const Vec3& r2) noexcept
+			{
+				// Assumes rotation matrix from: rotateX(x) * rotateY(y) * rotateZ(z)
+				// r0, r1, r2 are the ROWS of the rotation matrix
+				Vec3 euler;
+
+				// Extract Y rotation
+				float sinY = -r0.z;
+				if (std::abs(sinY) < 0.99999f)
+				{
+					euler.y = std::asin(std::clamp(sinY, -1.0f, 1.0f));
+					float cosY = std::cos(euler.y);
+
+					// Extract X and Z rotations
+					euler.x = std::atan2(r1.z / cosY, r2.z / cosY);
+					euler.z = std::atan2(r0.y / cosY, r0.x / cosY);
+				}
+				else
+				{
+					// Gimbal lock
+					euler.z = 0.0f;
+					if (sinY < -0.99999f)
+					{
+						euler.y = -1.57079632f;
+						euler.x = std::atan2(-r1.x, r1.y);
+					}
+					else
+					{
+						euler.y = 1.57079632f;
+						euler.x = std::atan2(r1.x, -r1.y);
+					}
+				}
+				return euler;
+			}
+
 		private:
 			f32 m_data[4][4]{};
 	};

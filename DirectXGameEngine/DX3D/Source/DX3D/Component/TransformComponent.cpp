@@ -73,20 +73,14 @@ dx3d::Mat4x4 dx3d::TransformComponent::getRigidWorldMatrix() noexcept
 void dx3d::TransformComponent::updateWorldMatrix() noexcept
 {
 	if (!m_dirty) return;
-
 	m_dirty = false;
 
-	// Compute Local Rigid Matrix (Rotation * Translation)
-	Mat4x4 localRigid =
-		Mat4x4::rotateX(m_rotation.x) *
-		Mat4x4::rotateY(m_rotation.y) *
-		Mat4x4::rotateZ(m_rotation.z) *
-		Mat4x4::translate(m_position);
+	// Build local affine matrix: Scale * Rotation * Translation
+	// Using X*Y*Z rotation order (matching toEulerAngles expectation)
+	Mat4x4 localRotation = Mat4x4::rotateX(m_rotation.x) * Mat4x4::rotateY(m_rotation.y) * Mat4x4::rotateZ(m_rotation.z);
 
-	// Compute Local Affine Matrix (Scale * Rigid)
-	Mat4x4 localAffine =
-		Mat4x4::scale(m_scale) *
-		localRigid;
+	Mat4x4 localRigid = localRotation * Mat4x4::translate(m_position);
+	Mat4x4 localAffine = Mat4x4::scale(m_scale) * localRigid;
 
 	// Check for Parent Hierarchy
 	GameObject* parent = getGameObject().getParent();
@@ -94,9 +88,7 @@ void dx3d::TransformComponent::updateWorldMatrix() noexcept
 	{
 		auto& parentTransform = parent->getTransform();
 
-		// For row-vector convention: World = Local * ParentWorld
-		// But your multiplication order seems to be Local * Parent based on the operator*
-		// Let's keep it consistent with what works, but fix the rigid/affine separation
+		// World = Local * ParentWorld (row-vector convention)
 		m_rigidWorldMatrix = localRigid * parentTransform.getRigidWorldMatrix();
 		m_affineWorldMatrix = localAffine * parentTransform.getAffineWorldMatrix();
 	}

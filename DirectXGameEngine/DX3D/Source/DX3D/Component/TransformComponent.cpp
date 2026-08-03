@@ -72,31 +72,80 @@ dx3d::Mat4x4 dx3d::TransformComponent::getRigidWorldMatrix() noexcept
 
 void dx3d::TransformComponent::updateWorldMatrix() noexcept
 {
-	if (!m_dirty) return;
-	m_dirty = false;
+    if (!m_dirty) return;
+    m_dirty = false;
 
-	// Build local affine matrix: Scale * Rotation * Translation
-	// Using X*Y*Z rotation order (matching toEulerAngles expectation)
-	Mat4x4 localRotation = Mat4x4::rotateX(m_rotation.x) * Mat4x4::rotateY(m_rotation.y) * Mat4x4::rotateZ(m_rotation.z);
+    // Compute local matrices (same as before)
+    Mat4x4 localRigid =
+        Mat4x4::rotateX(m_rotation.x) *
+        Mat4x4::rotateY(m_rotation.y) *
+        Mat4x4::rotateZ(m_rotation.z) *
+        Mat4x4::translate(m_position);
 
-	Mat4x4 localRigid = localRotation * Mat4x4::translate(m_position);
-	Mat4x4 localAffine = Mat4x4::scale(m_scale) * localRigid;
+    Mat4x4 localAffine =
+        Mat4x4::scale(m_scale) *
+        localRigid;
 
-	// Check for Parent Hierarchy
-	GameObject* parent = getGameObject().getParent();
-	if (parent)
-	{
-		auto& parentTransform = parent->getTransform();
+    // Check for Parent Hierarchy
+    GameObject* parent = getGameObject().getParent();
+    if (parent)
+    {
+        auto& parentTransform = parent->getTransform();
 
-		// World = Local * ParentWorld (row-vector convention)
-		m_rigidWorldMatrix = localRigid * parentTransform.getRigidWorldMatrix();
-		m_affineWorldMatrix = localAffine * parentTransform.getAffineWorldMatrix();
-	}
-	else
-	{
-		m_rigidWorldMatrix = localRigid;
-		m_affineWorldMatrix = localAffine;
-	}
+        // Force parent to update first
+        parentTransform.updateWorldMatrix();
+
+        // Get parent's WORLD values directly
+        Vec3 parentWorldPos = parentTransform.m_worldPosition;
+        Vec3 parentWorldRot = parentTransform.m_worldRotation;
+        Vec3 parentWorldScale = parentTransform.m_worldScale;
+
+        // Compute our world values from parent's world + our local
+        m_worldPosition = parentWorldPos + m_position;
+        m_worldRotation = parentWorldRot + m_rotation;
+        m_worldScale.x = parentWorldScale.x * m_scale.x;
+        m_worldScale.y = parentWorldScale.y * m_scale.y;
+        m_worldScale.z = parentWorldScale.z * m_scale.z;
+
+        // Still compute matrices for rendering
+        Mat4x4 worldScaleMat = Mat4x4::scale(m_worldScale);
+        Mat4x4 worldRotMat =
+            Mat4x4::rotateX(m_worldRotation.x) *
+            Mat4x4::rotateY(m_worldRotation.y) *
+            Mat4x4::rotateZ(m_worldRotation.z);
+        Mat4x4 worldTransMat = Mat4x4::translate(m_worldPosition);
+
+        m_rigidWorldMatrix = worldRotMat * worldTransMat;
+        m_affineWorldMatrix = worldScaleMat * m_rigidWorldMatrix;
+    }
+    else
+    {
+        // No parent - world = local
+        m_worldPosition = m_position;
+        m_worldRotation = m_rotation;
+        m_worldScale = m_scale;
+
+        m_rigidWorldMatrix = localRigid;
+        m_affineWorldMatrix = localAffine;
+    }
+}
+
+dx3d::Vec3 dx3d::TransformComponent::getWorldPosition()
+{
+    updateWorldMatrix();
+    return m_worldPosition;
+}
+
+dx3d::Vec3 dx3d::TransformComponent::getWorldRotation()
+{
+    updateWorldMatrix();
+    return m_worldRotation;
+}
+
+dx3d::Vec3 dx3d::TransformComponent::getWorldScale()
+{
+    updateWorldMatrix();
+    return m_worldScale;
 }
 
 void dx3d::TransformComponent::markAsDirty()

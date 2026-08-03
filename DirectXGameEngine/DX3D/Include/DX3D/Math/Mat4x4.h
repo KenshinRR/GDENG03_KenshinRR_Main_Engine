@@ -195,22 +195,30 @@ namespace dx3d
 
 			static Vec3 toEulerAngles(const Vec3& r0, const Vec3& r1, const Vec3& r2) noexcept
 			{
+				// r0, r1, r2 are the ROWS of a rotation matrix built as Rx*Ry*Rz
+				// (X rotation first in code, so Z is applied first to the vector)
 				Vec3 euler;
-				float sinY = -r0.z; // Row 0, Column 2 in DirectX Row-Major
 
-				if (std::abs(sinY) < 0.99999f)
+				// Extract Y rotation from r0.z = -sin(y)
+				float sinY = -r0.z;
+				sinY = std::clamp(sinY, -1.0f, 1.0f);
+				euler.y = std::asin(sinY);
+
+				float cosY = std::cos(euler.y);
+
+				if (std::abs(cosY) > 0.00001f)
 				{
-					euler.y = std::asin(std::clamp(sinY, -1.0f, 1.0f)); // Yaw (Y)
-					euler.x = std::atan2(r1.z, r2.z);                   // Pitch (X)
-					euler.z = std::atan2(r0.y, r0.x);                   // Roll (Z)
+					// No gimbal lock
+					euler.x = std::atan2(r1.z, r2.z);  // X rotation
+					euler.z = std::atan2(r0.y, r0.x);  // Z rotation
 				}
 				else
 				{
-					// Gimbal lock fallback
-					euler.y = (sinY < 0.0f) ? -1.57079632f : 1.57079632f;
-					euler.x = std::atan2(-r1.x, r1.y);
-					euler.z = 0.0f;
+					// Gimbal lock - cos(y) ≈ 0
+					euler.x = 0.0f;
+					euler.z = std::atan2(-r1.x, r1.y);
 				}
+
 				return euler;
 			}
 
@@ -247,6 +255,16 @@ namespace dx3d
 					}
 				}
 				return euler;
+			}
+
+			static Mat4x4 fromRows(const Vec4& r0, const Vec4& r1, const Vec4& r2, const Vec4& r3) noexcept
+			{
+				Mat4x4 res;
+				res.m_data[0][0] = r0.x; res.m_data[0][1] = r0.y; res.m_data[0][2] = r0.z; res.m_data[0][3] = r0.w;
+				res.m_data[1][0] = r1.x; res.m_data[1][1] = r1.y; res.m_data[1][2] = r1.z; res.m_data[1][3] = r1.w;
+				res.m_data[2][0] = r2.x; res.m_data[2][1] = r2.y; res.m_data[2][2] = r2.z; res.m_data[2][3] = r2.w;
+				res.m_data[3][0] = r3.x; res.m_data[3][1] = r3.y; res.m_data[3][2] = r3.z; res.m_data[3][3] = r3.w;
+				return res;
 			}
 
 		private:

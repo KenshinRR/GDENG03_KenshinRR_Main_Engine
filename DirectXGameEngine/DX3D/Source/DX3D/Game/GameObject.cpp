@@ -58,81 +58,45 @@ void dx3d::GameObject::setParent(GameObject* newParent)
     if (m_parent == newParent || newParent == this) return;
     if (newParent && !newParent->isDeleted() && newParent->isDescendantOf(this)) return;
 
-    Mat4x4 worldMat = getTransform().getAffineWorldMatrix();
+    // Get current WORLD transform values (force update if needed)
+    Vec3 worldPos = getTransform().getWorldPosition();
+    Vec3 worldRot = getTransform().getWorldRotation();
+    Vec3 worldScale = getTransform().getWorldScale();
 
+    // Unlink from current parent
     if (m_parent)
     {
         std::erase(m_parent->m_children, this);
     }
 
+    // Assign new parent
     m_parent = (newParent && !newParent->isDeleted()) ? newParent : nullptr;
 
     if (m_parent)
     {
         m_parent->m_children.push_back(this);
 
-        Mat4x4 parentWorldMat = m_parent->getTransform().getAffineWorldMatrix();
-        Mat4x4 invParentMat = Mat4x4::inverse(parentWorldMat);
-        Mat4x4 localMat = worldMat * invParentMat;
+        // Get parent's WORLD transform values
+        Vec3 parentWorldPos = m_parent->getTransform().getWorldPosition();
+        Vec3 parentWorldRot = m_parent->getTransform().getWorldRotation();
+        Vec3 parentWorldScale = m_parent->getTransform().getWorldScale();
 
-        // Extract position from row 3
-        Vec3 newPos = { localMat.row(3).x, localMat.row(3).y, localMat.row(3).z };
+        // Calculate new LOCAL transform values
+        Vec3 localPos = worldPos - parentWorldPos;
+        Vec3 localRot = worldRot - parentWorldRot;
+        Vec3 localScale;
+        localScale.x = worldScale.x / parentWorldScale.x;
+        localScale.y = worldScale.y / parentWorldScale.y;
+        localScale.z = worldScale.z / parentWorldScale.z;
 
-        // Extract columns of 3x3 part (scale * rotation)
-        Vec3 c0 = { localMat.row(0).x, localMat.row(1).x, localMat.row(2).x };
-        Vec3 c1 = { localMat.row(0).y, localMat.row(1).y, localMat.row(2).y };
-        Vec3 c2 = { localMat.row(0).z, localMat.row(1).z, localMat.row(2).z };
-
-        // Extract scale from column lengths
-        Vec3 newScale = { c0.length(), c1.length(), c2.length() };
-
-        // Remove scale to get rotation columns
-        if (newScale.x > 0.00001f) c0 = c0 / newScale.x;
-        if (newScale.y > 0.00001f) c1 = c1 / newScale.y;
-        if (newScale.z > 0.00001f) c2 = c2 / newScale.z;
-
-        // Orthogonalize rotation (handles shear from non-uniform parent scale)
-        Vec3::normalize(c0);
-        c1 = c1 - c0 * Vec3::dot(c0, c1);
-        Vec3::normalize(c1);
-        c2 = Vec3::cross(c0, c1);
-
-        // Convert rotation columns to rows for toEulerAngles
-        Vec3 rotRow0 = { c0.x, c1.x, c2.x };
-        Vec3 rotRow1 = { c0.y, c1.y, c2.y };
-        Vec3 rotRow2 = { c0.z, c1.z, c2.z };
-
-        Vec3 newRot = Mat4x4::toEulerAngles(rotRow0, rotRow1, rotRow2);
-
-        getTransform().setPosition(newPos);
-        getTransform().setRotation(newRot);
-        getTransform().setScale(newScale);
+        // Set local transform
+        getTransform().setPosition(localPos);
+        getTransform().setRotation(localRot);
+        getTransform().setScale(localScale);
     }
     else
     {
-        Vec3 worldPos = { worldMat.row(3).x, worldMat.row(3).y, worldMat.row(3).z };
-
-        Vec3 wc0 = { worldMat.row(0).x, worldMat.row(1).x, worldMat.row(2).x };
-        Vec3 wc1 = { worldMat.row(0).y, worldMat.row(1).y, worldMat.row(2).y };
-        Vec3 wc2 = { worldMat.row(0).z, worldMat.row(1).z, worldMat.row(2).z };
-
-        Vec3 worldScale = { wc0.length(), wc1.length(), wc2.length() };
-
-        if (worldScale.x > 0.00001f) wc0 = wc0 / worldScale.x;
-        if (worldScale.y > 0.00001f) wc1 = wc1 / worldScale.y;
-        if (worldScale.z > 0.00001f) wc2 = wc2 / worldScale.z;
-
-        Vec3::normalize(wc0);
-        wc1 = wc1 - wc0 * Vec3::dot(wc0, wc1);
-        Vec3::normalize(wc1);
-        wc2 = Vec3::cross(wc0, wc1);
-
-        Vec3 wr0 = { wc0.x, wc1.x, wc2.x };
-        Vec3 wr1 = { wc0.y, wc1.y, wc2.y };
-        Vec3 wr2 = { wc0.z, wc1.z, wc2.z };
-
-        Vec3 worldRot = Mat4x4::toEulerAngles(wr0, wr1, wr2);
-
+        // Unparenting: world becomes local
         getTransform().setPosition(worldPos);
         getTransform().setRotation(worldRot);
         getTransform().setScale(worldScale);

@@ -8,6 +8,7 @@
 
 #include <DX3D/UI/HierarchyUI.h>
 #include <DX3D/UI/MainMenuBarUI.h>
+#include <DX3D/UI/DebugWindowUI.h>
 
 #include <DX3D/EventBroadcasting/EventBroadcastManager.h>
 #include <DX3D/EventBroadcasting/EventNames.h>
@@ -61,14 +62,20 @@ void MainGame::onCreate()
 	auto floorTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base / "DirectXGameEngine/Game/Assets/Textures/floor.jpg").c_str());
 
 	// UI initialize
+
 	std::unique_ptr<dx3d::HierarchyUI> hierarchy_UI = std::make_unique<dx3d::HierarchyUI>(dx3d::BaseDesc{ getLogger() });
 	hierarchy_UI->setGameObjectList(&world.getGameObjectList());
+
+	m_UIs.push_back(std::make_unique<dx3d::DebugWindowUI>(dx3d::BaseDesc{ getLogger() })); // ui works but not as a seperate window, it is in the hierarchy window. need to fix that
 	m_UIs.push_back(std::move(hierarchy_UI));
 
 	m_UIs.push_back(std::make_unique<dx3d::MainMenuBarUI>(dx3d::BaseDesc{ getLogger() }));
 	m_UIs.push_back(std::make_unique<dx3d::InspectorUI>(dx3d::BaseDesc{ getLogger() }));
+	
 
+	
 	// Create mesh resources (reusable)
+	
 	auto cubeMesh = getMeshFactory().createCubeMesh();
 	m_spawnCubeMesh = cubeMesh;
 	auto sphereMesh = getMeshFactory().createSphereMesh(20, 20);
@@ -108,11 +115,11 @@ void MainGame::onCreate()
 
 	
 		
-		auto armaDObject = world.createGameObject<dx3d::GameObject>();
+		/*auto armaDObject = world.createGameObject<dx3d::GameObject>();
 		
 		armaDObject->createOrGetComponent<dx3d::MeshComponent>()->setMesh(getMeshFactory().getCustomMesh("Armadillo"));
 		armaDObject->createOrGetComponent<dx3d::MeshComponent>()->setMaterial(basicMat);
-		armaDObject->getTransform().setScale({ 0.5f, 0.5f, 0.5f });
+		armaDObject->getTransform().setScale({ 0.5f, 0.5f, 0.5f });*/
 	
 	
 

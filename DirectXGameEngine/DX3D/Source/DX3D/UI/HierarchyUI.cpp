@@ -51,6 +51,7 @@ void dx3d::HierarchyUI::draw()
                 {
                     param.PutExtra("Key", "Cube");
                     EventBroadcastManager::getInstance().postEvent(EventNames::ON_ADD_3D_OBJECT, param);
+					DX3DLogInfo("Add Cube GameObject event posted.");
                 }
                 ImGui::EndPopup();
             }

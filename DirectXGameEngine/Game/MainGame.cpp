@@ -101,7 +101,7 @@ void MainGame::onCreate()
 		auto floorMeshComp = floor->createOrGetComponent<dx3d::MeshComponent>();
 		floorMeshComp->setMesh(planeMesh);
 		floorMeshComp->setMaterial(basicMat);
-		floor->getTransform().setScale({ 6.8f, 0.1f, 6.8f });
+		floor->getTransform().setScale({ 7.0f, 7.0f, 7.0f });
 		floor->getTransform().setPosition({ 0, 0, 0 });
 
 		///  test object

@@ -344,6 +344,9 @@
     <ClInclude Include="DX3D\Include\DX3D\UI\SceneViewportUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DX3D\Include\DX3D\Math\Quaternion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="DX3D\Configs\shadertoolsconfig.json" />

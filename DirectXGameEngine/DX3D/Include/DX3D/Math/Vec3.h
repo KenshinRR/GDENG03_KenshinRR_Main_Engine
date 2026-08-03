@@ -23,11 +23,30 @@ namespace dx3d
 				return *this;
 			}
 
+			Vec3& operator-=(const Vec3& rhs)
+			{
+				x -= rhs.x;
+				y -= rhs.y;
+				z -= rhs.z;
+				return *this;
+			}
+
 			Vec3& operator*=(float scalar)
 			{
 				x *= scalar;
 				y *= scalar;
 				z *= scalar;
+				return *this;
+			}
+
+			Vec3& operator/=(float scalar)
+			{
+				if (scalar != 0.0f)
+				{
+					x /= scalar;
+					y /= scalar;
+					z /= scalar;
+				}
 				return *this;
 			}
 
@@ -46,6 +65,20 @@ namespace dx3d
 				};
 			}
 
+			static float dot(const Vec3& x, const Vec3& y) noexcept
+			{
+				return x.x * y.x + x.y * y.y + x.z * y.z;
+			}
+
+			static Vec3 cross(const Vec3& x, const Vec3& y) noexcept
+			{
+				return Vec3{
+					x.y * y.z - x.z * y.y,
+					x.z * y.x - x.x * y.z,
+					x.x * y.y - x.y * y.x
+				};
+			}
+
 		public:
 			f32 x{}, y{}, z{};
 		};
@@ -54,6 +87,17 @@ namespace dx3d
 		{
 			lhs += rhs;
 			return lhs;
+		}
+
+		inline Vec3 operator-(Vec3 lhs, const Vec3& rhs)
+		{
+			lhs -= rhs;
+			return lhs;
+		}
+
+		inline Vec3 operator-(const Vec3& v)
+		{
+			return Vec3{ -v.x, -v.y, -v.z };
 		}
 
 		inline Vec3 operator*(Vec3 v, float scalar)
@@ -65,6 +109,12 @@ namespace dx3d
 		inline Vec3 operator*(float scalar, Vec3 v)
 		{
 			v *= scalar;
+			return v;
+		}
+
+		inline Vec3 operator/(Vec3 v, float scalar)
+		{
+			v /= scalar;
 			return v;
 		}
 }

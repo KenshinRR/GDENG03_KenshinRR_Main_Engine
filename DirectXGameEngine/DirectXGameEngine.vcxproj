@@ -192,6 +192,7 @@
     <ClCompile Include="DX3D\Source\DX3D\EventBroadcasting\Parameters.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\UI\MainMenuBarUI.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\UI\SceneViewportUI.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\UI\DebugWindowUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <!-- ADDED: Test UI declaration. -->
@@ -254,6 +255,7 @@
     <ClInclude Include="DX3D\Include\DX3D\UI\MainMenuBarUI.h" />
     <ClInclude Include="DX3D\Include\DX3D\UI\HierarchyUI.h" />
     <ClInclude Include="DX3D\Include\DX3D\UI\SceneViewportUI.h" />
+    <ClInclude Include="DX3D\Include\DX3D\UI\DebugWindowUI.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

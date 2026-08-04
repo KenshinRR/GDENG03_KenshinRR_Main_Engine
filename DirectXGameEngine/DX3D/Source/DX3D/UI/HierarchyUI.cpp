@@ -13,11 +13,20 @@ dx3d::HierarchyUI::HierarchyUI(const BaseDesc& desc) : BaseUI(desc)
             m_isPlayMode = params.GetBoolExtra("IsPlayMode", false);
         }
     );
+
+    EventBroadcastManager::getInstance().addObserver(
+        EventNames::ON_GAMEOBJECT_SELECTED,
+        [this](Parameters& params)
+        {
+            m_selectedObject = params.GetGameObjectPtr("Selected", nullptr);
+        }
+    );
 }
 
 dx3d::HierarchyUI::~HierarchyUI()
 {
     EventBroadcastManager::getInstance().RemoveObserver(EventNames::ON_EDITOR_PLAY_MODE_CHANGED);
+    EventBroadcastManager::getInstance().RemoveObserver(EventNames::ON_GAMEOBJECT_SELECTED);
 }
 
 void dx3d::HierarchyUI::draw()
@@ -57,7 +66,7 @@ void dx3d::HierarchyUI::draw()
             }
 
             ImGui::EndDisabled();
-
+            ImGui::Separator();
 
             // Make sure we actually have a list set
             if (!m_gameObjects || m_gameObjects->empty())
@@ -67,63 +76,136 @@ void dx3d::HierarchyUI::draw()
                 return;
             }
 
+            std::vector<GameObject*> rootObjects;
             for (auto& [key, vec] : *m_gameObjects) // note the * to dereference
             {
-                ImGui::Separator();
-                ImGui::Text("Group %zu", key);
-
-                int g_it = 0;
                 for (auto& objPtr : vec)
                 {
                     GameObject* obj = objPtr.get();
-                    if (!obj || obj->isDeleted()) continue;
-
-                    // Use the GameObject’s real name accessor
-                    const std::string& name = obj->getName();
-
-                    ImGui::PushID(obj);
-
-                    bool enabled = obj->isEnabled();
-                    ImGui::BeginDisabled(m_isPlayMode);
-                    if (ImGui::Checkbox("##Enabled", &enabled))
+                    if (obj && !obj->isDeleted() && obj->getParent() == nullptr)
                     {
-                        Parameters param;
-                        param.PutExtra("Target", obj);
-                        param.PutExtra("Enabled", enabled);
-                        EventBroadcastManager::getInstance().postEvent(EventNames::ON_SET_GAMEOBJECT_ENABLED, param);
+                        rootObjects.push_back(obj);
                     }
-                    ImGui::EndDisabled();
-
-                    ImGui::SameLine();
-                    if (ImGui::SmallButton(("Select##" + std::to_string(g_it)).c_str()))
-                    {
-                        Parameters param;
-                        param.PutExtra("Selected", obj);
-
-                        EventBroadcastManager::getInstance().postEvent(EventNames::ON_GAMEOBJECT_SELECTED, param);
-                    }
-
-                    ImGui::SameLine();
-                    ImGui::TextUnformatted(name.c_str());
-
-                    ImGui::SameLine();
-                    ImGui::BeginDisabled(m_isPlayMode);
-                    if (ImGui::SmallButton("Delete"))
-                    {
-                        Parameters param;
-                        param.PutExtra("Target", obj);
-                        EventBroadcastManager::getInstance().postEvent(EventNames::ON_DELETE_GAMEOBJECT, param);
-                    }
-                    ImGui::EndDisabled();
-
-                    ImGui::PopID();
-                    g_it++;
                 }
             }
 
+            for (GameObject* rootObj : rootObjects)
+            {
+                drawGameObjectNode(rootObj);
+            }
+
+            ImGui::Spacing();
+            ImGui::Dummy(ImVec2(ImGui::GetContentRegionAvail().x, std::max(40.0f, ImGui::GetContentRegionAvail().y)));
+            if (!m_isPlayMode && ImGui::BeginDragDropTarget())
+            {
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("GAMEOBJECT_PTR"))
+                {
+                    GameObject* draggedObj = *(GameObject**)payload->Data;
+                    if (draggedObj && draggedObj->getParent() != nullptr)
+                    {
+                        Parameters param;
+                        param.PutExtra("Child", draggedObj);
+                        param.PutExtra("Parent", static_cast<GameObject*>(nullptr));
+                        EventBroadcastManager::getInstance().postEvent(EventNames::ON_SET_PARENT, param);
+                    }
+                }
+                ImGui::EndDragDropTarget();
+            }
         }
         ImGui::End();
     }
+}
+
+void dx3d::HierarchyUI::drawGameObjectNode(GameObject* obj)
+{
+    if (!obj || obj->isDeleted()) return;
+
+    ImGui::PushID(obj);
+
+    std::vector<GameObject*> validChildren;
+    for (GameObject* child : obj->getChildren())
+    {
+        if (child && !child->isDeleted())
+        {
+            validChildren.push_back(child);
+        }
+    }
+
+    ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
+    if (m_selectedObject == obj)
+    {
+        nodeFlags |= ImGuiTreeNodeFlags_Selected;
+    }
+    if (validChildren.empty())
+    {
+        nodeFlags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+    }
+
+    bool enabled = obj->isEnabled();
+    ImGui::BeginDisabled(m_isPlayMode);
+    if (ImGui::Checkbox("##Enabled", &enabled))
+    {
+        Parameters param;
+        param.PutExtra("Target", obj);
+        param.PutExtra("Enabled", enabled);
+        EventBroadcastManager::getInstance().postEvent(EventNames::ON_SET_GAMEOBJECT_ENABLED, param);
+    }
+    ImGui::EndDisabled();
+
+    ImGui::SameLine();
+
+    bool isNodeOpen = ImGui::TreeNodeEx((void*)obj, nodeFlags, "%s", obj->getName().c_str());
+
+    if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+    {
+        Parameters param;
+        param.PutExtra("Selected", obj);
+        EventBroadcastManager::getInstance().postEvent(EventNames::ON_GAMEOBJECT_SELECTED, param);
+    }
+
+    if (!m_isPlayMode && ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
+    {
+        ImGui::SetDragDropPayload("GAMEOBJECT_PTR", &obj, sizeof(GameObject*));
+        ImGui::Text("Reparent %s", obj->getName().c_str());
+        ImGui::EndDragDropSource();
+    }
+
+    if (!m_isPlayMode && ImGui::BeginDragDropTarget())
+    {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("GAMEOBJECT_PTR"))
+        {
+            GameObject* draggedObj = *(GameObject**)payload->Data;
+            if (draggedObj && draggedObj != obj && !obj->isDescendantOf(draggedObj))
+            {
+                Parameters param;
+                param.PutExtra("Child", draggedObj);
+                param.PutExtra("Parent", obj);
+                EventBroadcastManager::getInstance().postEvent(EventNames::ON_SET_PARENT, param);
+            }
+        }
+        ImGui::EndDragDropTarget();
+    }
+
+    ImGui::SameLine(ImGui::GetWindowWidth() - 60.0f);
+    ImGui::BeginDisabled(m_isPlayMode);
+    if (ImGui::SmallButton("Delete"))
+    {
+        Parameters param;
+        param.PutExtra("Target", obj);
+        EventBroadcastManager::getInstance().postEvent(EventNames::ON_DELETE_GAMEOBJECT, param);
+    }
+    ImGui::EndDisabled();
+
+    if (isNodeOpen && !validChildren.empty())
+    {
+        for (GameObject* child : validChildren)
+        {
+            drawGameObjectNode(child);
+        }
+        ImGui::TreePop();
+    }
+
+    ImGui::PopID();
 }
 
 void dx3d::HierarchyUI::setGameObjectList(const std::unordered_map<size_t, std::vector<UniquePtr<GameObject>>>* list)

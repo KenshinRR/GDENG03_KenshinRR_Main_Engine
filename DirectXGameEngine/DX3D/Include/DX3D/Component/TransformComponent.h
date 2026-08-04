@@ -29,6 +29,10 @@ namespace dx3d
 		Mat4x4 getAffineWorldMatrix() noexcept;
 		Mat4x4 getRigidWorldMatrix() noexcept;
 
+		Vec3 getWorldPosition();
+		Vec3 getWorldRotation();
+		Vec3 getWorldScale();
+
 		void updateWorldMatrix() noexcept;
 	private:
 		void markAsDirty();
@@ -37,9 +41,14 @@ namespace dx3d
 		Vec3 m_rotation{ 0,0,0 };
 		Vec3 m_scale{ 1,1,1 };
 
+		Vec3 m_worldPosition{ 0,0,0 };
+		Vec3 m_worldRotation{ 0,0,0 };
+		Vec3 m_worldScale{ 1,1,1 };
+
 		Mat4x4 m_rigidWorldMatrix{};   // rotation + translation only
 		Mat4x4 m_affineWorldMatrix{};  // rotation + translation + scale
 
 		bool m_dirty{};
+		void computeWorldFromParent();
 	};
 }

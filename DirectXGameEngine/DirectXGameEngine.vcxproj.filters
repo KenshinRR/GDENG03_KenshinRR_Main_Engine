@@ -167,9 +167,6 @@
     <ClCompile Include="DX3D\Source\DX3D\UI\SceneViewportUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DX3D\Source\DX3D\UI\DebugWindowUI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <!-- ADDED: Test UI declaration. -->
@@ -347,7 +344,7 @@
     <ClInclude Include="DX3D\Include\DX3D\UI\SceneViewportUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DX3D\Include\DX3D\UI\DebugWindowUI.h">
+    <ClInclude Include="DX3D\Include\DX3D\Math\Quaternion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -8,7 +8,6 @@
 
 #include <DX3D/UI/HierarchyUI.h>
 #include <DX3D/UI/MainMenuBarUI.h>
-#include <DX3D/UI/DebugWindowUI.h>
 
 #include <DX3D/EventBroadcasting/EventBroadcastManager.h>
 #include <DX3D/EventBroadcasting/EventNames.h>
@@ -62,20 +61,14 @@ void MainGame::onCreate()
 	auto floorTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base / "DirectXGameEngine/Game/Assets/Textures/floor.jpg").c_str());
 
 	// UI initialize
-
 	std::unique_ptr<dx3d::HierarchyUI> hierarchy_UI = std::make_unique<dx3d::HierarchyUI>(dx3d::BaseDesc{ getLogger() });
 	hierarchy_UI->setGameObjectList(&world.getGameObjectList());
-
-	m_UIs.push_back(std::make_unique<dx3d::DebugWindowUI>(dx3d::BaseDesc{ getLogger() })); // ui works but not as a seperate window, it is in the hierarchy window. need to fix that
 	m_UIs.push_back(std::move(hierarchy_UI));
 
 	m_UIs.push_back(std::make_unique<dx3d::MainMenuBarUI>(dx3d::BaseDesc{ getLogger() }));
 	m_UIs.push_back(std::make_unique<dx3d::InspectorUI>(dx3d::BaseDesc{ getLogger() }));
-	
 
-	
 	// Create mesh resources (reusable)
-	
 	auto cubeMesh = getMeshFactory().createCubeMesh();
 	m_spawnCubeMesh = cubeMesh;
 	auto sphereMesh = getMeshFactory().createSphereMesh(20, 20);
@@ -108,21 +101,16 @@ void MainGame::onCreate()
 		auto floorMeshComp = floor->createOrGetComponent<dx3d::MeshComponent>();
 		floorMeshComp->setMesh(planeMesh);
 		floorMeshComp->setMaterial(basicMat);
-		floor->getTransform().setScale({ 6.8f, 0.1f, 6.8f });
+		floor->getTransform().setScale({ 7.0f, 7.0f, 7.0f });
 		floor->getTransform().setPosition({ 0, 0, 0 });
 
 		///  test object
-
-	
-		
-		/*auto armaDObject = world.createGameObject<dx3d::GameObject>();
-		
-		armaDObject->createOrGetComponent<dx3d::MeshComponent>()->setMesh(getMeshFactory().getCustomMesh("Armadillo"));
-		armaDObject->createOrGetComponent<dx3d::MeshComponent>()->setMaterial(basicMat);
-		armaDObject->getTransform().setScale({ 0.5f, 0.5f, 0.5f });*/
-	
-	
-
+		//commented out since I don't have the model for me -Ira uncomment if you have the model in your project folder
+		//auto armaDObject = world.createGameObject<dx3d::GameObject>();
+		//
+		//armaDObject->createOrGetComponent<dx3d::MeshComponent>()->setMesh(getMeshFactory().getCustomMesh("Armadillo"));
+		//armaDObject->createOrGetComponent<dx3d::MeshComponent>()->setMaterial(basicMat);
+		//armaDObject->getTransform().setScale({ 0.5f, 0.5f, 0.5f });
 	}
 
 	srand((unsigned int)time(NULL));
@@ -325,6 +313,25 @@ void MainGame::registerEditorEvents()
 			[applyValue, oldValue]() { applyValue(oldValue); },
 			[applyValue, newValue]() { applyValue(newValue); }
 		});
+	});
+
+	events.addObserver(dx3d::EventNames::ON_SET_PARENT, [this](dx3d::Parameters& params)
+	{
+		if (m_isPlayMode) return;
+
+		auto* child = params.GetGameObjectPtr("Child", nullptr);
+		auto* newParent = params.GetGameObjectPtr("Parent", nullptr);
+
+		if (!child || child->isDeleted()) return;
+		if (child == newParent) return;
+
+		auto* oldParent = child->getParent();
+		if (oldParent == newParent) return;
+
+		executeEditorCommand(EditorCommand{
+			[child, oldParent]() { child->setParent(oldParent); },
+			[child, newParent]() { child->setParent(newParent); }
+			});
 	});
 
 	events.addObserver(dx3d::EventNames::ON_EDITOR_UNDO, [this]() { undoEditorCommand(); });

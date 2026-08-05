@@ -33,6 +33,11 @@ void dx3d::Parameters::PutExtra(std::string paramName, std::string value)
 	this->stringData[paramName] = value;
 }
 
+void dx3d::Parameters::PutExtra(std::string paramName, const char* value)
+{
+	this->stringData[paramName] = value ? std::string(value) : std::string{};
+}
+
 void dx3d::Parameters::PutExtra(std::string paramName, const Vec3& value)
 {
 	this->vec3Data[paramName] = value;

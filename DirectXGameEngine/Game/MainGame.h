@@ -41,10 +41,14 @@ private:
 	std::unordered_map<dx3d::ui32, dx3d::UniquePtr<dx3d::InspectorUI>> m_InspectorUIs{};
 	dx3d::GameObject* m_testObject{}; // ADDED: The centre cube edited by the Transform tab.
 	dx3d::RefPtr<dx3d::Mesh> m_spawnCubeMesh{};
+	dx3d::RefPtr<dx3d::Mesh> m_spawnSphereMesh{};
+	dx3d::RefPtr<dx3d::Mesh> m_spawnCapsuleMesh{};
+	dx3d::RefPtr<dx3d::Mesh> m_spawnCylinderMesh{};
+	dx3d::RefPtr<dx3d::Mesh> m_spawnPlaneMesh{};
 	dx3d::RefPtr<dx3d::MaterialResource> m_spawnMaterial{};
 	std::vector<EditorCommand> m_undoStack{};
 	std::vector<EditorCommand> m_redoStack{};
 	bool m_isPlayMode{ false };
-	size_t m_spawnedObjectCounter{ 0 };
+	std::unordered_map<std::string, size_t> m_spawnedObjectCounters{};
 	static constexpr size_t MaxUndoCommands = 20;
 };

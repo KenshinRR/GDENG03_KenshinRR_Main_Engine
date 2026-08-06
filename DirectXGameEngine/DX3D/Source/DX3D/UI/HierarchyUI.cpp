@@ -63,7 +63,10 @@ void dx3d::HierarchyUI::draw()
                     EventBroadcastManager::getInstance().postEvent(EventNames::ON_ADD_3D_OBJECT, param);
 					DX3DLogInfo("Added Cube GameObject.");
                 }
-             
+                else
+                {
+					DX3DLogError("Failed to add GameObject: object does not exist");
+                }
                 ImGui::EndPopup();
             }
 

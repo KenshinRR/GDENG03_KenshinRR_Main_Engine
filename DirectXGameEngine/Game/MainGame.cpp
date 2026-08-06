@@ -109,7 +109,6 @@ void MainGame::onCreate()
 		floor->getTransform().setPosition({ 0, 0, 0 });
 
 		///  test object
-
 		//commented out since I don't have the model for me -Ira uncomment if you have the model in your project folder
 		//auto armaDObject = world.createGameObject<dx3d::GameObject>();
 		//

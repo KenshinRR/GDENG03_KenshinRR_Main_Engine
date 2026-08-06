@@ -64,6 +64,26 @@ void dx3d::HierarchyUI::draw()
 					DX3DLogInfo("Added Cube GameObject.");
                 }
              
+                if (ImGui::MenuItem("Add Sphere"))
+                {
+                    param.PutExtra("Key", "Sphere");
+                    EventBroadcastManager::getInstance().postEvent(EventNames::ON_ADD_3D_OBJECT, param);
+                }
+                if (ImGui::MenuItem("Add Capsule"))
+                {
+                    param.PutExtra("Key", "Capsule");
+                    EventBroadcastManager::getInstance().postEvent(EventNames::ON_ADD_3D_OBJECT, param);
+                }
+                if (ImGui::MenuItem("Add Cylinder"))
+                {
+                    param.PutExtra("Key", "Cylinder");
+                    EventBroadcastManager::getInstance().postEvent(EventNames::ON_ADD_3D_OBJECT, param);
+                }
+                if (ImGui::MenuItem("Add Plane"))
+                {
+                    param.PutExtra("Key", "Plane");
+                    EventBroadcastManager::getInstance().postEvent(EventNames::ON_ADD_3D_OBJECT, param);
+                }
                 ImGui::EndPopup();
             }
 

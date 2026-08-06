@@ -171,6 +171,10 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DX3D\Source\DX3D\Core\DebugLogManager.cpp">
+    <ClCompile Include="DX3D\Source\DX3D\Resource\TextureManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DX3D\Source\DX3D\UI\InspectorTabItems\TextureComponentInspectorUIT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -357,6 +361,10 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DX3D\Include\DX3D\Core\DebugLogManager.h">
+    <ClInclude Include="DX3D\Include\DX3D\Resource\TextureManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DX3D\Include\DX3D\UI\InspectorTabItems\TextureComponentInspectorUIT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

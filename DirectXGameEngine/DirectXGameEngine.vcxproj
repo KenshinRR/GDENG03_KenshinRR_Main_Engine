@@ -194,6 +194,8 @@
     <ClCompile Include="DX3D\Source\DX3D\UI\MainMenuBarUI.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\UI\SceneViewportUI.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\UI\DebugWindowUI.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Resource\TextureManager.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\UI\InspectorTabItems\TextureComponentInspectorUIT.cpp" />
   </ItemGroup>
   <ItemGroup>
     <!-- ADDED: Test UI declaration. -->
@@ -258,6 +260,8 @@
     <ClInclude Include="DX3D\Include\DX3D\UI\HierarchyUI.h" />
     <ClInclude Include="DX3D\Include\DX3D\UI\SceneViewportUI.h" />
     <ClInclude Include="DX3D\Include\DX3D\UI\DebugWindowUI.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Resource\TextureManager.h" />
+    <ClInclude Include="DX3D\Include\DX3D\UI\InspectorTabItems\TextureComponentInspectorUIT.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

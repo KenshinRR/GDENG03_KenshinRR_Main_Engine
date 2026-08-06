@@ -17,6 +17,7 @@ namespace dx3d
 		void PutExtra(std::string paramName, bool value);
 		void PutExtra(std::string paramName, GameObject* value);
 		void PutExtra(std::string paramName, std::string value);
+		void PutExtra(std::string paramName, const char* value);
 		void PutExtra(std::string paramName, const Vec3& value);
 		
 

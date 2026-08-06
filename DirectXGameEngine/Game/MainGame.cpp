@@ -14,6 +14,8 @@
 #include <DX3D/EventBroadcasting/EventNames.h>
 #include <DX3D/EventBroadcasting/Parameters.h>
 
+#include <DX3D/Resource/TextureManager.h>
+
 MainGame::MainGame(const dx3d::GameDesc& desc) : dx3d::Game(desc)
 {
 }
@@ -60,8 +62,11 @@ void MainGame::onCreate()
 	Game::onCreate();
 	auto& world = getWorld();
 	std::filesystem::path base = std::filesystem::current_path().parent_path();
-	auto woodTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base/"DirectXGameEngine/Game/Assets/Textures/wood.jpg").c_str());
-	auto floorTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base / "DirectXGameEngine/Game/Assets/Textures/floor.jpg").c_str());
+
+	dx3d::TextureManager::getInstance().loadAllTextures(getResourceManager());
+
+	auto woodTex = dx3d::TextureManager::getInstance().getTexture("wood");
+	auto floorTex = dx3d::TextureManager::getInstance().getTexture("floor");
 
 	// UI initialize
 	std::unique_ptr<dx3d::HierarchyUI> hierarchy_UI = std::make_unique<dx3d::HierarchyUI>(dx3d::BaseDesc{ getLogger() });
@@ -76,9 +81,13 @@ void MainGame::onCreate()
 	auto cubeMesh = getMeshFactory().createCubeMesh();
 	m_spawnCubeMesh = cubeMesh;
 	auto sphereMesh = getMeshFactory().createSphereMesh(20, 20);
+	m_spawnSphereMesh = sphereMesh;
 	auto capsuleMesh = getMeshFactory().createCapsuleMesh(0.5f, 2.0f);
+	m_spawnCapsuleMesh = capsuleMesh;
 	auto cylinderMesh = getMeshFactory().createCylinderMesh(0.5f, 2.0f);
+	m_spawnCylinderMesh = cylinderMesh;
 	auto planeMesh = getMeshFactory().createPlaneMesh(10.0f, 10.0f);
+	m_spawnPlaneMesh = planeMesh;
 	auto circleMesh = getMeshFactory().createCircleMesh(0.5f, 32);
 	
 
@@ -390,18 +399,24 @@ dx3d::GameObject* MainGame::spawnEditorObject(const std::string& type)
 	auto* object = getWorld().createGameObject<dx3d::GameObject>();
 	if (!object) return nullptr;
 
-	++m_spawnedObjectCounter;
-	object->setName(type == "Empty"
-		? "Empty GameObject " + std::to_string(m_spawnedObjectCounter)
-		: "Cube " + std::to_string(m_spawnedObjectCounter));
+	const auto objectTypeName = type == "Empty" ? std::string{ "Empty GameObject" } : type;
+	const auto objectIndex = ++m_spawnedObjectCounters[objectTypeName];
+	object->setName(objectTypeName + " " + std::to_string(objectIndex));
 
 	object->getTransform().setPosition({ 0.0f, 0.5f, 0.0f });
 	object->getTransform().setScale({ 0.5f, 0.5f, 0.5f });
 
-	if (type == "Cube" && m_spawnCubeMesh && m_spawnMaterial)
+	dx3d::RefPtr<dx3d::Mesh> spawnMesh{};
+	if (type == "Cube") spawnMesh = m_spawnCubeMesh;
+	else if (type == "Sphere") spawnMesh = m_spawnSphereMesh;
+	else if (type == "Capsule") spawnMesh = m_spawnCapsuleMesh;
+	else if (type == "Cylinder") spawnMesh = m_spawnCylinderMesh;
+	else if (type == "Plane") spawnMesh = m_spawnPlaneMesh;
+
+	if (spawnMesh && m_spawnMaterial)
 	{
 		auto* mesh = object->createOrGetComponent<dx3d::MeshComponent>();
-		mesh->setMesh(m_spawnCubeMesh);
+		mesh->setMesh(spawnMesh);
 		mesh->setMaterial(m_spawnMaterial);
 	}
 

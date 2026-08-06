@@ -22,6 +22,7 @@ dx3d::InspectorUI::InspectorUI(const BaseDesc& desc) : BaseUI(desc)
 
 dx3d::InspectorUI::~InspectorUI()
 {
+	EventBroadcastManager::getInstance().RemoveObserver(EventNames::ON_GAMEOBJECT_SELECTED);
 }
 
 void dx3d::InspectorUI::draw()

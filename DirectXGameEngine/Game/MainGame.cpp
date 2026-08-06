@@ -13,6 +13,8 @@
 
 #include <filesystem>
 
+#include <reactphysics3d/reactphysics3d.h>
+
 
 MainGame::MainGame(const dx3d::GameDesc& desc) : dx3d::Game(desc)
 {

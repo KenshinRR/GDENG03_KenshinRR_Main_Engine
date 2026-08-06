@@ -4,6 +4,8 @@
 #include <DX3D/Math/Vec3.h>
 #include <vector>
 
+#include <DX3D/UI/InspectorTabItems/TextureComponentInspectorUIT.h>
+
 namespace dx3d
 {
 
@@ -30,6 +32,8 @@ namespace dx3d
 		Vec3 m_editStartRotation{};
 		Vec3 m_editStartScale{};
 		//Display& m_display;
+
+		TextureComponentInspectorUIT m_textComInspector;
 	};
 
 }

@@ -87,9 +87,11 @@ dx3d::RefPtr<dx3d::IndexBuffer> dx3d::GraphicsDevice::createIndexBuffer(const In
 	return std::make_shared<IndexBuffer>(desc, getGraphicsResourceDesc());
 }
 
-dx3d::RefPtr<dx3d::Texture> dx3d::GraphicsDevice::createTexture(const TextureDesc& desc)
+dx3d::RefPtr<dx3d::Texture> dx3d::GraphicsDevice::createTexture(const TextureDesc& desc, std::string textureName)
 {
-	return std::make_shared<Texture>(desc, getGraphicsResourceDesc());
+	auto newTexture = std::make_shared<Texture>(desc, getGraphicsResourceDesc());
+	newTexture->setName(textureName);
+	return newTexture;
 }
 
 dx3d::RefPtr<dx3d::Sampler> dx3d::GraphicsDevice::createSampler(const SamplerDesc& desc)

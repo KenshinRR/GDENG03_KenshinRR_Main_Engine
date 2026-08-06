@@ -13,6 +13,8 @@
 #include <DX3D/EventBroadcasting/EventNames.h>
 #include <DX3D/EventBroadcasting/Parameters.h>
 
+#include <DX3D/Resource/TextureManager.h>
+
 MainGame::MainGame(const dx3d::GameDesc& desc) : dx3d::Game(desc)
 {
 }
@@ -57,8 +59,11 @@ void MainGame::onCreate()
 	Game::onCreate();
 	auto& world = getWorld();
 	std::filesystem::path base = std::filesystem::current_path().parent_path();
-	auto woodTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base/"DirectXGameEngine/Game/Assets/Textures/wood.jpg").c_str());
-	auto floorTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base / "DirectXGameEngine/Game/Assets/Textures/floor.jpg").c_str());
+
+	dx3d::TextureManager::getInstance().loadAllTextures(getResourceManager());
+
+	auto woodTex = dx3d::TextureManager::getInstance().getTexture("wood");
+	auto floorTex = dx3d::TextureManager::getInstance().getTexture("floor");
 
 	// UI initialize
 	std::unique_ptr<dx3d::HierarchyUI> hierarchy_UI = std::make_unique<dx3d::HierarchyUI>(dx3d::BaseDesc{ getLogger() });

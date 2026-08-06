@@ -28,6 +28,7 @@ namespace dx3d
         std::string getTextureNameFromFileName(std::string fileName);
         RefPtr<dx3d::TextureResource> getTexture(std::string textureName);
         std::vector<std::string> getAllTextureNames();
+        std::string getStringKey(dx3d::TextureResource* toFind);
 
     private:
         inline static TextureManager* instancePtra = nullptr;

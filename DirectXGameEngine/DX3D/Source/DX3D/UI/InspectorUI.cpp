@@ -4,6 +4,7 @@
 #include <DX3D/Game/GameObject.h>
 #include <DX3D/Component/TransformComponent.h>
 #include <DX3D/Component/CubeComponent.h>
+#include <DX3D/Component/MeshComponent.h>
 
 #include <DX3D/Component/CameraComponent.h>
 #include <DX3D/Graphics/GraphicsDevice.h>
@@ -74,6 +75,12 @@ void dx3d::InspectorUI::draw()
 			if (ImGui::BeginTabItem("Transform"))
 			{
 				drawTransformInspector(*m_selectedGameObject);
+				ImGui::EndTabItem();
+			}
+
+			if (ImGui::BeginTabItem("Texture"))
+			{
+				m_textComInspector.draw(m_selectedGameObject->createOrGetComponent<MeshComponent>()->getMaterial());
 				ImGui::EndTabItem();
 			}
 

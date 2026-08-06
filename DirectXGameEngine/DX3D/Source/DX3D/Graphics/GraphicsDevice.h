@@ -32,7 +32,7 @@ namespace dx3d
 		RefPtr<GraphicsPipelineLayout> createGraphicsPipelineLayout(const GraphicsPipelineLayoutDesc& desc);
 		RefPtr<ConstantBuffer> createConstantBuffer(const ConstantBufferDesc& desc);
 		RefPtr<IndexBuffer> createIndexBuffer(const IndexBufferDesc& desc);
-		RefPtr<Texture> createTexture(const TextureDesc& desc);
+		RefPtr<Texture> createTexture(const TextureDesc& desc, std::string textureName);
 		RefPtr<Sampler> createSampler(const SamplerDesc& desc);
 		//new function for graphics device
 		RefPtr<Rasterizer> createRasterizer(const RasterizerDesc& desc);

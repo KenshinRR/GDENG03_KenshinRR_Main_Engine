@@ -50,3 +50,13 @@ std::vector<std::string> dx3d::TextureManager::getAllTextureNames()
 
     return keys;
 }
+
+std::string dx3d::TextureManager::getStringKey(dx3d::TextureResource* toFind)
+{
+    for (const auto& pair : m_textures) {
+        if (pair.second.get() == toFind) { // shared_ptr comparison
+            return pair.first;
+        }
+    }
+    return "NOT_FOUND"; // empty string if not found
+}

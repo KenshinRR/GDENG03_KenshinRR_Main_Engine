@@ -34,7 +34,7 @@ dx3d::TextureResource::TextureResource(const TextureResourceDesc& desc) : Resour
 
     try
     {
-        m_texture = desc.graphicsDevice.createTexture({ { width, height }, pixels });
+        m_texture = desc.graphicsDevice.createTexture({ { width, height }, pixels }, textureFile.stem().string());
     }
     catch (...)
     {

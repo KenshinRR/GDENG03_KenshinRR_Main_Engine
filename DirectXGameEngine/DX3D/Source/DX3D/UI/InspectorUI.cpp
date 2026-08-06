@@ -69,7 +69,7 @@ void dx3d::InspectorUI::draw()
 		ImGui::EndDisabled();
 		ImGui::Separator();
 
-		if (ImGui::BeginTabBar("##TestTabs")) // create tab bar with id
+		if (ImGui::BeginTabBar("##InspectorTabs")) // create tab bar with id
 		{
 			if (ImGui::BeginTabItem("Transform"))
 			{

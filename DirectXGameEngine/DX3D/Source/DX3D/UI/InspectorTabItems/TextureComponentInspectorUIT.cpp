@@ -34,7 +34,7 @@ void dx3d::TextureComponentInspectorUIT::draw(MaterialResource* matResource)
 	}
 
 	std::string textureName = TextureManager::getInstance().getStringKey(matResource->getTexture(0));
-	static int selectedItem = getTextureNameKey(textureName);
+	int selectedItem = getTextureNameKey(textureName);
 	if (ImGui::Combo("Dropdown", &selectedItem, m_textureNames.data(), (int)m_textureNames.size())) {
 		//matResource->setTexture(0, TextureManager::getInstance().getTexture(textureName));
 	}

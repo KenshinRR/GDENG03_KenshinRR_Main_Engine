@@ -35,6 +35,14 @@ void dx3d::MainMenuBarUI::draw()
 			}
 			ImGui::EndMenu();
 		}
+		if (ImGui::BeginMenu("Activity"))
+		{
+			if (ImGui::MenuItem("Spawn 20 Cubes"))
+			{
+				EventBroadcastManager::getInstance().postEvent(EventNames::ACTIVITY_SPAWN20CUBES);
+			}
+			ImGui::EndMenu();
+		}
 	}
 	ImGui::EndMainMenuBar();
 }

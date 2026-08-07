@@ -16,10 +16,57 @@
 
 #include <DX3D/Physics/PhysicsManager.h>
 
+#include <DX3D/EventBroadcasting/EventBroadcastManager.h>
+#include <DX3D/EventBroadcasting/EventNames.h>
+
 #include <filesystem>
 
 MainGame::MainGame(const dx3d::GameDesc& desc) : dx3d::Game(desc)
 {
+	dx3d::EventBroadcastManager::getInstance().addObserver
+	(
+		dx3d::EventNames::ACTIVITY_SPAWN20CUBES,
+		[this]()
+		{
+			create20P6Cubes();
+		}
+	);
+}
+
+void MainGame::create20P6Cubes()
+{
+	auto cubeMesh = getMeshFactory().createCubeMesh();
+
+	std::filesystem::path base = std::filesystem::current_path().parent_path();
+	auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base / "DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
+
+	if (basicMat)
+	{
+		auto matData = dx3d::Vec3(1, 1, 1);
+		basicMat->setData(std::as_bytes(std::span{ &matData, 1 }));
+	}
+
+	// Creating cubes
+	for (int i = 0; i < 20; i++)
+	{
+		auto cube = getWorld().createGameObject<dx3d::GameObject>();
+		cube->setName("Cube");
+		auto comp = cube->createOrGetComponent<dx3d::MeshComponent>();
+		comp->setMaterial(basicMat);
+		comp->setMesh(cubeMesh);
+		auto roty = (rand() % 628) / 100.0f;
+		cube->getTransform().setScale({ 0.5,0.5,0.5 });
+		cube->getTransform().setPosition({ 0.0f, 10.0f, 0.0f });
+		cube->getTransform().setRotation({ 0,roty,0 });
+
+		dx3d::PhysicsManager::getInstance().addRigidBody(
+			&cube->getTransform(),
+			dx3d::PhysicsManager::DYNAMIC
+		);
+
+		auto rigidBodyComp = cube->createOrGetComponent<dx3d::RigidBodyComponent>();
+		rigidBodyComp->setTransformComponent(&cube->getTransform());
+	}
 }
 
 void MainGame::onCreate()
@@ -102,7 +149,7 @@ void MainGame::onCreate()
 		auto floorMeshComp = floor->createOrGetComponent<dx3d::MeshComponent>();
 		floorMeshComp->setMesh(planeMesh);
 		floorMeshComp->setMaterial(basicMat);
-		floor->getTransform().setScale({ 6.8f, 0.1f, 6.8f });
+		floor->getTransform().setScale({ 10.0f, 0.1f, 10.0f });
 		floor->getTransform().setPosition({ 0, 0, 0 });
 
 		dx3d::PhysicsManager::getInstance().addRigidBody(

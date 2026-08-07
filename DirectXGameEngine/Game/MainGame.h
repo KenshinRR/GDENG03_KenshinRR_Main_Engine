@@ -8,6 +8,8 @@ class MainGame : public dx3d::Game
 {
 public:
 	explicit MainGame(const dx3d::GameDesc& desc);
+
+	void create20P6Cubes();
 protected:
 	virtual void onCreate();
 	virtual void onUpdate(dx3d::f32 deltaTime);

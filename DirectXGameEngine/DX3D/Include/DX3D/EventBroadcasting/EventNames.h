@@ -18,5 +18,7 @@ namespace dx3d
 		inline static const std::string ON_SCENE_PAUSE = "ON_SCENE_PAUSE";
 		inline static const std::string ON_SCENE_UNPAUSE = "ON_SCENE_UNPAUSE";
 		inline static const std::string ON_SCENE_FRAMESTEP = "ON_SCENE_FRAMESTEP";
+
+		inline static const std::string ACTIVITY_SPAWN20CUBES = "ACTIVITY_SPAWN20CUBES";
 	};
 }

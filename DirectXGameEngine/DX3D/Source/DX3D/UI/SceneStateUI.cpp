@@ -31,9 +31,18 @@ void dx3d::SceneStateUI::draw()
 
 			}
 			// Add GameObject button
-			if (ImGui::Button("Pause"))
+			if (ImGui::Button(m_currentPauseLabel.c_str()))
 			{
-				EventBroadcastManager::getInstance().postEvent(EventNames::ON_SCENE_PAUSE);
+				if (m_currentPauseLabel == "Pause")
+				{
+					m_currentPauseLabel = "Unpause";
+					EventBroadcastManager::getInstance().postEvent(EventNames::ON_SCENE_PAUSE);
+				}
+				else
+				{
+					m_currentPauseLabel = "Pause";
+					EventBroadcastManager::getInstance().postEvent(EventNames::ON_SCENE_UNPAUSE);
+				}
 			}
 			// Add GameObject button
 			if (ImGui::Button("Frame Step"))

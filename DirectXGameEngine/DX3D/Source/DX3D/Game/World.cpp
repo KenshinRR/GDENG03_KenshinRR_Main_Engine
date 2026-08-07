@@ -3,12 +3,14 @@
 #include <DX3D/Game/Component.h>
 #include <DX3D/Component/MeshComponent.h>
 #include <DX3D/Component/TransformComponent.h>
+#include <DX3D/Component/RigidBodyComponent.h>
 #include <DX3D/EventBroadcasting/EventBroadcastManager.h>
 #include <DX3D/EventBroadcasting/EventNames.h>
 #include <DX3D/EventBroadcasting/Parameters.h>
 #include <DX3D/Graphics/Mesh/ImportedMeshContainer.h>
 #include <DX3D/Resource/ImportedMaterialContainer.h>
 #include <filesystem>
+#include <ranges>
 
 dx3d::World::World(const WorldDesc& desc) : 
     Base(desc.base), 
@@ -30,6 +32,17 @@ dx3d::World::World(const WorldDesc& desc) :
             Add3DModelGameObject(params.GetStringExtra("Key", "null"));
         }
     );
+}
+
+void dx3d::World::onStart()
+{
+    auto numComponents = 0u;
+    auto rigidBodyComponents = getComponents<RigidBodyComponent>(numComponents);
+    for (auto i : std::views::iota(0u, numComponents))
+    {
+        RigidBodyComponent* rigidBodyComponent = rigidBodyComponents[i];
+        rigidBodyComponent->onStart();
+    }
 }
 
 void dx3d::World::update(f32 deltaTime)
@@ -62,6 +75,17 @@ void dx3d::World::update(f32 deltaTime)
         comp->updateWorldMatrix();
     }
     m_dirtyTransforms.clear();
+}
+
+void dx3d::World::onEnd()
+{
+    auto numComponents = 0u;
+    auto rigidBodyComponents = getComponents<RigidBodyComponent>(numComponents);
+    for (auto i : std::views::iota(0u, numComponents))
+    {
+        RigidBodyComponent* rigidBodyComponent = rigidBodyComponents[i];
+        rigidBodyComponent->onEnd();
+    }
 }
 
 const std::unordered_map<size_t, std::vector<dx3d::UniquePtr<dx3d::GameObject>>>& dx3d::World::getGameObjectList()

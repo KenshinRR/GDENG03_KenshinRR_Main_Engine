@@ -1,7 +1,9 @@
 #include "MainGame.h"
 #include "Objects/Player.h"
 #include <DX3D/Graphics/Mesh/MeshFactory.h>
+
 #include <DX3D/Component/MeshComponent.h>
+#include <DX3D/Component/RigidBodyComponent.h>
 
 #include <DX3D/UI/SceneUI.h>
 #include <DX3D/UI/MainMenuBarUI.h>
@@ -134,11 +136,14 @@ void MainGame::onCreate()
 				cube->getTransform().setScale({ 0.5,0.5,0.5 });
 				cube->getTransform().setPosition({ x * 1.4f, 1.0f, y * 1.4f });
 				cube->getTransform().setRotation({ 0,roty,0 });
-
+				
 				dx3d::PhysicsManager::getInstance().addRigidBody(
 					&cube->getTransform(),
 					dx3d::PhysicsManager::DYNAMIC
 				);
+
+				auto rigidBodyComp = cube->createOrGetComponent<dx3d::RigidBodyComponent>();
+				rigidBodyComp->setTransformComponent(&cube->getTransform());
 			}
 		}
 	}

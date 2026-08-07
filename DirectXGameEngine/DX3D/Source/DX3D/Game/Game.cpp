@@ -55,6 +55,7 @@ dx3d::Game::Game(const GameDesc& desc)
 		[this]()
 		{
 			m_currentState = SceneState::Play;
+			m_world->onStart();
 		}
 	);
 	EventBroadcastManager::getInstance().addObserver
@@ -67,10 +68,19 @@ dx3d::Game::Game(const GameDesc& desc)
 	);
 	EventBroadcastManager::getInstance().addObserver
 	(
+		EventNames::ON_SCENE_UNPAUSE,
+		[this]()
+		{
+			m_currentState = SceneState::Play;
+		}
+	);
+	EventBroadcastManager::getInstance().addObserver
+	(
 		EventNames::ON_SCENE_STOP,
 		[this]()
 		{
 			m_currentState = SceneState::Edit;
+			m_world->onEnd();
 		}
 	);
 

@@ -7,6 +7,7 @@
 #include <DX3D/UI/MainMenuBarUI.h>
 #include <DX3D/UI/InspectorUI.h>
 #include <DX3D/UI/HierarchyUI.h>
+#include <DX3D/UI/SceneStateUI.h>
 
 #include <DX3D/Graphics/Mesh/ImportedMeshContainer.h>
 #include <DX3D/Resource/ImportedMaterialContainer.h>
@@ -39,6 +40,7 @@ void MainGame::onCreate()
 	m_UIs.push_back(std::move(hierarchy_UI));
 	m_UIs.push_back(std::make_unique<dx3d::MainMenuBarUI>(dx3d::BaseDesc{ getLogger() }));
 	m_UIs.push_back(std::make_unique<dx3d::InspectorUI>(dx3d::BaseDesc{ getLogger() }));
+	m_UIs.push_back(std::make_unique<dx3d::SceneStateUI>(dx3d::BaseDesc{ getLogger() }));
 	
 	// Create mesh resources (reusable)
 	auto cubeMesh = getMeshFactory().createCubeMesh();

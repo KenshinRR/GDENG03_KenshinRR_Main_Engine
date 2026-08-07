@@ -40,5 +40,7 @@ namespace dx3d
 		bool m_imguiInitialized{ false };
 
 		std::chrono::steady_clock::time_point m_previousTime{};
+
+		SceneState m_currentState;
 	};
 }

@@ -204,6 +204,7 @@
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Mesh\ImportedMeshContainer.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\UI\ImportedMaterialContainer.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Physics\PhysicsManager.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\UI\SceneStateUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX3D\Include\DX3D\EventBroadcasting\EventNames.h" />
@@ -274,6 +275,7 @@
     <ClInclude Include="DX3D\Source\DX3D\Graphics\Mesh\ImportedMeshContainer.h" />
     <ClInclude Include="DX3D\Include\DX3D\Resource\ImportedMaterialContainer.h" />
     <ClInclude Include="DX3D\Include\DX3D\Physics\PhysicsManager.h" />
+    <ClInclude Include="DX3D\Include\DX3D\UI\SceneStateUI.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

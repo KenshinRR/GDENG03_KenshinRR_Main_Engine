@@ -13,6 +13,9 @@
 
 #include <DX3D/Physics/PhysicsManager.h>
 
+#include <DX3D/EventBroadcasting/EventBroadcastManager.h>
+#include <DX3D/EventBroadcasting/EventNames.h>
+
 #include <imgui.h>
 #include <imgui_impl_dx11.h>
 #include <imgui_impl_win32.h>
@@ -42,6 +45,34 @@ dx3d::Game::Game(const GameDesc& desc)
 	ImGui_ImplWin32_Init(m_display->getHandle());
 	ImGui_ImplDX11_Init(m_graphicsDevice->getNativeDevice(), m_graphicsDevice->getNativeContext());
 	m_imguiInitialized = true;
+
+	m_currentState = SceneState::Edit;
+
+	// Events
+	EventBroadcastManager::getInstance().addObserver
+	(
+		EventNames::ON_SCENE_PLAY,
+		[this]()
+		{
+			m_currentState = SceneState::Play;
+		}
+	);
+	EventBroadcastManager::getInstance().addObserver
+	(
+		EventNames::ON_SCENE_PAUSE,
+		[this]()
+		{
+			m_currentState = SceneState::Pause;
+		}
+	);
+	EventBroadcastManager::getInstance().addObserver
+	(
+		EventNames::ON_SCENE_STOP,
+		[this]()
+		{
+			m_currentState = SceneState::Edit;
+		}
+	);
 
 	DX3DLogInfo("Game Initialized!");
 }
@@ -97,10 +128,15 @@ void dx3d::Game::onInternalUpdate()
 
 	m_inputSystem->update();
 
-	onUpdate(deltaTime);
-
-	PhysicsManager::getInstance().update(deltaTime);
-	m_world->update(deltaTime);
+	switch (m_currentState)
+	{
+	case SceneState::Play:
+		PhysicsManager::getInstance().update(deltaTime);
+	case SceneState::Edit:
+		m_world->update(deltaTime);
+		onUpdate(deltaTime);
+		break;
+	}
 
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();

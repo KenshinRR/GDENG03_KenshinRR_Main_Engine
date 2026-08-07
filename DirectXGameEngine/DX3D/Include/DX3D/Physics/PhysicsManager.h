@@ -11,6 +11,10 @@ namespace dx3d
 	class PhysicsManager
 	{
     public:
+        inline static const std::string DYNAMIC = "DYNAMIC";
+        inline static const std::string STATIC = "STATIC";
+        inline static const std::string KINEMATIC = "KINEMATIC";
+    public:
         PhysicsManager();
         ~PhysicsManager();
 
@@ -26,7 +30,7 @@ namespace dx3d
         void syncTransforms();
         dx3d::Vec3 quaternionToEuler(const reactphysics3d::Quaternion& q);
 
-        void addRigidBody(TransformComponent* transformComp);
+        void addRigidBody(TransformComponent* transformComp, std::string bodyType);
         void removeRigidBody(reactphysics3d::RigidBody* body);
 
     private:

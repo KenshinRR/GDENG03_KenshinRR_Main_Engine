@@ -78,11 +78,16 @@ dx3d::Vec3 dx3d::PhysicsManager::quaternionToEuler(const reactphysics3d::Quatern
 }
 
 
-void dx3d::PhysicsManager::addRigidBody(TransformComponent* transformComp)
+void dx3d::PhysicsManager::addRigidBody(TransformComponent* transformComp, std::string bodyType)
 {
-    // getting the orientation
-    Vec3 rotationEuler = transformComp->getRotation();
+    // Determine body type
+    reactphysics3d::BodyType type;
+    if (bodyType == "DYNAMIC") type = reactphysics3d::BodyType::DYNAMIC;
+    else if (bodyType == "KINEMATIC") type = reactphysics3d::BodyType::KINEMATIC;
+    else type = reactphysics3d::BodyType::STATIC;
 
+    // Convert rotation to quaternion
+    Vec3 rotationEuler = transformComp->getRotation();
     float pitch = rotationEuler.x * (M_PI / 180.0f);
     float yaw = rotationEuler.y * (M_PI / 180.0f);
     float roll = rotationEuler.z * (M_PI / 180.0f);
@@ -90,20 +95,34 @@ void dx3d::PhysicsManager::addRigidBody(TransformComponent* transformComp)
     reactphysics3d::Quaternion orientation =
         reactphysics3d::Quaternion::fromEulerAngles(pitch, yaw, roll);
 
+    // Build physics transform
     reactphysics3d::Transform physicsTransform(
-        // position
         reactphysics3d::Vector3(
             transformComp->getPosition().x,
             transformComp->getPosition().y,
             transformComp->getPosition().z
-        ),   
-        orientation       // orientation
+        ),
+        orientation
     );
 
+    // Create rigid body
     reactphysics3d::RigidBody* body = m_physicsWorld->createRigidBody(physicsTransform);
+    body->setType(type);
 
+    // Create box collider using scale
+    Vec3 scale = transformComp->getScale();
+    reactphysics3d::BoxShape* boxShape =
+        m_physicsCommon.createBoxShape(
+            reactphysics3d::Vector3(scale.x * 0.5f, scale.y * 0.5f, scale.z * 0.5f)
+        );
+
+    // Attach collider to body
+    body->addCollider(boxShape, reactphysics3d::Transform::identity());
+
+    // Track mapping
     m_rigidBodies[body] = transformComp;
 }
+
 
 void dx3d::PhysicsManager::removeRigidBody(reactphysics3d::RigidBody* body) {
     if (body) {

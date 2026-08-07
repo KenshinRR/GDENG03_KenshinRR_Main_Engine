@@ -11,6 +11,8 @@
 #include <DX3D/Graphics/Mesh/ImportedMeshContainer.h>
 #include <DX3D/Resource/ImportedMaterialContainer.h>
 
+#include <DX3D/Physics/PhysicsManager.h>
+
 #include <filesystem>
 
 MainGame::MainGame(const dx3d::GameDesc& desc) : dx3d::Game(desc)
@@ -99,6 +101,10 @@ void MainGame::onCreate()
 		floor->getTransform().setScale({ 6.8f, 0.1f, 6.8f });
 		floor->getTransform().setPosition({ 0, 0, 0 });
 
+		dx3d::PhysicsManager::getInstance().addRigidBody(
+			&floor->getTransform(),
+			dx3d::PhysicsManager::STATIC
+		);
 	}
 
 	srand((unsigned int)time(NULL));
@@ -124,8 +130,13 @@ void MainGame::onCreate()
 				comp->setMesh(cubeMesh);
 				auto roty = (rand() % 628) / 100.0f;
 				cube->getTransform().setScale({ 0.5,0.5,0.5 });
-				cube->getTransform().setPosition({ x * 1.4f, 0.25f + 0.05f, y * 1.4f });
+				cube->getTransform().setPosition({ x * 1.4f, 1.0f, y * 1.4f });
 				cube->getTransform().setRotation({ 0,roty,0 });
+
+				dx3d::PhysicsManager::getInstance().addRigidBody(
+					&cube->getTransform(),
+					dx3d::PhysicsManager::DYNAMIC
+				);
 			}
 		}
 	}

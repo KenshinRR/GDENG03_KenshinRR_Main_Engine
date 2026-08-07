@@ -11,6 +11,8 @@
 #include <DX3D/Resource/ResourceManager.h>
 #include <DX3D/Graphics/Mesh/MeshFactory.h>
 
+#include <DX3D/Physics/PhysicsManager.h>
+
 #include <imgui.h>
 #include <imgui_impl_dx11.h>
 #include <imgui_impl_win32.h>
@@ -97,6 +99,7 @@ void dx3d::Game::onInternalUpdate()
 
 	onUpdate(deltaTime);
 
+	PhysicsManager::getInstance().update(deltaTime);
 	m_world->update(deltaTime);
 
 	ImGui_ImplDX11_NewFrame();

@@ -30,6 +30,9 @@ namespace dx3d
         void syncTransforms();
         dx3d::Vec3 quaternionToEuler(const reactphysics3d::Quaternion& q);
 
+        void updateRigidBodyTransform(reactphysics3d::RigidBody* body, TransformComponent* transformComp);
+        void syncComponentToPhysics(TransformComponent* transformComp);
+
         void addRigidBody(TransformComponent* transformComp, std::string bodyType);
         void removeRigidBody(reactphysics3d::RigidBody* body);
 

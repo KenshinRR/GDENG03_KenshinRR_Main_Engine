@@ -77,6 +77,40 @@ dx3d::Vec3 dx3d::PhysicsManager::quaternionToEuler(const reactphysics3d::Quatern
     return dx3d::Vec3(roll, pitch, yaw);
 }
 
+void dx3d::PhysicsManager::updateRigidBodyTransform(reactphysics3d::RigidBody* body,
+    TransformComponent* transformComp) {
+    // Convert rotation to quaternion
+    Vec3 rotationEuler = transformComp->getRotation();
+    float pitch = rotationEuler.x * (M_PI / 180.0f);
+    float yaw = rotationEuler.y * (M_PI / 180.0f);
+    float roll = rotationEuler.z * (M_PI / 180.0f);
+
+    reactphysics3d::Quaternion orientation =
+        reactphysics3d::Quaternion::fromEulerAngles(pitch, yaw, roll);
+
+    // Build physics transform
+    reactphysics3d::Transform physicsTransform(
+        reactphysics3d::Vector3(
+            transformComp->getPosition().x,
+            transformComp->getPosition().y,
+            transformComp->getPosition().z
+        ),
+        orientation
+    );
+
+    // Push into physics world
+    body->setTransform(physicsTransform);
+}
+
+void dx3d::PhysicsManager::syncComponentToPhysics(TransformComponent* transformComp) {
+    for (auto& [body, comp] : m_rigidBodies) {
+        if (comp == transformComp) {
+            updateRigidBodyTransform(body, transformComp);
+            break;
+        }
+    }
+}
+
 
 void dx3d::PhysicsManager::addRigidBody(TransformComponent* transformComp, std::string bodyType)
 {

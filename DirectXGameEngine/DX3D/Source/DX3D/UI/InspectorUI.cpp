@@ -8,6 +8,8 @@
 #include <DX3D/Component/TransformComponent.h>
 #include <DX3D/Component/MeshComponent.h>
 
+#include <DX3D/Physics/PhysicsManager.h>
+
 dx3d::InspectorUI::InspectorUI(const BaseDesc& desc) : BaseUI(desc)
 {
 	EventBroadcastManager::getInstance().addObserver
@@ -97,4 +99,6 @@ void dx3d::InspectorUI::drawTransformInspector()
 	{
 		transform.setScale({ s[0], s[1], s[2] });
 	}
+
+	PhysicsManager::getInstance().syncComponentToPhysics(&transform);
 }

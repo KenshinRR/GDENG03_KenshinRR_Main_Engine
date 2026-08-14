@@ -90,6 +90,7 @@ void dx3d::SceneManager::saveSceneToFile(size_t sceneId, const std::string& file
             if (auto* transform = obj->getComponent<TransformComponent>())
             {
                 goJson["Transform"] = {
+                    {"m_ComponentID",transform->getID()},
                     {"m_GameObject", obj->getID()},
                     {"m_LocalPosition", {{"x", transform->getPosition().x}, {"y", transform->getPosition().y}, {"z", transform->getPosition().z}}},
                     {"m_LocalRotation", {{"x", transform->getRotation().x}, {"y", transform->getRotation().y}, {"z", transform->getRotation().z}}},
@@ -101,6 +102,7 @@ void dx3d::SceneManager::saveSceneToFile(size_t sceneId, const std::string& file
             if (auto* camera = obj->getComponent<CameraComponent>())
             {
                 goJson["Camera"] = {
+                    {"m_ComponentID",camera->getID()},
                     {"m_GameObject", obj->getID()},
                     {"m_nearPlane", camera->getNearPlane()},
                     {"m_farPlane", camera->getFarPlane()},
@@ -113,6 +115,7 @@ void dx3d::SceneManager::saveSceneToFile(size_t sceneId, const std::string& file
             if (auto* rb = obj->getComponent<RigidBodyComponent>())
             {
                 goJson["Rigidbody"] = {
+                    {"m_ComponentID",rb->getID()},
                     {"m_GameObject", obj->getID()},
                 };
             }

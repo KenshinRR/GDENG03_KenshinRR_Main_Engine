@@ -3,6 +3,7 @@
 
 dx3d::Mesh::Mesh(const MeshDesc& desc, const GraphicsResourceDesc& gDesc) : GraphicsResource(gDesc)
 {
+	m_type = desc.type;
 	m_vertices = desc.vertices;
 	m_indices = desc.indices;
 }

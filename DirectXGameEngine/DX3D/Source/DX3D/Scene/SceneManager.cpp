@@ -10,6 +10,9 @@
 #include <DX3D/EventBroadcasting/EventBroadcastManager.h>
 #include <DX3D/EventBroadcasting/EventNames.h>
 
+#include <DX3D/Resource/MaterialResource.h>
+#include <DX3D/Resource/Resource.h>
+
 #include <fstream>
 
 #include <json.hpp>
@@ -121,14 +124,13 @@ void dx3d::SceneManager::saveSceneToFile(size_t sceneId, const std::string& file
             }
 
             // Mesh
-            //if (auto* meshComp = obj->getComponent<MeshComponent>())
-            //{
-            //    goJson["Mesh"] = {
-            //        {"m_MeshID", meshComp->getMesh()->getID()},
-            //        {"m_MaterialID", meshComp->getMaterial()->getID()}
-            //        // Add textures if needed
-            //    };
-            //}
+            if (auto* meshComp = obj->getComponent<MeshComponent>())
+            {
+                goJson["Mesh"] = {
+                    {"m_MeshType", meshComp->getMesh()->getType()},
+                    {"m_TextureName", "default"}
+                };
+            }
 
             sceneJson.push_back(goJson);
         }

@@ -90,5 +90,5 @@ dx3d::MeshResource::MeshResource(const MeshResourceDesc& desc)
         }
     }
 
-    m_mesh = desc.graphicsDevice.createMesh({ vertices, indices });
+    m_mesh = desc.graphicsDevice.createMesh({ meshFile.filename().string(), vertices, indices});
 }

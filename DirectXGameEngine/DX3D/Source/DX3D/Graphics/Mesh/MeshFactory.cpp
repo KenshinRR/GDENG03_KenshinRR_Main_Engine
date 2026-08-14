@@ -37,7 +37,7 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCubeMesh()
     // Bottom
     addFace({ 0,-1,0 }, { -0.5f,-0.5f,0.5f }, { -0.5f,-0.5f,-0.5f }, { 0.5f,-0.5f,-0.5f }, { 0.5f,-0.5f,0.5f });
 
-    return m_context.graphicsDevice.createMesh({ vertices, indices });
+    return m_context.graphicsDevice.createMesh({ "Cube", vertices, indices});
 }
 
 dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createSphereMesh(ui32 stacks, ui32 slices)
@@ -87,7 +87,7 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createSphereMesh(ui32 stacks, ui32 s
         }
     }
 
-    return m_context.graphicsDevice.createMesh({ vertices, indices });
+    return m_context.graphicsDevice.createMesh({ "Sphere", vertices, indices});
 }
 
 dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCapsuleMesh(f32 radius, f32 height, ui32 segments, ui32 rings)
@@ -218,7 +218,7 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCapsuleMesh(f32 radius, f32 he
         }
     }
 
-    return m_context.graphicsDevice.createMesh({ vertices, indices });
+    return m_context.graphicsDevice.createMesh({"Capsule", vertices, indices});
 }
 
 dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCylinderMesh(f32 radius, f32 height, ui32 segments)
@@ -331,7 +331,7 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCylinderMesh(f32 radius, f32 h
         indices.push_back(bottom2);
     }
 
-    return m_context.graphicsDevice.createMesh({ vertices, indices });
+    return m_context.graphicsDevice.createMesh({ "Cylinder", vertices, indices});
 }
 
 
@@ -373,7 +373,7 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createPlaneMesh(f32 width, f32 heigh
         }
     }
 
-    return m_context.graphicsDevice.createMesh({ vertices, indices });
+    return m_context.graphicsDevice.createMesh({ "Plane", vertices, indices});
 }
 
 dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCircleMesh(f32 radius, ui32 segments)
@@ -400,5 +400,5 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCircleMesh(f32 radius, ui32 se
         indices.insert(indices.end(), { 0,i,i + 1 });
     }
 
-    return m_context.graphicsDevice.createMesh({ vertices, indices });
+    return m_context.graphicsDevice.createMesh({ "Circle", vertices, indices});
 }

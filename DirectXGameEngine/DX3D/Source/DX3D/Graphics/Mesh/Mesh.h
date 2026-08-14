@@ -19,10 +19,11 @@ namespace dx3d
 		const ui32* getIndices() const noexcept;
 		ui32 getIndexCount() const noexcept;
 
+		std::string getType() { return m_type; }
 	private:
 		std::vector<Vertex> m_vertices;
 		std::vector<ui32> m_indices;
 
-
+		std::string m_type;
 	};
 }

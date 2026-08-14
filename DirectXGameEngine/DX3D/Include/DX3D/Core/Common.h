@@ -130,6 +130,7 @@ namespace dx3d
 
 	struct MeshDesc
 	{
+		std::string type{};
 		std::vector<Vertex> vertices{};
 		std::vector<ui32> indices{};
 	};

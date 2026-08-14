@@ -12,6 +12,10 @@
             "m_ID": 0,
             "m_Name": "GameObject"
         },
+        "Mesh": {
+            "m_MeshType": "Cylinder",
+            "m_TextureName": "default"
+        },
         "Transform": {
             "m_ComponentID": 0,
             "m_GameObject": 0,
@@ -45,6 +49,10 @@
             "m_ID": 1,
             "m_Name": "GameObject"
         },
+        "Mesh": {
+            "m_MeshType": "teapot.obj",
+            "m_TextureName": "default"
+        },
         "Transform": {
             "m_ComponentID": 2,
             "m_GameObject": 1,
@@ -77,6 +85,10 @@
             ],
             "m_ID": 2,
             "m_Name": "GameObject"
+        },
+        "Mesh": {
+            "m_MeshType": "Plane",
+            "m_TextureName": "default"
         },
         "Transform": {
             "m_ComponentID": 4,
@@ -114,6 +126,10 @@
             "m_ID": 3,
             "m_Name": "Cube"
         },
+        "Mesh": {
+            "m_MeshType": "Cube",
+            "m_TextureName": "default"
+        },
         "Rigidbody": {
             "m_ComponentID": 8,
             "m_GameObject": 3
@@ -128,7 +144,7 @@
             },
             "m_LocalRotation": {
                 "x": 0.0,
-                "y": 0.5299999713897705,
+                "y": 0.3199999928474426,
                 "z": 0.0
             },
             "m_LocalScale": {
@@ -154,6 +170,10 @@
             "m_ID": 4,
             "m_Name": "Cube"
         },
+        "Mesh": {
+            "m_MeshType": "Cube",
+            "m_TextureName": "default"
+        },
         "Rigidbody": {
             "m_ComponentID": 11,
             "m_GameObject": 4
@@ -168,7 +188,7 @@
             },
             "m_LocalRotation": {
                 "x": 0.0,
-                "y": 3.049999952316284,
+                "y": 4.710000038146973,
                 "z": 0.0
             },
             "m_LocalScale": {
@@ -194,6 +214,10 @@
             "m_ID": 5,
             "m_Name": "Cube"
         },
+        "Mesh": {
+            "m_MeshType": "Cube",
+            "m_TextureName": "default"
+        },
         "Rigidbody": {
             "m_ComponentID": 14,
             "m_GameObject": 5
@@ -208,7 +232,7 @@
             },
             "m_LocalRotation": {
                 "x": 0.0,
-                "y": 1.559999942779541,
+                "y": 4.599999904632568,
                 "z": 0.0
             },
             "m_LocalScale": {
@@ -234,6 +258,10 @@
             "m_ID": 6,
             "m_Name": "Cube"
         },
+        "Mesh": {
+            "m_MeshType": "Cube",
+            "m_TextureName": "default"
+        },
         "Rigidbody": {
             "m_ComponentID": 17,
             "m_GameObject": 6
@@ -248,7 +276,7 @@
             },
             "m_LocalRotation": {
                 "x": 0.0,
-                "y": 3.240000009536743,
+                "y": 2.2100000381469727,
                 "z": 0.0
             },
             "m_LocalScale": {
@@ -274,6 +302,10 @@
             "m_ID": 7,
             "m_Name": "Cube"
         },
+        "Mesh": {
+            "m_MeshType": "Cube",
+            "m_TextureName": "default"
+        },
         "Rigidbody": {
             "m_ComponentID": 20,
             "m_GameObject": 7
@@ -288,7 +320,7 @@
             },
             "m_LocalRotation": {
                 "x": 0.0,
-                "y": 0.5099999904632568,
+                "y": 5.360000133514404,
                 "z": 0.0
             },
             "m_LocalScale": {
@@ -314,6 +346,10 @@
             "m_ID": 8,
             "m_Name": "Cube"
         },
+        "Mesh": {
+            "m_MeshType": "Cube",
+            "m_TextureName": "default"
+        },
         "Rigidbody": {
             "m_ComponentID": 23,
             "m_GameObject": 8
@@ -328,7 +364,7 @@
             },
             "m_LocalRotation": {
                 "x": 0.0,
-                "y": 3.4200000762939453,
+                "y": 5.179999828338623,
                 "z": 0.0
             },
             "m_LocalScale": {
@@ -354,6 +390,10 @@
             "m_ID": 9,
             "m_Name": "Cube"
         },
+        "Mesh": {
+            "m_MeshType": "Cube",
+            "m_TextureName": "default"
+        },
         "Rigidbody": {
             "m_ComponentID": 26,
             "m_GameObject": 9
@@ -368,7 +408,7 @@
             },
             "m_LocalRotation": {
                 "x": 0.0,
-                "y": 1.2100000381469727,
+                "y": 2.3299999237060547,
                 "z": 0.0
             },
             "m_LocalScale": {
@@ -394,6 +434,10 @@
             "m_ID": 10,
             "m_Name": "Cube"
         },
+        "Mesh": {
+            "m_MeshType": "Cube",
+            "m_TextureName": "default"
+        },
         "Rigidbody": {
             "m_ComponentID": 29,
             "m_GameObject": 10
@@ -408,7 +452,7 @@
             },
             "m_LocalRotation": {
                 "x": 0.0,
-                "y": 6.210000038146973,
+                "y": 1.0099999904632568,
                 "z": 0.0
             },
             "m_LocalScale": {
@@ -434,6 +478,10 @@
             "m_ID": 11,
             "m_Name": "Cube"
         },
+        "Mesh": {
+            "m_MeshType": "Cube",
+            "m_TextureName": "default"
+        },
         "Rigidbody": {
             "m_ComponentID": 32,
             "m_GameObject": 11
@@ -448,7 +496,7 @@
             },
             "m_LocalRotation": {
                 "x": 0.0,
-                "y": 1.5499999523162842,
+                "y": 5.389999866485596,
                 "z": 0.0
             },
             "m_LocalScale": {
@@ -474,6 +522,10 @@
             "m_ID": 12,
             "m_Name": "Cube"
         },
+        "Mesh": {
+            "m_MeshType": "Cube",
+            "m_TextureName": "default"
+        },
         "Rigidbody": {
             "m_ComponentID": 35,
             "m_GameObject": 12
@@ -488,7 +540,7 @@
             },
             "m_LocalRotation": {
                 "x": 0.0,
-                "y": 2.180000066757202,
+                "y": 3.9600000381469727,
                 "z": 0.0
             },
             "m_LocalScale": {
@@ -514,6 +566,10 @@
             "m_ID": 13,
             "m_Name": "Cube"
         },
+        "Mesh": {
+            "m_MeshType": "Cube",
+            "m_TextureName": "default"
+        },
         "Rigidbody": {
             "m_ComponentID": 38,
             "m_GameObject": 13
@@ -528,7 +584,7 @@
             },
             "m_LocalRotation": {
                 "x": 0.0,
-                "y": 4.71999979019165,
+                "y": 6.039999961853027,
                 "z": 0.0
             },
             "m_LocalScale": {
@@ -554,6 +610,10 @@
             "m_ID": 14,
             "m_Name": "Cube"
         },
+        "Mesh": {
+            "m_MeshType": "Cube",
+            "m_TextureName": "default"
+        },
         "Rigidbody": {
             "m_ComponentID": 41,
             "m_GameObject": 14
@@ -568,7 +628,7 @@
             },
             "m_LocalRotation": {
                 "x": 0.0,
-                "y": 1.7999999523162842,
+                "y": 2.2100000381469727,
                 "z": 0.0
             },
             "m_LocalScale": {
@@ -594,6 +654,10 @@
             "m_ID": 15,
             "m_Name": "Cube"
         },
+        "Mesh": {
+            "m_MeshType": "Cube",
+            "m_TextureName": "default"
+        },
         "Rigidbody": {
             "m_ComponentID": 44,
             "m_GameObject": 15
@@ -608,7 +672,7 @@
             },
             "m_LocalRotation": {
                 "x": 0.0,
-                "y": 5.349999904632568,
+                "y": 1.3200000524520874,
                 "z": 0.0
             },
             "m_LocalScale": {
@@ -634,6 +698,10 @@
             "m_ID": 16,
             "m_Name": "Cube"
         },
+        "Mesh": {
+            "m_MeshType": "Cube",
+            "m_TextureName": "default"
+        },
         "Rigidbody": {
             "m_ComponentID": 47,
             "m_GameObject": 16
@@ -648,7 +716,7 @@
             },
             "m_LocalRotation": {
                 "x": 0.0,
-                "y": 2.7699999809265137,
+                "y": 1.6299999952316284,
                 "z": 0.0
             },
             "m_LocalScale": {
@@ -674,6 +742,10 @@
             "m_ID": 17,
             "m_Name": "Cube"
         },
+        "Mesh": {
+            "m_MeshType": "Cube",
+            "m_TextureName": "default"
+        },
         "Rigidbody": {
             "m_ComponentID": 50,
             "m_GameObject": 17
@@ -688,7 +760,7 @@
             },
             "m_LocalRotation": {
                 "x": 0.0,
-                "y": 0.949999988079071,
+                "y": 0.5099999904632568,
                 "z": 0.0
             },
             "m_LocalScale": {
@@ -714,6 +786,10 @@
             "m_ID": 18,
             "m_Name": "Cube"
         },
+        "Mesh": {
+            "m_MeshType": "Cube",
+            "m_TextureName": "default"
+        },
         "Rigidbody": {
             "m_ComponentID": 53,
             "m_GameObject": 18
@@ -728,7 +804,7 @@
             },
             "m_LocalRotation": {
                 "x": 0.0,
-                "y": 3.940000057220459,
+                "y": 4.820000171661377,
                 "z": 0.0
             },
             "m_LocalScale": {
@@ -754,6 +830,10 @@
             "m_ID": 19,
             "m_Name": "Cube"
         },
+        "Mesh": {
+            "m_MeshType": "Cube",
+            "m_TextureName": "default"
+        },
         "Rigidbody": {
             "m_ComponentID": 56,
             "m_GameObject": 19
@@ -768,7 +848,7 @@
             },
             "m_LocalRotation": {
                 "x": 0.0,
-                "y": 5.880000114440918,
+                "y": 0.6000000238418579,
                 "z": 0.0
             },
             "m_LocalScale": {
@@ -794,6 +874,10 @@
             "m_ID": 20,
             "m_Name": "Cube"
         },
+        "Mesh": {
+            "m_MeshType": "Cube",
+            "m_TextureName": "default"
+        },
         "Rigidbody": {
             "m_ComponentID": 59,
             "m_GameObject": 20
@@ -808,7 +892,7 @@
             },
             "m_LocalRotation": {
                 "x": 0.0,
-                "y": 6.239999771118164,
+                "y": 0.11999999731779099,
                 "z": 0.0
             },
             "m_LocalScale": {
@@ -834,6 +918,10 @@
             "m_ID": 21,
             "m_Name": "Cube"
         },
+        "Mesh": {
+            "m_MeshType": "Cube",
+            "m_TextureName": "default"
+        },
         "Rigidbody": {
             "m_ComponentID": 62,
             "m_GameObject": 21
@@ -848,7 +936,7 @@
             },
             "m_LocalRotation": {
                 "x": 0.0,
-                "y": 1.9800000190734863,
+                "y": 5.329999923706055,
                 "z": 0.0
             },
             "m_LocalScale": {
@@ -874,6 +962,10 @@
             "m_ID": 22,
             "m_Name": "Cube"
         },
+        "Mesh": {
+            "m_MeshType": "Cube",
+            "m_TextureName": "default"
+        },
         "Rigidbody": {
             "m_ComponentID": 65,
             "m_GameObject": 22
@@ -888,7 +980,7 @@
             },
             "m_LocalRotation": {
                 "x": 0.0,
-                "y": 2.569999933242798,
+                "y": 0.8999999761581421,
                 "z": 0.0
             },
             "m_LocalScale": {
@@ -914,6 +1006,10 @@
             "m_ID": 23,
             "m_Name": "Cube"
         },
+        "Mesh": {
+            "m_MeshType": "Cube",
+            "m_TextureName": "default"
+        },
         "Rigidbody": {
             "m_ComponentID": 68,
             "m_GameObject": 23
@@ -928,7 +1024,7 @@
             },
             "m_LocalRotation": {
                 "x": 0.0,
-                "y": 3.059999942779541,
+                "y": 5.210000038146973,
                 "z": 0.0
             },
             "m_LocalScale": {
@@ -954,6 +1050,10 @@
             "m_ID": 24,
             "m_Name": "Cube"
         },
+        "Mesh": {
+            "m_MeshType": "Cube",
+            "m_TextureName": "default"
+        },
         "Rigidbody": {
             "m_ComponentID": 71,
             "m_GameObject": 24
@@ -968,7 +1068,7 @@
             },
             "m_LocalRotation": {
                 "x": 0.0,
-                "y": 3.2100000381469727,
+                "y": 4.889999866485596,
                 "z": 0.0
             },
             "m_LocalScale": {
@@ -994,6 +1094,10 @@
             "m_ID": 25,
             "m_Name": "Cube"
         },
+        "Mesh": {
+            "m_MeshType": "Cube",
+            "m_TextureName": "default"
+        },
         "Rigidbody": {
             "m_ComponentID": 74,
             "m_GameObject": 25
@@ -1008,7 +1112,7 @@
             },
             "m_LocalRotation": {
                 "x": 0.0,
-                "y": 4.880000114440918,
+                "y": 1.9800000190734863,
                 "z": 0.0
             },
             "m_LocalScale": {
@@ -1034,6 +1138,10 @@
             "m_ID": 26,
             "m_Name": "Cube"
         },
+        "Mesh": {
+            "m_MeshType": "Cube",
+            "m_TextureName": "default"
+        },
         "Rigidbody": {
             "m_ComponentID": 77,
             "m_GameObject": 26
@@ -1048,7 +1156,7 @@
             },
             "m_LocalRotation": {
                 "x": 0.0,
-                "y": 2.4600000381469727,
+                "y": 5.260000228881836,
                 "z": 0.0
             },
             "m_LocalScale": {
@@ -1074,6 +1182,10 @@
             "m_ID": 27,
             "m_Name": "Cube"
         },
+        "Mesh": {
+            "m_MeshType": "Cube",
+            "m_TextureName": "default"
+        },
         "Rigidbody": {
             "m_ComponentID": 80,
             "m_GameObject": 27
@@ -1088,7 +1200,7 @@
             },
             "m_LocalRotation": {
                 "x": 0.0,
-                "y": 0.30000001192092896,
+                "y": 2.559999942779541,
                 "z": 0.0
             },
             "m_LocalScale": {

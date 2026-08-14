@@ -3,6 +3,7 @@
 #include <DX3D/Core/Logger.h>
 #include <DX3D/Math/Rect.h>
 #include <DX3D/Math/Vec3.h>
+#include <DX3D/Math/Vec2.h>
 #include <vector>
 
 namespace dx3d
@@ -123,6 +124,8 @@ namespace dx3d
 	struct Vertex
 	{
 		Vec3 position;
+		Vec2 texcoord{};
+		Vec3 normal{};
 	};
 
 	struct MeshDesc

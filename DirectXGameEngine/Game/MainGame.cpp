@@ -19,6 +19,8 @@
 #include <DX3D/EventBroadcasting/EventBroadcastManager.h>
 #include <DX3D/EventBroadcasting/EventNames.h>
 
+#include <DX3D/Scene/SceneManager.h>
+
 #include <filesystem>
 
 MainGame::MainGame(const dx3d::GameDesc& desc) : dx3d::Game(desc)
@@ -73,12 +75,22 @@ void MainGame::onCreate()
 {
 	Game::onCreate();
 	auto& world = getWorld();
+
+	// Loading texture resources
 	std::filesystem::path base = std::filesystem::current_path().parent_path();
 	auto woodTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base/"DirectXGameEngine/Game/Assets/Textures/wood.jpg").c_str());
 	auto floorTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base / "DirectXGameEngine/Game/Assets/Textures/floor.jpg").c_str());
 	auto brickTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base / "DirectXGameEngine/Game/Assets/Textures/brick.png").c_str());
 
 	auto logo = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base / "DirectXGameEngine/Game/Assets/Textures/dlsuLogo.png").c_str());
+
+	// SCene initialize
+	auto& manager = dx3d::SceneManager::getInstance();
+	if (!manager.getActiveScene()) {
+		// create or set a scene before using
+		manager.createScene(0);
+		manager.setActiveScene(0);
+	}
 
 	// UI initilization
 	std::unique_ptr<dx3d::SceneUI> scene_UI = std::make_unique<dx3d::SceneUI>(dx3d::BaseDesc{ getLogger() });

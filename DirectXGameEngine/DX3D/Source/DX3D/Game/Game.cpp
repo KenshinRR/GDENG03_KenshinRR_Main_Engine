@@ -154,5 +154,5 @@ void dx3d::Game::onInternalUpdate()
 	onDrawUi();
 	ImGui::Render();
 
-	m_worldRenderer->render(*m_world, m_display->getSwapChain(), deltaTime, ImGui::GetDrawData(), m_display.get());
+	m_worldRenderer->render(m_display->getSwapChain(), deltaTime, ImGui::GetDrawData(), m_display.get());
 }

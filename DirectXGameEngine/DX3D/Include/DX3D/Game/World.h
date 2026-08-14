@@ -2,78 +2,66 @@
 #include <DX3D/Core/Common.h>
 #include <DX3D/Core/Base.h>
 #include <DX3D/Core/Identifiable.h>
+#include <DX3D/Scene/Scene.h>
 #include <unordered_map>
 #include <vector>
 
-
 namespace dx3d
 {
-	class World final : public Base
-	{
-	public:
-		explicit World(const WorldDesc& desc);
+    class World final : public Base
+    {
+    public:
+        explicit World(const WorldDesc& desc);
 
-		template <typename T>
-		T* createGameObject() requires IsRegistered<GameObject, T>
-		{
-			static_assert(std::is_base_of<GameObject, T>::value, "T must inherit from dx3d::GameObject.");
-			static_assert(HasTypeId<T>, "T needs a unique TypeId. Make sure you added dx3d_typeid and applied it to the correct class.");
-			UniquePtr<GameObject> e = std::make_unique<T>(GameObjectDesc{
-				{m_logger},
-				m_gameContext,
-				*this
-				});
-			return static_cast<T*>(createGameObjectInternal(e));
-		}
+        template <typename T>
+        T* createGameObject() requires IsRegistered<GameObject, T>
+        {
+            static_assert(std::is_base_of<GameObject, T>::value, "T must inherit from dx3d::GameObject.");
+            static_assert(HasTypeId<T>, "T needs a unique TypeId.");
+            UniquePtr<GameObject> e = std::make_unique<T>(GameObjectDesc{
+                {m_logger},
+                m_gameContext,
+                *this
+                });
+            return static_cast<T*>(createGameObjectInternal(e));
+        }
 
-		template <typename T> requires IsRegistered<Component, T>
-		T* const* getComponents(ui32& numComponents) const noexcept
-		{
-			return reinterpret_cast<T* const*>(getComponentsInternal(T::GetTypeId(), &numComponents));
-		}
+        template <typename T> requires IsRegistered<Component, T>
+        T* const* getComponents(ui32& numComponents) const noexcept
+        {
+            return reinterpret_cast<T* const*>(m_scene.getComponentsInternal(T::GetTypeId(), &numComponents));
+        }
 
-		void onStart();
-		void update(f32 deltaTime);
-		void onEnd();
+        void onStart();
+        void update(f32 deltaTime);
+        void onEnd();
 
-		const std::unordered_map<size_t, std::vector<UniquePtr<GameObject>>>& getGameObjectList();
+        const std::unordered_map<size_t, std::vector<UniquePtr<GameObject>>>& getGameObjectList();
 
-		GameObject* AddEmptyGameObject();
-		GameObject* Add3DModelGameObject(std::string key);
+        GameObject* AddEmptyGameObject();
+        GameObject* Add3DModelGameObject(std::string key);
 
-	private:
-		GameObject* createGameObjectInternal(UniquePtr<GameObject>& object);
-		void addComponentInternal(Component& component);
-		void addDirtyTransformInternal(TransformComponent& component);
+    private:
+        GameObject* createGameObjectInternal(UniquePtr<GameObject>& object);
 
-		Component* const* getComponentsInternal(size_t typeId, ui32* numComponents) const noexcept;
-	private:
-		enum class EventType
-		{
-			Create = 0
-		};
-		struct GameObjectEvent
-		{
-			GameObject* object{};
-			// size_t pendingObjectIndex{};
-			EventType eventType{};
-		};
+        void addDirtyTransformInternal(TransformComponent& component);
 
-	private:
-		GameContext m_gameContext;
+        enum class EventType { Create = 0 };
+        struct GameObjectEvent
+        {
+            GameObject* object{};
+            EventType eventType{};
+        };
 
-		std::unordered_map<size_t, std::vector<UniquePtr<GameObject>>> m_objects{};
-		std::unordered_map<size_t, std::vector<Component*>> m_components{};
+    private:
+        GameContext m_gameContext;
+        Scene m_scene;
 
-		std::vector<TransformComponent*> m_dirtyTransforms{};
+        std::vector<TransformComponent*> m_dirtyTransforms{};
+        std::vector<GameObjectEvent> m_events{};
+        std::vector<GameObjectEvent> m_eventsSwapBuffer{};
 
-		std::vector<UniquePtr<GameObject>> m_pendingObjects;
-		std::vector<UniquePtr<GameObject>> m_pendingObjectsSwapBuffer;
-
-		std::vector<GameObjectEvent> m_events{};
-		std::vector<GameObjectEvent> m_eventsSwapBuffer{};
-
-		friend class GameObject;
-		friend class TransformComponent;
-	};
+        friend class GameObject;
+        friend class TransformComponent;
+    };
 }

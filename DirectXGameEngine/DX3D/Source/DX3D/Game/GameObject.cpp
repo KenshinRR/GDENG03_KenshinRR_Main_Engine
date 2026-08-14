@@ -2,6 +2,7 @@
 #include<DX3D/Game/Component.h>
 #include<DX3D/Component/TransformComponent.h>
 #include<DX3D/Game/World.h>
+#include <DX3D/Scene/SceneManager.h>
 
 dx3d::GameObject::GameObject(const GameObjectDesc& desc) : 
 	Identifiable(desc.base),
@@ -23,7 +24,7 @@ dx3d::Component* dx3d::GameObject::createComponentInternal(UniquePtr<Component>&
 	auto ptr = component.get();
 	if (m_components.find(typeId) != m_components.end()) return {};
 	m_components.emplace(typeId, std::move(component));
-	m_world.addComponentInternal(*ptr);
+	SceneManager::getInstance().getActiveScene()->addComponent(*ptr);
 	return ptr;
 }
 

@@ -206,6 +206,8 @@
     <ClCompile Include="DX3D\Source\DX3D\Physics\PhysicsManager.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\UI\SceneStateUI.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Component\RigidBodyComponent.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Scene\Scene.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Scene\SceneManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX3D\Include\DX3D\EventBroadcasting\EventNames.h" />
@@ -278,6 +280,8 @@
     <ClInclude Include="DX3D\Include\DX3D\Physics\PhysicsManager.h" />
     <ClInclude Include="DX3D\Include\DX3D\UI\SceneStateUI.h" />
     <ClInclude Include="DX3D\Include\DX3D\Component\RigidBodyComponent.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Scene\Scene.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Scene\SceneManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

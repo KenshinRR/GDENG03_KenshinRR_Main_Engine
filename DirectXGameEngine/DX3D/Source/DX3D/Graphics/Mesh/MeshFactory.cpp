@@ -159,8 +159,64 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCapsuleMesh(f32 radius, f32 he
         }
     }
 
-    // Indices (same as your original, unchanged)
-    // ... reuse your existing index generation code here ...
+    // Indices for cylinder
+    ui32 cylStart = (rings + 1) * (segments + 1);
+    for (ui32 j = 0; j < segments; ++j)
+    {
+        ui32 k1 = cylStart + j;
+        ui32 k2 = k1 + (segments + 1);
+
+        indices.push_back(k1);
+        indices.push_back(k2);
+        indices.push_back(k1 + 1);
+
+        indices.push_back(k1 + 1);
+        indices.push_back(k2);
+        indices.push_back(k2 + 1);
+    }
+
+    // Indices for top hemisphere (reversed winding)
+    for (ui32 i = 0; i < rings; ++i)
+    {
+        ui32 k1 = i * (segments + 1);
+        ui32 k2 = k1 + segments + 1;
+
+        for (ui32 j = 0; j < segments; ++j)
+        {
+            indices.push_back(k1);
+            indices.push_back(k1 + 1);
+            indices.push_back(k2);
+
+            indices.push_back(k1 + 1);
+            indices.push_back(k2 + 1);
+            indices.push_back(k2);
+
+            k1++;
+            k2++;
+        }
+    }
+
+    // Indices for bottom hemisphere
+    ui32 bottomStart = cylStart + 2 * (segments + 1);
+    for (ui32 i = 0; i < rings; ++i)
+    {
+        ui32 k1 = bottomStart + i * (segments + 1);
+        ui32 k2 = k1 + segments + 1;
+
+        for (ui32 j = 0; j < segments; ++j)
+        {
+            indices.push_back(k1);
+            indices.push_back(k2);
+            indices.push_back(k1 + 1);
+
+            indices.push_back(k1 + 1);
+            indices.push_back(k2);
+            indices.push_back(k2 + 1);
+
+            k1++;
+            k2++;
+        }
+    }
 
     return m_context.graphicsDevice.createMesh({ vertices, indices });
 }
@@ -214,8 +270,66 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCylinderMesh(f32 radius, f32 h
         vertices.push_back({ {x, -halfHeight, z}, uvBottom, normal });
     }
 
-    // Indices (same as your original, unchanged)
-    // ... reuse your existing index generation code here ...
+    // Top cap (outward)
+    for (ui32 i = 1; i < segments; ++i)
+    {
+        indices.push_back(0);
+        indices.push_back(i);
+        indices.push_back(i + 1);
+    }
+    indices.push_back(0);
+    indices.push_back(segments);
+    indices.push_back(1);
+
+    // Top cap (inward, reversed winding)
+    for (ui32 i = 1; i < segments; ++i)
+    {
+        indices.push_back(0);
+        indices.push_back(i + 1);
+        indices.push_back(i);
+    }
+    indices.push_back(0);
+    indices.push_back(1);
+    indices.push_back(segments);
+
+    // Bottom cap (outward)
+    for (ui32 i = 1; i < segments; ++i)
+    {
+        indices.push_back(bottomCenterIdx);
+        indices.push_back(bottomCenterIdx + i);
+        indices.push_back(bottomCenterIdx + i + 1);
+    }
+    indices.push_back(bottomCenterIdx);
+    indices.push_back(bottomCenterIdx + segments);
+    indices.push_back(bottomCenterIdx + 1);
+
+    // Bottom cap (inward, reversed winding)
+    for (ui32 i = 1; i < segments; ++i)
+    {
+        indices.push_back(bottomCenterIdx);
+        indices.push_back(bottomCenterIdx + i + 1);
+        indices.push_back(bottomCenterIdx + i);
+    }
+    indices.push_back(bottomCenterIdx);
+    indices.push_back(bottomCenterIdx + 1);
+    indices.push_back(bottomCenterIdx + segments);
+
+    // Side faces
+    for (ui32 i = 0; i < segments; ++i)
+    {
+        ui32 top1 = sideStartIdx + i * 2;
+        ui32 bottom1 = top1 + 1;
+        ui32 top2 = sideStartIdx + ((i + 1) % segments) * 2;
+        ui32 bottom2 = top2 + 1;
+
+        indices.push_back(top1);
+        indices.push_back(bottom1);
+        indices.push_back(top2);
+
+        indices.push_back(top2);
+        indices.push_back(bottom1);
+        indices.push_back(bottom2);
+    }
 
     return m_context.graphicsDevice.createMesh({ vertices, indices });
 }

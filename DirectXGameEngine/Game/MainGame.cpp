@@ -116,8 +116,8 @@ void MainGame::onCreate()
 	dx3d::ImportedMeshContainer::getInstance().addMesh("Teapot", teapotMesh);
 	auto bunnyMesh = getResourceManager().createResourceFromFile<dx3d::MeshResource>((base / "DirectXGameEngine/Game/Assets/3D Objects/bunny.obj").c_str());
 	dx3d::ImportedMeshContainer::getInstance().addMesh("Bunny", bunnyMesh);
-	auto armadilloMesh = getResourceManager().createResourceFromFile<dx3d::MeshResource>((base / "DirectXGameEngine/Game/Assets/3D Objects/armadillo.obj").c_str());
-	dx3d::ImportedMeshContainer::getInstance().addMesh("Armadillo", armadilloMesh);
+	// auto armadilloMesh = getResourceManager().createResourceFromFile<dx3d::MeshResource>((base / "DirectXGameEngine/Game/Assets/3D Objects/armadillo.obj").c_str());
+	// dx3d::ImportedMeshContainer::getInstance().addMesh("Armadillo", armadilloMesh);
 
 	//// Create a floor with plane
 	//auto floor = world.createGameObject<dx3d::GameObject>();
@@ -128,6 +128,25 @@ void MainGame::onCreate()
 
 	auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base / "DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
 	dx3d::ImportedMaterialContainer::getInstance().addMaterial("Basic", basicMat);
+
+	// Creating cylinder
+	{
+		auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base / "DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
+		if (basicMat)
+		{
+			auto matData = dx3d::Vec3(1, 1, 1);
+			basicMat->setData(std::as_bytes(std::span{ &matData, 1 }));
+			basicMat->setTexture(0, brickTex);
+		}
+
+		auto cylinderObj = world.createGameObject<dx3d::GameObject>();
+		// cylinderObj->setName("Cylinder");
+		auto cylinderObjMeshComponent = cylinderObj->createOrGetComponent<dx3d::MeshComponent>();
+		cylinderObjMeshComponent->setMaterial(basicMat);
+		cylinderObjMeshComponent->setMesh(cylinderMesh);
+		cylinderObj->getTransform().setPosition({ 0.0f, 1.0f, 0.0f });
+		cylinderObj->getTransform().setRotation({ 0.0f, 0.0f, 0.0f });
+	}
 
 	// Create a teapot
 	{
@@ -208,7 +227,7 @@ void MainGame::onCreate()
 	}
 
 	auto player = world.createGameObject<Player>();
-	player->getTransform().setPosition({ 0, 1, -2 });
+	player->getTransform().setPosition({ 0, 3, -5 });
 
 	getInputSystem().setCursorLocked(false);
 	getInputSystem().setCursorVisible(true);

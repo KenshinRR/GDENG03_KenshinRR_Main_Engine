@@ -29,8 +29,15 @@ namespace dx3d
         // Internal lookup
         Component* const* getComponentsInternal(size_t typeId, ui32* numComponents) const noexcept;
 
+        void setID(size_t id) { m_ID = id; }
+        size_t getID() { return m_ID; }
+
     private:
         std::unordered_map<size_t, std::vector<UniquePtr<GameObject>>> m_objects{};
         std::unordered_map<size_t, std::vector<Component*>> m_components{};
+        size_t m_ID{};
+
+        size_t m_nextGameObjectId{ 0 };
+        size_t m_nextComponenttId{ 0 };
     };
 }

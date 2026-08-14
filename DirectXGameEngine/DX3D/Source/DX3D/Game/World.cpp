@@ -78,7 +78,7 @@ void dx3d::World::onEnd()
 
 const std::unordered_map<size_t, std::vector<dx3d::UniquePtr<dx3d::GameObject>>>& dx3d::World::getGameObjectList()
 {
-    return m_scene.getObjects();
+    return SceneManager::getInstance().getActiveScene()->getObjects();
 }
 
 dx3d::GameObject* dx3d::World::AddEmptyGameObject()
@@ -106,9 +106,11 @@ dx3d::GameObject* dx3d::World::Add3DModelGameObject(std::string key)
 
 dx3d::GameObject* dx3d::World::createGameObjectInternal(UniquePtr<GameObject>& object)
 {
-    auto ptr = m_scene.addObject(std::move(object));
+    auto ptr = SceneManager::getInstance().getActiveScene()->addObject(std::move(object));
     if (ptr)
+    {
         m_events.push_back({ ptr, EventType::Create });
+    }
     return ptr;
 }
 

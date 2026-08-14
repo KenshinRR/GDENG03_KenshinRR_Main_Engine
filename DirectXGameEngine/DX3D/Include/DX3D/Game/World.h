@@ -3,6 +3,7 @@
 #include <DX3D/Core/Base.h>
 #include <DX3D/Core/Identifiable.h>
 #include <DX3D/Scene/Scene.h>
+#include <DX3D/Scene/SceneManager.h>
 #include <unordered_map>
 #include <vector>
 
@@ -29,7 +30,7 @@ namespace dx3d
         template <typename T> requires IsRegistered<Component, T>
         T* const* getComponents(ui32& numComponents) const noexcept
         {
-            return reinterpret_cast<T* const*>(m_scene.getComponentsInternal(T::GetTypeId(), &numComponents));
+            return reinterpret_cast<T* const*>(SceneManager::getInstance().getActiveScene()->getComponentsInternal(T::GetTypeId(), &numComponents));
         }
 
         void onStart();
@@ -55,7 +56,6 @@ namespace dx3d
 
     private:
         GameContext m_gameContext;
-        Scene m_scene;
 
         std::vector<TransformComponent*> m_dirtyTransforms{};
         std::vector<GameObjectEvent> m_events{};

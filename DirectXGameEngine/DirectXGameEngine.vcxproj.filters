@@ -404,6 +404,9 @@
     <ClInclude Include="DX3D\Include\DX3D\Scene\SceneManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="json.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="DX3D\Configs\shadertoolsconfig.json" />

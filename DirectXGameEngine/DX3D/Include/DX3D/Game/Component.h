@@ -12,9 +12,13 @@ namespace dx3d
 		explicit Component(const ComponentDesc& desc);
 		GameObject& getGameObject() noexcept;
 
+		void setID(size_t id) { m_ID = id; }
+		size_t getID() { return m_ID; }
+
 	protected:
 		GameObject& m_object;
 		World& m_world;
 		GameContext& m_context;
+		size_t m_ID{};
 	};
 }

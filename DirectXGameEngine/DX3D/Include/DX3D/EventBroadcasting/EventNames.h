@@ -20,5 +20,7 @@ namespace dx3d
 		inline static const std::string ON_SCENE_FRAMESTEP = "ON_SCENE_FRAMESTEP";
 
 		inline static const std::string ACTIVITY_SPAWN20CUBES = "ACTIVITY_SPAWN20CUBES";
+
+		inline static const std::string ON_SCENE_SAVE = "ON_SCENE_SAVE";
 	};
 }

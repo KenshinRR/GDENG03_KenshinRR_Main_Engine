@@ -25,6 +25,10 @@ void dx3d::MainMenuBarUI::draw()
 			{
 				EventBroadcastManager::getInstance().postEvent(EventNames::ON_COLORPICKER_POPUP);
 			}
+			if (ImGui::MenuItem("Save Scene"))
+			{
+				EventBroadcastManager::getInstance().postEvent(EventNames::ON_SCENE_SAVE);
+			}
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("About"))

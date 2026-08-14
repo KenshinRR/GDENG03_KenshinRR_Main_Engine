@@ -7,6 +7,7 @@ dx3d::GameObject* dx3d::Scene::addObject(UniquePtr<GameObject> object)
     if (!object) return {};
 
     auto ptr = object.get();
+    ptr->setID(m_nextGameObjectId++);
     auto typeId = ptr->getTypeId();
 
     m_objects[typeId].push_back(std::move(object));
@@ -16,6 +17,7 @@ dx3d::GameObject* dx3d::Scene::addObject(UniquePtr<GameObject> object)
 void dx3d::Scene::addComponent(Component& component)
 {
     auto typeId = component.getTypeId();
+    component.setID(m_nextComponenttId++);
     m_components[typeId].push_back(&component);
 }
 
